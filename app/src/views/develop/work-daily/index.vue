@@ -106,16 +106,17 @@
             @click="openEdit(null)">添加
           </el-button>
         </template>
-        <!-- 平台列 -->
-        <template slot="platform" slot-scope="{row}">
-          {{ row.platform ? row.platform.name : '' }}
-        </template>
-        <!-- 内容列 -->
+        <!-- 内容列（按平台展示，每个平台标题 + HTML 截断预览，鼠标悬停显示完整） -->
         <template slot="content" slot-scope="{row}">
-          <el-popover placement="top" width="420" trigger="hover">
-            <div style="white-space: pre-wrap">{{ row.content }}</div>
-            <span slot="reference" class="text-ellipsis">{{ row.content }}</span>
-          </el-popover>
+          <div>
+            <div v-for="(p, idx) in (row.content && row.content.platforms ? row.content.platforms : [])" :key="idx" style="margin-bottom:8px">
+              <div style="font-weight:600">{{ p.platform_name || findPlatformName(p.platform_id) }}</div>
+              <el-popover placement="top" width="520" trigger="hover">
+                <div style="max-height:400px; overflow:auto" v-html="renderMarkdown(p.content)"></div>
+                <div slot="reference" v-html="truncateHtml(p.content, 200)"></div>
+              </el-popover>
+            </div>
+          </div>
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
@@ -184,19 +185,11 @@ export default {
           width: 120
         },
         {
-          prop: 'platform',
-          label: '平台',
-          align: 'center',
-          showOverflowTooltip: true,
-          minWidth: 120,
-          slot: 'platform'
-        },
-        {
           prop: 'content',
           label: '内容',
-          align: 'center',
+          align: 'left',
           showOverflowTooltip: true,
-          minWidth: 260,
+          minWidth: 320,
           slot: 'content'
         },
         {
@@ -288,6 +281,35 @@ export default {
       }).catch(() => {
         this.platforms = [];
       });
+    },
+    findPlatformName(id) {
+      const p = this.platforms.find(x => x.id === id);
+      return p ? p.name : '';
+    },
+    // crude markdown -> HTML renderer using existing mavon if available, or simple escape
+    renderMarkdown(md) {
+      try {
+        // mavon editor provides global converter in some setups; fallback to simple replace
+        if (window.marked) {
+          return window.marked(md || '');
+        }
+        return (md || '').replace(/\n/g, '<br/>');
+      } catch (e) {
+        return (md || '').replace(/\n/g, '<br/>');
+      }
+    },
+    truncateHtml(md, len) {
+      // convert to plain text then truncate, but return as HTML-escaped text
+      const tmp = document.createElement('div');
+      tmp.innerHTML = this.renderMarkdown(md || '');
+      const text = tmp.textContent || tmp.innerText || '';
+      if (text.length <= len) {
+        return this.renderMarkdown(md || '');
+      }
+      const sub = text.slice(0, len) + '...';
+      // escape and wrap in <div>
+      const esc = sub.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return '<div>' + esc + '</div>';
     },
     exportReport() {
       if (this.reportType === 'month') {
