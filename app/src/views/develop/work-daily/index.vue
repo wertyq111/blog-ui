@@ -45,29 +45,45 @@
       <el-form class="ele-form-search" label-width="77px">
         <el-row :gutter="15">
           <el-col :lg="6" :md="12">
-            <el-form-item label="月报:">
+            <el-form-item label="报表类型:">
+              <el-select v-model="reportType" placeholder="请选择报表类型" style="width: 100%">
+                <el-option label="月报" value="month"/>
+                <el-option label="周报" value="week"/>
+                <el-option label="年报" value="year"/>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="reportType==='month'" :lg="6" :md="12">
+            <el-form-item label="月份:">
               <el-date-picker v-model="reportMonth" type="month" placeholder="选择月份" style="width: 100%"/>
             </el-form-item>
           </el-col>
-          <el-col :lg="2" :md="4">
-            <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportMonth">导出</el-button>
-          </el-col>
-          <el-col :lg="8" :md="12">
-            <el-form-item label="周报:">
+          <el-col v-if="reportType==='week'" :lg="8" :md="12">
+            <el-form-item label="日期范围:">
               <el-date-picker v-model="reportRange" type="daterange" range-separator="至"
                               start-placeholder="开始日期" end-placeholder="结束日期" style="width: 100%"/>
             </el-form-item>
           </el-col>
-          <el-col :lg="2" :md="4">
-            <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportWeek">导出</el-button>
-          </el-col>
-          <el-col :lg="6" :md="12">
-            <el-form-item label="年报:">
+          <el-col v-if="reportType==='year'" :lg="6" :md="12">
+            <el-form-item label="年份:">
               <el-date-picker v-model="reportYear" type="year" placeholder="选择年份" style="width: 100%"/>
             </el-form-item>
           </el-col>
           <el-col :lg="2" :md="4">
-            <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportYear">导出</el-button>
+            <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportReport">导出</el-button>
+          </el-col>
+          <el-col :lg="4" :md="8">
+            <el-form-item label="导入年份:">
+              <el-date-picker v-model="importYear" type="year" placeholder="选择年份" style="width: 100%"/>
+            </el-form-item>
+          </el-col>
+          <el-col :lg="4" :md="8">
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleImport"
+              accept=".md,.markdown">
+              <el-button type="primary" class="ele-btn-icon" icon="el-icon-upload2">导入Markdown</el-button>
+            </el-upload>
           </el-col>
         </el-row>
       </el-form>
@@ -222,9 +238,11 @@ export default {
       platforms: [],
       current: null,
       showEdit: false,
+      reportType: 'month',
       reportMonth: null,
       reportRange: [],
-      reportYear: null
+      reportYear: null,
+      importYear: new Date()
     };
   },
   created() {
@@ -271,30 +289,56 @@ export default {
         this.platforms = [];
       });
     },
-    exportMonth() {
-      if (!this.reportMonth) {
-        this.$message.error('请选择月份');
+    exportReport() {
+      if (this.reportType === 'month') {
+        if (!this.reportMonth) {
+          this.$message.error('请选择月份');
+          return;
+        }
+        const month = this.formatMonth(this.reportMonth);
+        this.downloadReport('/work-daily/report/month', {month}, `牛马日常月报-${month}.md`);
         return;
       }
-      const month = this.formatMonth(this.reportMonth);
-      this.downloadReport('/work-daily/report/month', {month}, `牛马日常月报-${month}.md`);
+      if (this.reportType === 'week') {
+        if (!this.reportRange || this.reportRange.length < 2) {
+          this.$message.error('请选择日期范围');
+          return;
+        }
+        const start = this.formatDate(this.reportRange[0]);
+        const end = this.formatDate(this.reportRange[1]);
+        this.downloadReport('/work-daily/report/week', {start_date: start, end_date: end}, `牛马日常周报-${start}-${end}.md`);
+        return;
+      }
+      if (this.reportType === 'year') {
+        if (!this.reportYear) {
+          this.$message.error('请选择年份');
+          return;
+        }
+        const year = this.formatYear(this.reportYear);
+        this.downloadReport('/work-daily/report/year', {year}, `牛马日常年报-${year}.md`);
+      }
     },
-    exportWeek() {
-      if (!this.reportRange || this.reportRange.length < 2) {
-        this.$message.error('请选择日期范围');
-        return;
+    handleImport(request) {
+      const formData = new FormData();
+      formData.append('file', request.file);
+      if (this.importYear) {
+        formData.append('year', this.formatYear(this.importYear));
       }
-      const start = this.formatDate(this.reportRange[0]);
-      const end = this.formatDate(this.reportRange[1]);
-      this.downloadReport('/work-daily/report/week', {start_date: start, end_date: end}, `牛马日常周报-${start}-${end}.md`);
-    },
-    exportYear() {
-      if (!this.reportYear) {
-        this.$message.error('请选择年份');
-        return;
-      }
-      const year = this.formatYear(this.reportYear);
-      this.downloadReport('/work-daily/report/year', {year}, `牛马日常年报-${year}.md`);
+      this.$http.post('/work-daily/import', formData, {
+        headers: {'Content-Type': 'multipart/form-data'}
+      }).then(res => {
+        if (res.data.code === 0) {
+          this.$message.success(`导入成功，共 ${res.data.data.count || 0} 条`);
+          this.reload();
+          request.onSuccess && request.onSuccess(res.data);
+        } else {
+          this.$message.error(res.data.msg || '导入失败');
+          request.onError && request.onError(res.data);
+        }
+      }).catch(e => {
+        this.$message.error(e.message || '导入失败');
+        request.onError && request.onError(e);
+      });
     },
     downloadReport(url, params, filename) {
       this.$http.get(url, {params, responseType: 'blob'}).then(res => {
