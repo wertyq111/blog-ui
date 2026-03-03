@@ -20,7 +20,7 @@
           </el-form-item>
         </el-col>
         <el-col :sm="12">
-          <el-form-item label="平台:" prop="platforms">
+          <el-form-item label="平台:" prop="platformIds">
             <el-select v-model="form.platformIds" multiple placeholder="请选择平台" style="width: 100%">
               <el-option v-for="item in platforms" :key="item.id" :label="item.name" :value="item.id"/>
             </el-select>
@@ -29,7 +29,7 @@
       </el-row>
       <el-row :gutter="15">
         <el-col :sm="24">
-          <el-form-item label="各平台内容:" prop="platforms">
+          <el-form-item label="各平台内容:" prop="platformContents">
             <div v-for="pid in form.platformIds" :key="pid" style="margin-bottom: 16px; border:1px solid #ebeef5; padding:10px; border-radius:4px">
               <div style="font-weight:600; margin-bottom:8px">{{ findPlatformName(pid) || pid }}</div>
               <mavon-editor v-model="form.platformContents[pid]" :toolbarsFlag="true" :subfield="true" />
@@ -71,7 +71,24 @@ export default {
       form: Object.assign({}, this.data),
       rules: {
         logDate: [{required: true, message: '请选择日期', trigger: 'change'}],
-        platforms: [{required: true, message: '请选择并填写平台内容', trigger: 'change'}]
+        platformIds: [{required: true, message: '请选择平台', trigger: 'change'}],
+        platformContents: [
+          {
+            validator: (rule, value, callback) => {
+              const ids = this.form.platformIds || [];
+              const contents = this.form.platformContents || {};
+              if (!ids.length) {
+                return callback(new Error('请选择并填写平台内容'));
+              }
+              const missing = ids.filter(id => !contents[id] || !contents[id].trim());
+              if (missing.length) {
+                return callback(new Error('请填写已选择平台的内容'));
+              }
+              callback();
+            },
+            trigger: 'blur'
+          }
+        ]
       },
       loading: false,
       isUpdate: false,
@@ -102,6 +119,16 @@ export default {
         this.form = {logDate: '', platformIds: [], platformContents: {}, customPlatformName: '', customPlatformContent: ''};
         this.isUpdate = false;
       }
+    },
+    'form.platformIds'(val) {
+      if (!this.form.platformContents) {
+        this.$set(this.form, 'platformContents', {});
+      }
+      (val || []).forEach(id => {
+        if (this.form.platformContents[id] === undefined) {
+          this.$set(this.form.platformContents, id, '');
+        }
+      });
     }
   },
   methods: {
