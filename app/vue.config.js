@@ -22,7 +22,7 @@ module.exports = {
     historyApiFallback: true,
     host: '0.0.0.0',
     port: 8080,
-    allowedHosts: 'all',
+    allowedHosts: ['all'],
     sockHost: '192.168.128.2',
     sockPort: 8080,
     sockPath: '/sockjs-node',
