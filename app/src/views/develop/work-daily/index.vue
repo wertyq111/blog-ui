@@ -27,6 +27,15 @@
                 style="width: 100%" />
             </el-form-item>
           </el-col>
+          <el-col :lg="10" :md="12">
+            <el-form-item label="内容搜索:">
+              <el-input
+                v-model="where.content"
+                placeholder="请输入关键字"
+                @keyup.enter.native="reload">
+              </el-input>
+            </el-form-item>
+          </el-col>
           <el-col :lg="8" :md="12">
             <div class="ele-form-actions">
               <el-button
@@ -41,6 +50,53 @@
         </el-row>
       </el-form>
 
+      <!-- 报表导出 -->
+      <el-form class="ele-form-search" label-width="77px">
+        <el-row :gutter="15">
+          <el-col :lg="6" :md="12">
+            <el-form-item label="报表类型:">
+              <el-select v-model="reportType" placeholder="请选择报表类型" style="width: 100%">
+                <el-option label="月报" value="month"/>
+                <el-option label="周报" value="week"/>
+                <el-option label="年报" value="year"/>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="reportType==='month'" :lg="6" :md="12">
+            <el-form-item label="月份:">
+              <el-date-picker v-model="reportMonth" type="month" placeholder="选择月份" style="width: 100%"/>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="reportType==='week'" :lg="8" :md="12">
+            <el-form-item label="日期范围:">
+              <el-date-picker v-model="reportRange" type="daterange" range-separator="至"
+                              start-placeholder="开始日期" end-placeholder="结束日期" style="width: 100%"/>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="reportType==='year'" :lg="6" :md="12">
+            <el-form-item label="年份:">
+              <el-date-picker v-model="reportYear" type="year" placeholder="选择年份" style="width: 100%"/>
+            </el-form-item>
+          </el-col>
+          <el-col :lg="2" :md="4">
+            <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportReport">导出</el-button>
+          </el-col>
+          <el-col :lg="4" :md="8">
+            <el-form-item label="导入年份:">
+              <el-date-picker v-model="importYear" type="year" placeholder="选择年份" style="width: 100%"/>
+            </el-form-item>
+          </el-col>
+          <el-col :lg="4" :md="8">
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleImport"
+              accept=".md,.markdown">
+              <el-button type="primary" class="ele-btn-icon" icon="el-icon-upload2">导入Markdown</el-button>
+            </el-upload>
+          </el-col>
+        </el-row>
+      </el-form>
+
       <!-- 数据表格 -->
       <ele-pro-table
         ref="table"
@@ -48,6 +104,17 @@
         :datasource="url"
         :where="where"
         height="calc(100vh - 420px)">
+        <!-- 表头工具栏 -->
+        <template slot="toolbar">
+          <el-button
+            v-if="canOperate"
+            class="ele-btn-icon"
+            icon="el-icon-plus"
+            size="small"
+            type="primary"
+            @click="openEdit(null)">添加
+          </el-button>
+        </template>
         <!-- 内容列 -->
         <template slot="content" slot-scope="{ row }">
           <div>
@@ -172,6 +239,7 @@ export default {
         platform_id: null,
         start_date: null,
         end_date: null,
+        content: "",
       },
       dateRange: [],
       platforms: [],
@@ -200,7 +268,7 @@ export default {
       this.$refs.table.reload({ where: this.where });
     },
     reset() {
-      this.where = { platform_id: null, start_date: null, end_date: null };
+      this.where = { platform_id: null, start_date: null, end_date: null, content: "" };
       this.dateRange = [];
       this.reload();
     },
