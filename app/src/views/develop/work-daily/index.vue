@@ -135,7 +135,6 @@ export default {
           prop: "content",
           label: "内容",
           align: "left",
-          showOverflowTooltip: true,
           minWidth: 320,
           slot: "content",
         },
