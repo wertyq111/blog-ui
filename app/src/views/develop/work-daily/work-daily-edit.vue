@@ -31,7 +31,7 @@
         <el-col :sm="24">
           <el-form-item label="各平台内容:" prop="platforms">
             <div v-for="pid in form.platformIds" :key="pid" style="margin-bottom: 16px; border:1px solid #ebeef5; padding:10px; border-radius:4px">
-              <div style="font-weight:600; margin-bottom:8px">{{ findPlatformName(pid) }}</div>
+              <div style="font-weight:600; margin-bottom:8px">{{ findPlatformName(pid) || pid }}</div>
               <mavon-editor v-model="form.platformContents[pid]" :toolbarsFlag="true" :subfield="true" />
             </div>
             <el-input v-if="allowCustom" v-model="form.customPlatformName" placeholder="新增临时平台名（可选）" style="margin-top:8px;"/>
@@ -60,6 +60,10 @@ export default {
     platforms: {
       type: Array,
       default: () => []
+    },
+    findPlatformName: {
+      type: Function,
+      default: () => ''
     }
   },
   data() {
@@ -83,11 +87,11 @@ export default {
         init.platformContents = {};
         if (init.content && init.content.platforms) {
           init.content.platforms.forEach(p => {
-            if (p.platform_id) {
-              init.platformIds.push(p.platform_id);
-              init.platformContents[p.platform_id] = p.content;
-            } else if (p.platform_name) {
-              init.customPlatformName = p.platform_name;
+            if (p.platformId) {
+              init.platformIds.push(p.platformId);
+              init.platformContents[p.platformId] = p.content;
+            } else if (p.platformName) {
+              init.customPlatformName = p.platformName;
               init.customPlatformContent = p.content;
             }
           });
@@ -112,10 +116,10 @@ export default {
 
           const platforms = [];
           (this.form.platformIds || []).forEach(pid => {
-            platforms.push({platform_id: pid, content: this.form.platformContents[pid] || ''});
+            platforms.push({platformId: pid, content: this.form.platformContents[pid] || ''});
           });
           if (this.form.customPlatformName) {
-            platforms.push({platform_id: null, platform_name: this.form.customPlatformName, content: this.form.customPlatformContent || ''});
+            platforms.push({platformId: null, platformName: this.form.customPlatformName, content: this.form.customPlatformContent || ''});
           }
 
           const payload = {

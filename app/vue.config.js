@@ -20,18 +20,21 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
-    allowedHosts: [
-      '.chouy.xyz'
-    ],
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
-    public: 'www.chouy.xyz',
-    hotOnly: false,
-    disableHostCheck: true,
-    https: true,
-    cert: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.crt')),
-    key: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.key'))
+    host: '0.0.0.0',
+    port: 8080,
+    allowedHosts: 'all',
+    sockHost: '192.168.128.2',
+    sockPort: 8080,
+    sockPath: '/sockjs-node',
+    // headers: {
+    //   'Access-Control-Allow-Origin': '*',
+    // },
+    // public: 'www.chouy.xyz',
+    // hotOnly: false,
+    // disableHostCheck: true,
+    // https: true,
+    // cert: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.crt')),
+    // key: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.key'))
   },
   css: {
     loaderOptions: {
