@@ -5,8 +5,6 @@
       <ele-pro-table
         ref="table"
         :columns="columns"
-        :datasource="localList.length?null:url"
-        :where="where"
         :data="localList"
         height="calc(100vh - 315px)">
         <template slot="toolbar">
