@@ -23,10 +23,13 @@
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="状态:" prop="status">
-            <el-select v-model="form.status" placeholder="请选择状态">
-              <el-option label="启用" :value="1"/>
-              <el-option label="禁用" :value="0"/>
-            </el-select>
+            <el-switch
+              v-model="form.status"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#13ce66"
+              inactive-color="#c0c4cc"
+              aria-label="平台启用状态开关"/>
           </el-form-item>
         </el-col>
         <el-col :sm="12">
