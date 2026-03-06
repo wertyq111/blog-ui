@@ -126,7 +126,15 @@ export default {
   },
   mounted() {
     this.loadList();
+    this.initSortable();
   },
+  beforeDestroy() {
+    if (this._sortable) {
+      this._sortable.destroy();
+      this._sortable = null;
+    }
+  },
+
   methods: {
     async loadList(page = 1, limit = 10) {
       try {
@@ -157,12 +165,49 @@ export default {
     },
 
     reload() {
-      this.loadList();
+      this.loadList(this.page, this.limit);
     },
     reset() {
       this.where = {};
+      this.page = 1;
       this.reload();
     },
+    initSortable() {
+      this.$nextTick(() => {
+        try {
+          const tbody = this.$el.querySelector('.el-table__body-wrapper tbody');
+          if (!tbody) return;
+          if (this._sortable) this._sortable.destroy();
+          this._sortable = Sortable.create(tbody, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: (evt) => {
+              // rebuild localList based on current DOM order
+              const rows = Array.from(tbody.querySelectorAll('tr'));
+              // try to find data-id attribute on tr or use existing order to map
+              const ids = rows.map(r => r.getAttribute('data-id'));
+              if (ids && ids.length === this.localList.length && ids[0]) {
+                const newList = ids.map(id => this.localList.find(item => String(item.id) === String(id))).filter(Boolean);
+                if (newList.length) {
+                  this.localList = newList;
+                  this.orderChanged = true;
+                }
+              } else {
+                // fallback: reorder by DOM order mapping to localList indices
+                const newList = rows.map((r, idx) => this.localList[idx]).filter(Boolean);
+                if (newList.length) {
+                  this.localList = newList;
+                  this.orderChanged = true;
+                }
+              }
+            }
+          });
+        } catch (e) {
+          // ignore
+        }
+      });
+    },
+
     openEdit(row) {
       this.current = row;
       this.showEdit = true;
