@@ -95,6 +95,7 @@ export default {
   },
   data() {
     return {
+      url: '/work-platform/index',
       columns: [
         { prop: 'id', label: 'ID', width: 60, align: 'center', showOverflowTooltip: true, fixed: "left" },
         { prop: 'name', label: '平台名称', align: 'center', showOverflowTooltip: true, minWidth: 160 },
@@ -107,10 +108,14 @@ export default {
       where: {},
       current: null,
       showEdit: false,
+      list: [],
       localList: [],
       originalList: [],
       orderChanged: false,
-      saving: false
+      saving: false,
+      page: 1,
+      limit: 10,
+      total: 0
     };
   },
   mounted() {
