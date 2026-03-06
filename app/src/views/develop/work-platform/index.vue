@@ -86,6 +86,7 @@
 <script>
 import {mapGetters} from "vuex";
 import draggable from 'vuedraggable';
+import Sortable from 'sortablejs';
 import WorkPlatformEdit from './work-platform-edit.vue';
 
 export default {
