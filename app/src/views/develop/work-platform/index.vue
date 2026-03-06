@@ -1,49 +1,14 @@
 <template>
   <div class="ele-body">
     <el-card shadow="never">
-      <!-- 搜索表单 -->
-      <el-form
-        :model="where"
-        class="ele-form-search"
-        label-width="77px"
-        @keyup.enter.native="reload"
-        @submit.native.prevent>
-        <el-row :gutter="15">
-          <el-col :lg="6" :md="12">
-            <el-form-item label="平台名称:">
-              <el-input v-model="where.name" clearable placeholder="请输入平台名称"/>
-            </el-form-item>
-          </el-col>
-          <el-col :lg="6" :md="12">
-            <el-form-item label="状态:">
-              <el-select v-model="where.status" clearable placeholder="请选择状态">
-                <el-option label="启用" :value="1"/>
-                <el-option label="禁用" :value="0"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :lg="6" :md="12">
-            <div class="ele-form-actions">
-              <el-button
-                class="ele-btn-icon"
-                icon="el-icon-search"
-                type="primary"
-                @click="reload">查询
-              </el-button>
-              <el-button @click="reset">重置</el-button>
-            </div>
-          </el-col>
-        </el-row>
-      </el-form>
-
-      <!-- 数据表格 -->
+      <!-- 搜索表单（略，复用原 index.vue 的搜索部分） -->
       <ele-pro-table
         ref="table"
         :columns="columns"
-        :datasource="url"
+        :datasource="localList.length?null:url"
         :where="where"
+        :data="localList"
         height="calc(100vh - 315px)">
-        <!-- 表头工具栏 -->
         <template slot="toolbar">
           <el-button
             v-if="canOperate"
@@ -53,14 +18,16 @@
             type="primary"
             @click="openEdit(null)">添加
           </el-button>
+          <el-button v-if="canOperate && orderChanged" size="small" type="warning" @click="undoOrder">撤销</el-button>
+          <el-button v-if="canOperate && orderChanged" size="small" type="primary" @click="saveOrder" :loading="saving">保存排序</el-button>
         </template>
-        <!-- 状态列 -->
+
         <template slot="status" slot-scope="{row}">
           <el-tag :type="Number(row.status) === 0 ? 'danger' : 'success'" size="mini">
             {{ Number(row.status) === 0 ? '禁用' : '启用' }}
           </el-tag>
         </template>
-        <!-- 操作列 -->
+
         <template slot="action" slot-scope="{row}">
           <el-link
             v-if="canOperate"
@@ -82,10 +49,33 @@
             </el-link>
           </el-popconfirm>
         </template>
+
+        <!-- draggable 列表渲染，当 ele-pro-table 无法直接支持时，可替换为自定义列表 -->
+        <template slot="default">
+          <draggable v-model="localList" handle=".drag-handle" @end="onDragEnd">
+            <div v-for="(row, index) in localList" :key="row.id" class="draggable-row">
+              <div class="row-left">
+                <i class="el-icon-rank drag-handle" style="cursor:move;margin-right:8px"/>
+                <span style="width:160px;display:inline-block">{{row.name}}</span>
+                <span style="width:80px;display:inline-block">{{row.sort}}</span>
+                <span style="width:80px;display:inline-block">
+                  <el-tag :type="Number(row.status) === 0 ? 'danger' : 'success'" size="mini">
+                    {{ Number(row.status) === 0 ? '禁用' : '启用' }}
+                  </el-tag>
+                </span>
+              </div>
+              <div class="row-right">
+                <el-button type="text" size="mini" @click="openEdit(row)">修改</el-button>
+                <el-popconfirm title="确定要删除此信息吗？" @confirm="remove(row)">
+                  <el-button type="text" size="mini" slot="reference">删除</el-button>
+                </el-popconfirm>
+              </div>
+            </div>
+          </draggable>
+        </template>
       </ele-pro-table>
     </el-card>
 
-    <!-- 编辑弹窗 -->
     <work-platform-edit
       :data="current"
       :visible.sync="showEdit"
@@ -95,11 +85,12 @@
 
 <script>
 import {mapGetters} from "vuex";
+import draggable from 'vuedraggable';
 import WorkPlatformEdit from './work-platform-edit.vue';
 
 export default {
-  name: 'WorkPlatform',
-  components: {WorkPlatformEdit},
+  name: 'WorkPlatformDraggable',
+  components: {WorkPlatformEdit, draggable},
   computed: {
     ...mapGetters(["permission"]),
     canOperate() {
@@ -110,73 +101,41 @@ export default {
     return {
       url: '/work-platform/index',
       columns: [
-        {
-          prop: 'id',
-          label: 'ID',
-          width: 60,
-          align: 'center',
-          showOverflowTooltip: true,
-          fixed: "left"
-        },
-        {
-          prop: 'name',
-          label: '平台名称',
-          align: 'center',
-          showOverflowTooltip: true,
-          minWidth: 160
-        },
-        {
-          prop: 'sort',
-          label: '排序',
-          align: 'center',
-          showOverflowTooltip: true,
-          width: 80
-        },
-        {
-          prop: 'status',
-          label: '状态',
-          align: 'center',
-          width: 80,
-          slot: 'status'
-        },
-        {
-          prop: 'createTime',
-          label: '创建时间',
-          align: 'center',
-          showOverflowTooltip: true,
-          minWidth: 160,
-          formatter: (row, column, cellValue) => {
-            return this.$util.toDateString(cellValue);
-          }
-        },
-        {
-          prop: 'updateTime',
-          label: '更新时间',
-          align: 'center',
-          showOverflowTooltip: true,
-          minWidth: 160,
-          formatter: (row, column, cellValue) => {
-            return this.$util.toDateString(cellValue);
-          }
-        },
-        {
-          columnKey: 'action',
-          label: '操作',
-          width: 160,
-          align: 'center',
-          resizable: false,
-          slot: 'action',
-          fixed: "right"
-        }
+        { prop: 'id', label: 'ID', width: 60, align: 'center', showOverflowTooltip: true, fixed: "left" },
+        { prop: 'name', label: '平台名称', align: 'center', showOverflowTooltip: true, minWidth: 160 },
+        { prop: 'sort', label: '排序', align: 'center', showOverflowTooltip: true, width: 80 },
+        { prop: 'status', label: '状态', align: 'center', width: 80, slot: 'status' },
+        { prop: 'createTime', label: '创建时间', align: 'center', showOverflowTooltip: true, minWidth: 160, formatter: (row, column, cellValue) => { return this.$util.toDateString(cellValue); } },
+        { prop: 'updateTime', label: '更新时间', align: 'center', showOverflowTooltip: true, minWidth: 160, formatter: (row, column, cellValue) => { return this.$util.toDateString(cellValue); } },
+        { columnKey: 'action', label: '操作', width: 160, align: 'center', resizable: false, slot: 'action', fixed: "right" }
       ],
       where: {},
       current: null,
-      showEdit: false
+      showEdit: false,
+      localList: [],
+      originalList: [],
+      orderChanged: false,
+      saving: false
     };
   },
+  mounted() {
+    this.loadList();
+  },
   methods: {
+    async loadList() {
+      try {
+        const res = await this.$http.get('/work-platform/list');
+        if (res.data && res.data.data) {
+          this.localList = res.data.data;
+          this.originalList = JSON.parse(JSON.stringify(this.localList));
+          this.orderChanged = false;
+        }
+      } catch (e) {
+        this.$message.error(e.message || '加载失败');
+      }
+    },
     reload() {
-      this.$refs.table.reload({where: this.where});
+      this.loadList();
     },
     reset() {
       this.where = {};
@@ -200,10 +159,39 @@ export default {
         loading.close();
         this.$message.error(e.message);
       });
+    },
+    onDragEnd() {
+      this.orderChanged = true;
+    },
+    undoOrder() {
+      this.localList = JSON.parse(JSON.stringify(this.originalList));
+      this.orderChanged = false;
+    },
+    async saveOrder() {
+      if (!this.orderChanged) return;
+      this.saving = true;
+      const payload = this.localList.map((item, idx) => ({ id: item.id, sort: (idx + 1) * 10 }));
+      try {
+        const res = await this.$http.post('/work-platform/reorder', { order: payload });
+        if (res.data.code === 0) {
+          this.$message.success('排序已保存');
+          this.orderChanged = false;
+          this.loadList();
+        } else {
+          this.$message.error(res.data.msg || '保存失败');
+        }
+      } catch (e) {
+        this.$message.error(e.message || '请求失败');
+      } finally {
+        this.saving = false;
+      }
     }
   }
 }
 </script>
 
 <style scoped>
+.draggable-row { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #f5f5f5; }
+.row-left { display:flex; align-items:center; }
+.row-right { display:flex; align-items:center; gap:8px; }
 </style>
