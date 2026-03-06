@@ -4,7 +4,7 @@
       <ele-pro-table
         ref="table"
         :columns="columns"
-        :data="localList"
+        :datasource="localList"
         height="calc(100vh - 315px)">
         <template slot="toolbar">
           <el-button
@@ -17,6 +17,10 @@
           </el-button>
           <el-button v-if="canOperate && orderChanged" size="small" type="warning" @click="undoOrder">撤销</el-button>
           <el-button v-if="canOperate && orderChanged" size="small" type="primary" @click="saveOrder" :loading="saving">保存排序</el-button>
+        </template>
+
+        <template slot="handle" slot-scope="{row}">
+          <i class="el-icon-rank drag-handle" style="cursor:move;margin-left:6px"/>
         </template>
 
         <template slot="status" slot-scope="{row}">
@@ -97,6 +101,7 @@ export default {
     return {
       url: '/work-platform/index',
       columns: [
+        { prop: 'handle', label: '', width: 48, slot: 'handle', fixed: "left" },
         { prop: 'id', label: 'ID', width: 60, align: 'center', showOverflowTooltip: true, fixed: "left" },
         { prop: 'name', label: '平台名称', align: 'center', showOverflowTooltip: true, minWidth: 160 },
         { prop: 'sort', label: '排序', align: 'center', showOverflowTooltip: true, width: 80 },
@@ -124,7 +129,9 @@ export default {
   methods: {
     async loadList(page = 1, limit = 10) {
       try {
+        console.log("cccc");
         const res = await this.$http.get('/work-platform/index', { params: { page, limit } });
+        console.log(res)
         // 支持 BaseResource collection 格式：res.data.data.data 或 res.data.data
         const respData = res.data && res.data.data;
         let items = [];
