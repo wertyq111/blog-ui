@@ -117,18 +117,32 @@ export default {
     this.loadList();
   },
   methods: {
-    async loadList() {
+    async loadList(page = 1, limit = 10) {
       try {
-        const res = await this.$http.get('/work-platform/list');
-        if (res.data && res.data.data) {
-          this.localList = res.data.data;
-          this.originalList = JSON.parse(JSON.stringify(this.localList));
-          this.orderChanged = false;
+        const res = await this.$http.get('/work-platform/index', { params: { page, limit } });
+        // 支持 BaseResource collection 格式：res.data.data.data 或 res.data.data
+        const respData = res.data && res.data.data;
+        let items = [];
+        if (respData) {
+          // 当 resource 返回 collection 时，items 可能在 respData.data
+          if (Array.isArray(respData.data)) {
+            items = respData.data;
+            this.pagination = { page: respData.current_page || page, limit: respData.per_page || limit, total: respData.total || items.length };
+          } else if (Array.isArray(respData)) {
+            items = respData;
+          } else if (Array.isArray(res.data)) {
+            items = res.data;
+          }
         }
+
+        this.localList = items;
+        this.originalList = JSON.parse(JSON.stringify(this.localList));
+        this.orderChanged = false;
       } catch (e) {
         this.$message.error(e.message || '加载失败');
       }
     },
+
     reload() {
       this.loadList();
     },
