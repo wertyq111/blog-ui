@@ -1,79 +1,58 @@
 <template>
   <div class="ele-body">
     <el-card shadow="never">
-      <ele-pro-table
-        ref="table"
-        :columns="columns"
-        :datasource="localList"
-        height="calc(100vh - 315px)">
-        <template slot="toolbar">
-          <el-button
-            v-if="canOperate"
-            class="ele-btn-icon"
-            icon="el-icon-plus"
-            size="small"
-            type="primary"
-            @click="openEdit(null)">添加
-          </el-button>
-          <el-button v-if="canOperate && orderChanged" size="small" type="warning" @click="undoOrder">撤销</el-button>
-          <el-button v-if="canOperate && orderChanged" size="small" type="primary" @click="saveOrder" :loading="saving">保存排序</el-button>
-        </template>
+      <el-table-draggable :animate="300" handle=".drag-handle" @drop="handleSort">
+        <ele-pro-table
+          ref="table"
+          :columns="columns"
+          :datasource="localList"
+          height="calc(100vh - 315px)">
+          <template slot="toolbar">
+            <el-button
+              v-if="canOperate"
+              class="ele-btn-icon"
+              icon="el-icon-plus"
+              size="small"
+              type="primary"
+              @click="openEdit(null)">添加
+            </el-button>
+            <el-button v-if="canOperate && orderChanged" size="small" type="warning" @click="undoOrder">撤销</el-button>
+            <el-button v-if="canOperate && orderChanged" size="small" type="primary" @click="saveOrder" :loading="saving">保存排序</el-button>
+          </template>
 
-        <template slot="handle" slot-scope="{row}">
-          <i class="el-icon-rank drag-handle" style="cursor:move;margin-left:6px"/>
-        </template>
+          <template slot="handle" slot-scope="{row}">
+            <i class="el-icon-rank drag-handle" style="cursor:move;margin-left:6px"/>
+          </template>
 
-        <template slot="status" slot-scope="{row}">
-          <el-tag :type="Number(row.status) === 0 ? 'danger' : 'success'" size="mini">
-            {{ Number(row.status) === 0 ? '禁用' : '启用' }}
-          </el-tag>
-        </template>
+          <template slot="status" slot-scope="{row}">
+            <el-tag :type="Number(row.status) === 0 ? 'danger' : 'success'" size="mini">
+              {{ Number(row.status) === 0 ? '禁用' : '启用' }}
+            </el-tag>
+          </template>
 
-        <template slot="action" slot-scope="{row}">
-          <el-link
-            v-if="canOperate"
-            :underline="false"
-            icon="el-icon-edit"
-            type="primary"
-            @click="openEdit(row)">修改
-          </el-link>
-          <el-popconfirm
-            class="ele-action"
-            title="确定要删除此信息吗？"
-            @confirm="remove(row)">
+          <template slot="action" slot-scope="{row}">
             <el-link
               v-if="canOperate"
-              slot="reference"
               :underline="false"
-              icon="el-icon-delete"
-              type="danger">删除
+              icon="el-icon-edit"
+              type="primary"
+              @click="openEdit(row)">修改
             </el-link>
-          </el-popconfirm>
-        </template>
-
-        <template slot="default">
-          <draggable v-model="localList" handle=".drag-handle" @end="onDragEnd">
-            <div v-for="(row, index) in localList" :key="row.id" class="draggable-row">
-              <div class="row-left">
-                <i class="el-icon-rank drag-handle" style="cursor:move;margin-right:8px"/>
-                <span style="width:160px;display:inline-block">{{row.name}}</span>
-                <span style="width:80px;display:inline-block">{{row.sort}}</span>
-                <span style="width:80px;display:inline-block">
-                  <el-tag :type="Number(row.status) === 0 ? 'danger' : 'success'" size="mini">
-                    {{ Number(row.status) === 0 ? '禁用' : '启用' }}
-                  </el-tag>
-                </span>
-              </div>
-              <div class="row-right">
-                <el-button type="text" size="mini" @click="openEdit(row)">修改</el-button>
-                <el-popconfirm title="确定要删除此信息吗？" @confirm="remove(row)">
-                  <el-button type="text" size="mini" slot="reference">删除</el-button>
-                </el-popconfirm>
-              </div>
-            </div>
-          </draggable>
-        </template>
-      </ele-pro-table>
+            <el-popconfirm
+              class="ele-action"
+              title="确定要删除此信息吗？"
+              @confirm="remove(row)">
+              <el-link
+                v-if="canOperate"
+                slot="reference"
+                :underline="false"
+                icon="el-icon-delete"
+                type="danger">删除
+              </el-link>
+            </el-popconfirm>
+          </template>
+        </ele-pro-table>
+      </el-table-draggable>
     </el-card>
 
     <work-platform-edit
@@ -85,13 +64,12 @@
 
 <script>
 import {mapGetters} from "vuex";
-import draggable from 'vuedraggable';
-import Sortable from 'sortablejs';
+import ElTableDraggable from '@/components/ElTableDraggable.vue';
 import WorkPlatformEdit from './work-platform-edit.vue';
 
 export default {
   name: 'WorkPlatformDraggable',
-  components: {WorkPlatformEdit, draggable},
+  components: {WorkPlatformEdit, ElTableDraggable},
   computed: {
     ...mapGetters(["permission"]),
     canOperate() {
@@ -126,13 +104,6 @@ export default {
   },
   mounted() {
     this.loadList();
-    this.initSortable();
-  },
-  beforeDestroy() {
-    if (this._sortable) {
-      this._sortable.destroy();
-      this._sortable = null;
-    }
   },
 
   methods: {
@@ -172,42 +143,6 @@ export default {
       this.page = 1;
       this.reload();
     },
-    initSortable() {
-      this.$nextTick(() => {
-        try {
-          const tbody = this.$el.querySelector('.el-table__body-wrapper tbody');
-          if (!tbody) return;
-          if (this._sortable) this._sortable.destroy();
-          this._sortable = Sortable.create(tbody, {
-            handle: '.drag-handle',
-            animation: 150,
-            onEnd: (evt) => {
-              // rebuild localList based on current DOM order
-              const rows = Array.from(tbody.querySelectorAll('tr'));
-              // try to find data-id attribute on tr or use existing order to map
-              const ids = rows.map(r => r.getAttribute('data-id'));
-              if (ids && ids.length === this.localList.length && ids[0]) {
-                const newList = ids.map(id => this.localList.find(item => String(item.id) === String(id))).filter(Boolean);
-                if (newList.length) {
-                  this.localList = newList;
-                  this.orderChanged = true;
-                }
-              } else {
-                // fallback: reorder by DOM order mapping to localList indices
-                const newList = rows.map((r, idx) => this.localList[idx]).filter(Boolean);
-                if (newList.length) {
-                  this.localList = newList;
-                  this.orderChanged = true;
-                }
-              }
-            }
-          });
-        } catch (e) {
-          // ignore
-        }
-      });
-    },
-
     openEdit(row) {
       this.current = row;
       this.showEdit = true;
@@ -227,8 +162,15 @@ export default {
         this.$message.error(e.message);
       });
     },
-    onDragEnd() {
-      this.orderChanged = true;
+    handleSort(evt) {
+      if (!evt) return;
+      const { oldIndex, newIndex } = evt;
+      if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+      const moved = this.localList.splice(oldIndex, 1)[0];
+      if (moved) {
+        this.localList.splice(newIndex, 0, moved);
+        this.orderChanged = true;
+      }
     },
     undoOrder() {
       this.localList = JSON.parse(JSON.stringify(this.originalList));
@@ -258,7 +200,4 @@ export default {
 </script>
 
 <style scoped>
-.draggable-row { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #f5f5f5; }
-.row-left { display:flex; align-items:center; }
-.row-right { display:flex; align-items:center; gap:8px; }
 </style>
