@@ -53,7 +53,6 @@
           <el-table-column align="center" width="38">
             <i class="sort-handle el-icon-_nav ele-text-placeholder"></i>
           </el-table-column>
-          <el-table-column align="center" label="ID" prop="id" width="60"/>
           <el-table-column align="center" label="平台名称" prop="name" min-width="160" show-overflow-tooltip/>
           <el-table-column align="center" label="排序" prop="sort" width="80">
             <template slot-scope="{$index, row}">
