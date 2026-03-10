@@ -23,7 +23,7 @@
         </el-col>
       </el-form-item>
       <el-form-item label="内容:" prop="title">
-        <tinymce-editor :height="300" v-model="form.content" :init="initEditor" />
+        <tinymce-editor :height="300" v-model="form.content" :init="initEditor"/>
       </el-form-item>
       <el-form-item label="文章分类:" prop="categoryId">
         <el-col :span="8">
@@ -168,14 +168,16 @@ export default {
         plugins: 'code print preview fullscreen paste searchreplace save autosave link autolink image imagetools media table codesample lists advlist hr charmap emoticons anchor directionality pagebreak quickbars nonbreaking visualblocks visualchars wordcount',
         toolbar: 'fullscreen preview code | undo redo | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | formatselect fontselect fontsizeselect | link image media emoticons charmap anchor pagebreak codesample | ltr rtl',
         toolbar_drawer: 'sliding',
-        images_upload_handler: async (blobInfo, success, error) => {
+        images_upload_handler: async (blobInfo, success, error) => {``
           let file = blobInfo.blob();
 
           // 上传到七牛云
           let result = await this.upLoadToQiniu(file);
           console.log(result)
-          if(result.status === 200) {
-            success(setting.qiniuDownloadnUrl + "/" + result.data.key);
+          if (result.status === 200) {
+            let picUrl = setting.qiniuDownloadnUrl + "/" + result.data.key
+            picUrl = await this.getPrivatePicUrl(picUrl)
+            success(picUrl);
           } else {
             error("图片上传失败");
           }
@@ -222,16 +224,15 @@ export default {
     },
 
     /* 更新壁纸图片 */
-    handleCover(url) {
+    async handleCover(url) {
       this.form.url = url
-      this.form.cover = url + "?imageMogr2/thumbnail/!30p"
+      this.form.cover = await this.getPrivatePicUrl(url)
     },
 
     /* 上传图片 */
     async upLoadToQiniu(file) {
-      console.log(file)
       const config = {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: {"Content-Type": "multipart/form-data"}
       };
       let fileType = "";
       if (file.type === "image/png") {
@@ -276,6 +277,15 @@ export default {
       return isJPG && isLt10M;
     },
 
+    /* 获取私有图片地址 */
+    async getPrivatePicUrl(url) {
+      let res = await this.$http.get("/qiniu/private-url", {params: {url, percent: 30}})
+      if (res.status === 200) {
+        console.log(res.data.data.url)
+        return res.data.data.url
+      }
+    },
+
     /* 处理分类下的标签 */
     handleLabels(categoryId) {
       let index = this.categories.findIndex((c) => {
@@ -288,7 +298,7 @@ export default {
         return this.data.labelId === l.id;
       })
 
-      if(checkLabelIndex === -1) {
+      if (checkLabelIndex === -1) {
         this.form.labelId = null
       } else {
         this.form.labelId = this.data.labelId

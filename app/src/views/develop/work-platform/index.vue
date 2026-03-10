@@ -150,8 +150,8 @@ export default {
         const params = {
           page,
           limit,
-          'filter[name]': this.where.name || undefined,
-          'filter[status]': this.where.status === null || this.where.status === '' ? undefined : this.where.status
+          'name': this.where.name || undefined,
+          'status': this.where.status === null || this.where.status === '' ? undefined : this.where.status
         };
         const res = await this.$http.get('/work-platform/index', { params });
         // 支持 BaseResource collection 格式：res.data.data.data 或 res.data.data

@@ -57,6 +57,10 @@
             @click="removeBatch">删除
           </el-button>
         </template>
+        <!-- 网址 -->
+        <template slot="url" slot-scope="{row}">
+          <el-link :href="row.url" target="_blank" type="primary">{{ row.url }}</el-link>
+        </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
           <el-link
@@ -126,26 +130,26 @@ export default {
           fixed: "left"
         },
         {
-          prop: 'id',
-          label: 'ID',
-          width: 60,
-          align: 'center',
-          showOverflowTooltip: true,
-          fixed: "left"
-        },
-        {
           prop: 'code',
           label: '项目编码',
           align: 'center',
           showOverflowTooltip: true,
-          width: 120,
+          width: 150,
         },
         {
           prop: 'name',
           label: '项目名称',
           align: 'center',
           showOverflowTooltip: true,
-          width: 100,
+          width: 150,
+        },
+        {
+          prop: 'url',
+          label: '网址',
+          align: 'center',
+          showOverflowTooltip: true,
+          minWidth: 200,
+          slot: 'url'
         },
         {
           prop: 'target',
@@ -155,24 +159,11 @@ export default {
           minWidth: 200
         },
         {
-          prop: 'createTime',
-          label: '创建时间',
+          prop: 'sort',
+          label: '排序',
           align: 'center',
           showOverflowTooltip: true,
-          width: 160,
-          formatter: (row, column, cellValue) => {
-            return this.$util.toDateString(cellValue);
-          }
-        },
-        {
-          prop: 'updateTime',
-          label: '更新时间',
-          align: 'center',
-          showOverflowTooltip: true,
-          width: 160,
-          formatter: (row, column, cellValue) => {
-            return this.$util.toDateString(cellValue);
-          }
+          width: 50
         },
         {
           columnKey: 'action',
