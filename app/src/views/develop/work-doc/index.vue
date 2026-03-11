@@ -380,7 +380,7 @@ export default {
       });
       list.forEach(item => {
         const node = map[item.id];
-        const parentId = Number(item.parent_id ?? item.parentId ?? 0);
+        const parentId = Number(item.parent_id || 0);
         if (parentId && map[parentId]) {
           map[parentId].children.push(node);
         } else {
