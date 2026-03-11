@@ -122,6 +122,9 @@
               <div style="font-weight:600">{{ p.platformName || p.platform_name || findPlatformName(p.platformId || p.platform_id) }}</div>
               <el-popover placement="top" width="560" trigger="hover">
                 <div class="md-preview-popover">
+                  <div class="md-preview-header">
+                    {{ p.platformName || p.platform_name || findPlatformName(p.platformId || p.platform_id) }}
+                  </div>
                   <mavon-editor
                     :value="p.content || ''"
                     :toolbarsFlag="false"
@@ -445,6 +448,15 @@ export default {
 .md-preview-popover {
   max-height: 420px;
   overflow: auto;
+}
+
+.md-preview-header {
+  font-weight: 600;
+  font-size: 14px;
+  color: #303133;
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ebeef5;
 }
 
 .md-preview-popover ::v-deep .v-note-wrapper {
