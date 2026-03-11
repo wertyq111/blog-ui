@@ -345,8 +345,8 @@ export default {
       this.$http.get('/work-doc-category/list').then(res => {
         this.loading = false;
         if (res.data.code === 0) {
-          this.categoryList = res.data.data || [];
-          this.categoryTree = this.buildCategoryTree(this.categoryList);
+          this.categoryTree = res.data.data || [];
+          this.categoryList = this.flattenCategories(this.categoryTree);
           this.$nextTick(() => {
             if (!this.currentCategory && this.categoryTree.length > 0) {
               this.onCategoryClick(this.categoryTree[0]);
@@ -369,39 +369,14 @@ export default {
       this.reloadDocs();
     },
 
-    buildCategoryTree(list = []) {
-      const map = {};
-      const roots = [];
-      list.forEach(item => {
-        map[item.id] = {
-          ...item,
-          children: []
-        };
-      });
-      list.forEach(item => {
-        const node = map[item.id];
-        const parentId = Number(item.parent_id ?? item.parentId ?? 0);
-        if (parentId && map[parentId]) {
-          map[parentId].children.push(node);
-        } else {
-          roots.push(node);
+    flattenCategories(tree = [], acc = []) {
+      (tree || []).forEach(node => {
+        acc.push(node);
+        if (node.children && node.children.length) {
+          this.flattenCategories(node.children, acc);
         }
       });
-      const sortNodes = (nodes) => {
-        nodes.sort((a, b) => {
-          const sa = Number(a.sort || 0);
-          const sb = Number(b.sort || 0);
-          if (sa !== sb) return sa - sb;
-          return Number(a.id) - Number(b.id);
-        });
-        nodes.forEach(n => {
-          if (n.children && n.children.length) {
-            sortNodes(n.children);
-          }
-        });
-      };
-      sortNodes(roots);
-      return roots;
+      return acc;
     },
     reloadDocs() {
       if (this.$refs.table) {
