@@ -120,9 +120,16 @@
           <div>
             <div v-for="(p, idx) in (row.content && row.content.platforms ? row.content.platforms : [])" :key="idx" style="margin-bottom:8px">
               <div style="font-weight:600">{{ p.platformName || p.platform_name || findPlatformName(p.platformId || p.platform_id) }}</div>
-              <el-popover placement="top" width="520" trigger="hover">
-                <div style="max-height:400px; overflow:auto" v-html="renderMarkdown(p.content)"></div>
-                <div slot="reference" v-html="truncateHtml(p.content, 200)"></div>
+              <el-popover placement="top" width="560" trigger="hover">
+                <div class="md-preview-popover">
+                  <mavon-editor
+                    :value="p.content || ''"
+                    :toolbarsFlag="false"
+                    :subfield="false"
+                    defaultOpen="preview"
+                    :editable="false" />
+                </div>
+                <div slot="reference" class="text-ellipsis">{{ truncateText(p.content, 120) }}</div>
               </el-popover>
             </div>
           </div>
@@ -165,10 +172,12 @@
 <script>
 import { mapGetters } from "vuex";
 import WorkDailyEdit from "./work-daily-edit.vue";
+import { mavonEditor } from "mavon-editor";
+import "mavon-editor/dist/css/index.css";
 
 export default {
   name: "WorkDaily",
-  components: { WorkDailyEdit },
+  components: { WorkDailyEdit, mavonEditor },
   computed: {
     ...mapGetters(["permission"]),
     canOperate() {
@@ -312,29 +321,10 @@ export default {
       const p = this.platforms.find((x) => x.id === id);
       return p ? p.name : "";
     },
-    renderMarkdown(md) {
-      try {
-        if (window.marked) {
-          return window.marked(md || "");
-        }
-        return (md || "").replace(/\n/g, "<br/>");
-      } catch (e) {
-        return (md || "").replace(/\n/g, "<br/>");
-      }
-    },
-    truncateHtml(md, len) {
-      const tmp = document.createElement("div");
-      tmp.innerHTML = this.renderMarkdown(md || "");
-      const text = tmp.textContent || tmp.innerText || "";
-      if (text.length <= len) {
-        return this.renderMarkdown(md || "");
-      }
-      const sub = text.slice(0, len) + "...";
-      const esc = sub
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-      return "<div>" + esc + "</div>";
+    truncateText(md, len) {
+      const text = (md || "").replace(/\s+/g, " ").trim();
+      if (text.length <= len) return text;
+      return text.slice(0, len) + "...";
     },
     exportReport() {
       if (this.reportType === "month") {
@@ -450,5 +440,19 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.md-preview-popover {
+  max-height: 420px;
+  overflow: auto;
+}
+
+.md-preview-popover ::v-deep .v-note-wrapper {
+  border: none;
+  min-height: auto;
+}
+
+.md-preview-popover ::v-deep .v-note-panel {
+  min-height: auto;
 }
 </style>
