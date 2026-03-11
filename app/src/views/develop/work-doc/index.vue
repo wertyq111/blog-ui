@@ -40,7 +40,17 @@
               :props="{label: 'name'}"
               highlight-current
               node-key="id"
-              @node-click="onCategoryClick" />
+              draggable
+              @node-click="onCategoryClick"
+              @node-drop="onCategoryDrop">
+              <span slot-scope="{ data }" class="custom-tree-node">
+                <span>
+                  <i :class="data.icon || 'el-icon-folder'" class="tree-node-icon" />
+                  {{ data.name }}
+                </span>
+                <el-tag v-if="Number(data.status) === 0" size="mini" type="info">停用</el-tag>
+              </span>
+            </el-tree>
           </div>
         </el-col>
 
@@ -111,10 +121,14 @@
               <el-tag :type="row.status === 1 ? 'success' : 'info'" size="mini">{{ row.status === 1 ? '启用' : '停用' }}</el-tag>
             </template>
             <template slot="action" slot-scope="{row}">
-              <el-link :underline="false" type="primary" icon="el-icon-document" @click="copyMarkdownLink(row)">复制链接</el-link>
-              <el-link :underline="false" type="primary" icon="el-icon-edit" class="ele-action" @click="openEdit(row)">编辑</el-link>
+              <el-tooltip content="复制引用链接" placement="top">
+                <el-button type="text" icon="el-icon-link" @click="copyMarkdownLink(row)" />
+              </el-tooltip>
+              <el-tooltip content="编辑" placement="top">
+                <el-button type="text" icon="el-icon-edit" class="ele-action" @click="openEdit(row)" />
+              </el-tooltip>
               <el-popconfirm class="ele-action" title="确定要删除此文档吗？" @confirm="remove(row)">
-                <el-link slot="reference" :underline="false" icon="el-icon-delete" type="danger">删除</el-link>
+                <el-button slot="reference" type="text" icon="el-icon-delete" style="color:#F56C6C" />
               </el-popconfirm>
             </template>
           </ele-pro-table>
@@ -138,13 +152,21 @@
     <el-dialog
       :visible.sync="showPreview"
       :fullscreen="previewFullscreen"
+      :show-close="false"
       width="80%"
       custom-class="doc-preview-dialog">
       <div slot="title" class="doc-preview-title">
         <div class="doc-preview-name">{{ previewDoc.title }}</div>
         <div class="doc-preview-actions">
-          <el-button size="mini" @click="togglePreviewFullscreen">{{ previewFullscreen ? '退出全屏' : '全屏查看' }}</el-button>
-          <el-button size="mini" type="primary" @click="copyMarkdownLink(previewDoc)">复制引用链接</el-button>
+          <el-tooltip content="全屏切换" placement="top">
+            <el-button size="mini" icon="el-icon-full-screen" @click="togglePreviewFullscreen" />
+          </el-tooltip>
+          <el-tooltip content="复制引用链接" placement="top">
+            <el-button size="mini" type="primary" icon="el-icon-link" @click="copyMarkdownLink(previewDoc)" />
+          </el-tooltip>
+          <el-tooltip content="关闭" placement="top">
+            <el-button size="mini" icon="el-icon-close" @click="showPreview = false" />
+          </el-tooltip>
         </div>
       </div>
       <mavon-editor
@@ -214,7 +236,7 @@ export default {
         {
           columnKey: 'action',
           label: '操作',
-          width: 240,
+          width: 140,
           align: 'center',
           resizable: false,
           slot: 'action',
@@ -322,7 +344,7 @@ export default {
   methods: {
     loadCategories() {
       this.loading = true;
-      this.$http.get('/work-doc-category/list', {params: {status: 1}}).then(res => {
+      this.$http.get('/work-doc-category/list').then(res => {
         this.loading = false;
         if (res.data.code === 0) {
           this.categoryList = res.data.data || [];
@@ -347,6 +369,32 @@ export default {
       this.currentCategory = node;
       this.where.category_id = node ? node.id : null;
       this.reloadDocs();
+    },
+    onCategoryDrop() {
+      const order = this.flattenCategoryOrder(this.categoryTree, 0);
+      this.$http.post('/work-doc-category/reorder', { order }).then(res => {
+        if (res.data.code === 0) {
+          this.$message.success('分类排序已保存');
+          this.loadCategories();
+        } else {
+          this.$message.error(res.data.msg || '分类排序保存失败');
+        }
+      }).catch(e => {
+        this.$message.error(e.message || '分类排序保存失败');
+      });
+    },
+    flattenCategoryOrder(list, parentId = 0, acc = []) {
+      (list || []).forEach((item, index) => {
+        acc.push({
+          id: item.id,
+          parent_id: parentId,
+          sort: (index + 1) * 10
+        });
+        if (item.children && item.children.length) {
+          this.flattenCategoryOrder(item.children, item.id, acc);
+        }
+      });
+      return acc;
     },
     reloadDocs() {
       if (this.$refs.table) {
@@ -463,6 +511,19 @@ export default {
 
 .doc-tree-group ::v-deep .el-tree-node__content > .el-tree-node__expand-icon {
   margin-left: 10px;
+}
+
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 8px;
+}
+
+.tree-node-icon {
+  margin-right: 6px;
+  color: #409EFF;
 }
 
 .doc-meta {

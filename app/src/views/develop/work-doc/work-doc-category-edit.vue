@@ -24,11 +24,22 @@
         <div class="field-desc">数字越小越靠前。</div>
       </el-form-item>
       <el-form-item label="状态:" prop="status">
-        <el-select v-model="form.status" style="width: 100%">
-          <el-option label="启用" :value="1" />
-          <el-option label="停用" :value="0" />
+        <el-switch
+          v-model="form.status"
+          :active-value="1"
+          :inactive-value="0"
+          active-text="启用"
+          inactive-text="停用" />
+        <div class="field-desc">停用后仍会显示在左侧分类树，并标记为“停用”。</div>
+      </el-form-item>
+      <el-form-item label="小图标:" prop="icon">
+        <el-select v-model="form.icon" clearable filterable placeholder="请选择图标" style="width: 100%">
+          <el-option v-for="item in iconOptions" :key="item.value" :label="item.label" :value="item.value">
+            <i :class="item.value" style="margin-right: 8px;" />
+            <span>{{ item.label }}</span>
+          </el-option>
         </el-select>
-        <div class="field-desc">停用后不会出现在左侧菜单。</div>
+        <div class="field-desc">可选 Element 内置图标，展示在左侧分类树。</div>
       </el-form-item>
       <el-form-item label="说明:" prop="description">
         <el-input type="textarea" v-model="form.description" placeholder="可选说明" />
@@ -61,8 +72,21 @@ export default {
         parentId: 0,
         sort: 0,
         status: 1,
+        icon: '',
         description: ''
       },
+      iconOptions: [
+        { label: '文档', value: 'el-icon-document' },
+        { label: '文件夹', value: 'el-icon-folder' },
+        { label: '文件', value: 'el-icon-tickets' },
+        { label: '知识库', value: 'el-icon-reading' },
+        { label: '工具', value: 'el-icon-set-up' },
+        { label: '代码', value: 'el-icon-cpu' },
+        { label: '任务', value: 'el-icon-s-claim' },
+        { label: '公告', value: 'el-icon-bell' },
+        { label: '标签', value: 'el-icon-collection-tag' },
+        { label: '星标', value: 'el-icon-star-on' }
+      ],
       rules: {
         name: [{required: true, message: '请输入分类名称', trigger: 'blur'}]
       },
@@ -80,6 +104,7 @@ export default {
           parentId: init.parent_id ?? init.parentId ?? 0,
           sort: init.sort ?? 0,
           status: init.status ?? 1,
+          icon: init.icon || '',
           description: init.description || ''
         };
         this.isUpdate = true;
@@ -91,7 +116,7 @@ export default {
   },
   methods: {
     resetForm() {
-      this.form = {id: null, name: '', parentId: 0, sort: 0, status: 1, description: ''};
+      this.form = {id: null, name: '', parentId: 0, sort: 0, status: 1, icon: '', description: ''};
     },
     save() {
       this.$refs['form'].validate((valid) => {
@@ -103,6 +128,7 @@ export default {
           parent_id: this.form.parentId,
           sort: this.form.sort,
           status: this.form.status,
+          icon: this.form.icon,
           description: this.form.description
         };
         this.$http.post(url, payload).then(res => {
