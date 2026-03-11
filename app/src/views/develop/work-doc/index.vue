@@ -40,7 +40,9 @@
               :props="{label: 'name'}"
               highlight-current
               node-key="id"
-              @node-click="onCategoryClick">
+              draggable
+              @node-click="onCategoryClick"
+              @node-drop="onCategoryDrop">
               <span slot-scope="{ data }" class="custom-tree-node">
                 <span>
                   <i :class="data.icon || 'el-icon-folder'" class="tree-node-icon" />
@@ -368,7 +370,32 @@ export default {
       this.where.category_id = node ? node.id : null;
       this.reloadDocs();
     },
-
+    onCategoryDrop() {
+      const order = this.flattenCategoryOrder(this.categoryTree, 0);
+      this.$http.post('/work-doc-category/reorder', { order }).then(res => {
+        if (res.data.code === 0) {
+          this.$message.success('分类排序已保存');
+          this.loadCategories();
+        } else {
+          this.$message.error(res.data.msg || '分类排序保存失败');
+        }
+      }).catch(e => {
+        this.$message.error(e.message || '分类排序保存失败');
+      });
+    },
+    flattenCategoryOrder(list, parentId = 0, acc = []) {
+      (list || []).forEach((item, index) => {
+        acc.push({
+          id: item.id,
+          parent_id: parentId,
+          sort: (index + 1) * 10
+        });
+        if (item.children && item.children.length) {
+          this.flattenCategoryOrder(item.children, item.id, acc);
+        }
+      });
+      return acc;
+    },
     buildCategoryTree(list = []) {
       const map = {};
       const roots = [];
