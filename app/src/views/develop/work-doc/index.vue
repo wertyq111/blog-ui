@@ -348,7 +348,7 @@ export default {
         this.loading = false;
         if (res.data.code === 0) {
           this.categoryList = res.data.data || [];
-          this.categoryTree = this.buildCategoryTree(this.categoryList);
+          this.categoryTree = this.$util.toTreeData(this.categoryList, 'id', 'parent_id');
           this.$nextTick(() => {
             if (!this.currentCategory && this.categoryTree.length > 0) {
               this.onCategoryClick(this.categoryTree[0]);
@@ -395,40 +395,6 @@ export default {
         }
       });
       return acc;
-    },
-    buildCategoryTree(list = []) {
-      const map = {};
-      const roots = [];
-      list.forEach(item => {
-        map[item.id] = {
-          ...item,
-          children: []
-        };
-      });
-      list.forEach(item => {
-        const node = map[item.id];
-        const parentId = Number(item.parent_id || 0);
-        if (parentId && map[parentId]) {
-          map[parentId].children.push(node);
-        } else {
-          roots.push(node);
-        }
-      });
-      const sortNodes = (nodes) => {
-        nodes.sort((a, b) => {
-          const sa = Number(a.sort || 0);
-          const sb = Number(b.sort || 0);
-          if (sa !== sb) return sa - sb;
-          return Number(a.id) - Number(b.id);
-        });
-        nodes.forEach(n => {
-          if (n.children && n.children.length) {
-            sortNodes(n.children);
-          }
-        });
-      };
-      sortNodes(roots);
-      return roots;
     },
     reloadDocs() {
       if (this.$refs.table) {
