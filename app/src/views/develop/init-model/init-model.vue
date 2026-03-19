@@ -3,7 +3,7 @@
   <el-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
-    :title="'转换路径'"
+    :title="'生成模板'"
     :visible="visible"
     custom-class="ele-dialog-form"
     width="680px"
@@ -25,7 +25,7 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <el-form-item label="模板字段:" prop="path">
+      <el-form-item label="模板字段:" prop="column">
         <el-input
           v-model="form.column"
           :rows="4"
@@ -72,10 +72,10 @@ export default {
   data() {
     return {
       // 表单数据
-      form: {columns: []},
+      form: {column: '', columns: []},
       // 表单验证规则
       rules: {
-        columns: [
+        column: [
           {required: true, message: '模板字段不能为空', trigger: 'blur'}
         ]
       },
@@ -87,7 +87,9 @@ export default {
   watch: {
     data() {
       if (this.data) {
-        this.form = Object.assign({}, this.data);
+        this.form = Object.assign({column: '', columns: []}, this.data);
+      } else {
+        this.form = {column: '', columns: []};
       }
 
       this.result = '';
@@ -128,7 +130,10 @@ export default {
     },
     /* 模板参数转换成数组 */
     convertToArray() {
-      this.form.columns = this.form.column.split(/\n/);
+      this.form.columns = this.form.column
+        .split(/\n/)
+        .map(item => item.trim())
+        .filter(item => !!item);
     },
     /* 更新visible */
     updateVisible(value) {

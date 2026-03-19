@@ -49,7 +49,7 @@
 
         <template slot="default">
           <draggable v-model="localList" handle=".drag-handle" @end="onDragEnd">
-            <div v-for="(row, index) in localList" :key="row.id" class="draggable-row">
+            <div v-for="row in localList" :key="row.id" class="draggable-row">
               <div class="row-left">
                 <i class="el-icon-rank drag-handle" style="cursor:move;margin-right:8px"/>
                 <span style="width:160px;display:inline-block">{{row.name}}</span>

@@ -1,101 +1,135 @@
 <template>
   <div class="ele-body">
     <el-card shadow="never">
-      <!-- 搜索表单 -->
-      <el-form
-        :model="where"
-        class="ele-form-search"
-        label-width="77px"
-        @keyup.enter.native="reload"
-        @submit.native.prevent>
-        <el-row :gutter="15">
-          <el-col :lg="6" :md="12">
-            <el-form-item label="平台:">
-              <el-select v-model="where.platform_id" clearable placeholder="请选择平台">
-                <el-option v-for="item in platforms" :key="item.id" :label="item.name" :value="item.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :lg="8" :md="12">
-            <el-form-item label="日期范围:">
-              <el-date-picker
-                v-model="dateRange"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :lg="10" :md="12">
-            <el-form-item label="内容搜索:">
-              <el-input
-                v-model="where.content"
-                placeholder="请输入关键字"
-                @keyup.enter.native="reload">
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :lg="8" :md="12">
-            <div class="ele-form-actions">
-              <el-button
-                class="ele-btn-icon"
-                icon="el-icon-search"
-                type="primary"
-                @click="reload">查询
-              </el-button>
-              <el-button @click="reset">重置</el-button>
+      <div class="daily-toolbar-grid">
+        <section class="daily-panel">
+          <div class="daily-panel__head">
+            <div>
+              <div class="daily-panel__title">筛选日志</div>
+              <div class="daily-panel__desc">按平台、日期和关键字快速定位日报记录。</div>
             </div>
-          </el-col>
-        </el-row>
-      </el-form>
+          </div>
+          <el-form
+            :model="where"
+            class="ele-form-search daily-form"
+            label-width="77px"
+            @keyup.enter.native="reload"
+            @submit.native.prevent>
+            <el-row :gutter="15">
+              <el-col :lg="8" :md="12">
+                <el-form-item label="平台:">
+                  <el-select v-model="where.platform_id" clearable placeholder="请选择平台">
+                    <el-option v-for="item in platforms" :key="item.id" :label="item.name" :value="item.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :lg="8" :md="12">
+                <el-form-item label="日期范围:">
+                  <el-date-picker
+                    v-model="dateRange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    style="width: 100%" />
+                </el-form-item>
+              </el-col>
+              <el-col :lg="8" :md="12">
+                <el-form-item label="内容搜索:">
+                  <el-input
+                    v-model="where.content"
+                    placeholder="请输入关键字"
+                    @keyup.enter.native="reload">
+                  </el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="24">
+                <div class="daily-form__actions">
+                  <el-button
+                    class="ele-btn-icon"
+                    icon="el-icon-search"
+                    type="primary"
+                    @click="reload">查询
+                  </el-button>
+                  <el-button @click="reset">重置</el-button>
+                </div>
+              </el-col>
+            </el-row>
+          </el-form>
+        </section>
 
-      <!-- 报表导出 -->
-      <el-form class="ele-form-search" label-width="77px">
-        <el-row :gutter="15">
-          <el-col :lg="6" :md="12">
-            <el-form-item label="报表类型:">
-              <el-select v-model="reportType" placeholder="请选择报表类型" style="width: 100%">
-                <el-option label="月报" value="month"/>
-                <el-option label="周报" value="week"/>
-                <el-option label="年报" value="year"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col v-if="reportType==='month'" :lg="6" :md="12">
-            <el-form-item label="月份:">
-              <el-date-picker v-model="reportMonth" type="month" placeholder="选择月份" style="width: 100%"/>
-            </el-form-item>
-          </el-col>
-          <el-col v-if="reportType==='week'" :lg="8" :md="12">
-            <el-form-item label="日期范围:">
-              <el-date-picker v-model="reportRange" type="daterange" range-separator="至"
-                              start-placeholder="开始日期" end-placeholder="结束日期" style="width: 100%"/>
-            </el-form-item>
-          </el-col>
-          <el-col v-if="reportType==='year'" :lg="6" :md="12">
-            <el-form-item label="年份:">
-              <el-date-picker v-model="reportYear" type="year" placeholder="选择年份" style="width: 100%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :lg="2" :md="4">
-            <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportReport">导出</el-button>
-          </el-col>
-          <el-col :lg="4" :md="8">
-            <el-form-item label="导入年份:">
-              <el-date-picker v-model="importYear" type="year" placeholder="选择年份" style="width: 100%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :lg="4" :md="8">
-            <el-upload
-              :show-file-list="false"
-              :http-request="handleImport"
-              accept=".md,.markdown">
-              <el-button type="primary" class="ele-btn-icon" icon="el-icon-upload2">导入Markdown</el-button>
-            </el-upload>
-          </el-col>
-        </el-row>
-      </el-form>
+        <section class="daily-panel daily-panel--accent">
+          <div class="daily-panel__head">
+            <div>
+              <div class="daily-panel__title">报表导出</div>
+              <div class="daily-panel__desc">按报表类型选择时间范围，并指定总结模型导出 Markdown。</div>
+            </div>
+          </div>
+          <el-form class="ele-form-search daily-form" label-width="77px">
+            <el-row :gutter="15">
+              <el-col :lg="8" :md="12">
+                <el-form-item label="报表类型:">
+                  <el-select v-model="reportType" placeholder="请选择报表类型" style="width: 100%">
+                    <el-option label="月报" value="month"/>
+                    <el-option label="周报" value="week"/>
+                    <el-option label="年报" value="year"/>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :lg="16" :md="12">
+                <el-form-item label="总结模型:">
+                  <el-select
+                    v-model="reportModel"
+                    :loading="reportModelLoading"
+                    clearable
+                    filterable
+                    placeholder="默认使用环境配置模型"
+                    style="width: 100%">
+                    <el-option
+                      v-for="item in reportModelOptions"
+                      :key="item"
+                      :label="item"
+                      :value="item"/>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="reportType==='month'" :lg="8" :md="12">
+                <el-form-item label="月份:">
+                  <el-date-picker v-model="reportMonth" type="month" placeholder="选择月份" style="width: 100%"/>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="reportType==='week'" :lg="12" :md="12">
+                <el-form-item label="日期范围:">
+                  <el-date-picker v-model="reportRange" type="daterange" range-separator="至"
+                                  start-placeholder="开始日期" end-placeholder="结束日期" style="width: 100%"/>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="reportType==='year'" :lg="8" :md="12">
+                <el-form-item label="年份:">
+                  <el-date-picker v-model="reportYear" type="year" placeholder="选择年份" style="width: 100%"/>
+                </el-form-item>
+              </el-col>
+              <el-col :lg="8" :md="12">
+                <el-form-item label="导入年份:">
+                  <el-date-picker v-model="importYear" type="year" placeholder="选择年份" style="width: 100%"/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="24">
+                <div class="daily-form__actions">
+                  <el-button type="success" class="ele-btn-icon" icon="el-icon-download" @click="exportReport">导出</el-button>
+                  <el-upload
+                    action="/work-daily/import"
+                    :show-file-list="false"
+                    :http-request="handleImport"
+                    accept=".md,.markdown">
+                    <el-button type="primary" class="ele-btn-icon" icon="el-icon-upload2">导入Markdown</el-button>
+                  </el-upload>
+                </div>
+              </el-col>
+            </el-row>
+          </el-form>
+        </section>
+      </div>
 
       <!-- 数据表格 -->
       <ele-pro-table
@@ -103,7 +137,7 @@
         :columns="columns"
         :datasource="url"
         :where="where"
-        height="calc(100vh - 420px)">
+        height="calc(100vh - 500px)">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
           <el-button
@@ -120,19 +154,9 @@
           <div>
             <div v-for="(p, idx) in (row.content && row.content.platforms ? row.content.platforms : [])" :key="idx" style="margin-bottom:8px">
               <div style="font-weight:600">{{ p.platformName || p.platform_name || findPlatformName(p.platformId || p.platform_id) }}</div>
-              <el-popover placement="top" width="560" trigger="hover">
-                <div class="md-preview-popover">
-                  <div class="md-preview-header">
-                    {{ p.platformName || p.platform_name || findPlatformName(p.platformId || p.platform_id) }}
-                  </div>
-                  <mavon-editor
-                    :value="p.content || ''"
-                    :toolbarsFlag="false"
-                    :subfield="false"
-                    defaultOpen="preview"
-                    :editable="false" />
-                </div>
-                <div slot="reference" class="text-ellipsis">{{ truncateText(p.content, 120) }}</div>
+              <el-popover placement="top" width="520" trigger="hover">
+                <div style="max-height:400px; overflow:auto" v-html="renderMarkdown(p.content)"></div>
+                <div slot="reference" v-html="truncateHtml(p.content, 200)"></div>
               </el-popover>
             </div>
           </div>
@@ -175,12 +199,10 @@
 <script>
 import { mapGetters } from "vuex";
 import WorkDailyEdit from "./work-daily-edit.vue";
-import { mavonEditor } from "mavon-editor";
-import "mavon-editor/dist/css/index.css";
 
 export default {
   name: "WorkDaily",
-  components: { WorkDailyEdit, mavonEditor },
+  components: { WorkDailyEdit },
   computed: {
     ...mapGetters(["permission"]),
     canOperate() {
@@ -258,6 +280,9 @@ export default {
       current: null,
       showEdit: false,
       reportType: "month",
+      reportModel: "",
+      reportModelOptions: [],
+      reportModelLoading: false,
       reportMonth: null,
       reportRange: [],
       reportYear: null,
@@ -266,6 +291,7 @@ export default {
   },
   created() {
     this.fetchPlatforms();
+    this.fetchReportModels();
   },
   methods: {
     reload() {
@@ -320,14 +346,53 @@ export default {
           this.platforms = [];
         });
     },
+    fetchReportModels() {
+      this.reportModelLoading = true;
+      this.$http
+        .get("/work-daily/report/models")
+        .then((res) => {
+          this.reportModelLoading = false;
+          if (res.data.code === 0 && res.data.data) {
+            this.reportModelOptions = res.data.data.models || [];
+            this.reportModel = res.data.data.currentModel || "";
+          } else {
+            this.reportModelOptions = [];
+            this.reportModel = "";
+          }
+        })
+        .catch(() => {
+          this.reportModelLoading = false;
+          this.reportModelOptions = [];
+          this.reportModel = "";
+        });
+    },
     findPlatformName(id) {
       const p = this.platforms.find((x) => x.id === id);
       return p ? p.name : "";
     },
-    truncateText(md, len) {
-      const text = (md || "").replace(/\s+/g, " ").trim();
-      if (text.length <= len) return text;
-      return text.slice(0, len) + "...";
+    renderMarkdown(md) {
+      try {
+        if (window.marked) {
+          return window.marked(md || "");
+        }
+        return (md || "").replace(/\n/g, "<br/>");
+      } catch (e) {
+        return (md || "").replace(/\n/g, "<br/>");
+      }
+    },
+    truncateHtml(md, len) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = this.renderMarkdown(md || "");
+      const text = tmp.textContent || tmp.innerText || "";
+      if (text.length <= len) {
+        return this.renderMarkdown(md || "");
+      }
+      const sub = text.slice(0, len) + "...";
+      const esc = sub
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      return "<div>" + esc + "</div>";
     },
     exportReport() {
       if (this.reportType === "month") {
@@ -336,9 +401,13 @@ export default {
           return;
         }
         const month = this.formatMonth(this.reportMonth);
+        const params = { month };
+        if (this.reportModel) {
+          params.model = this.reportModel;
+        }
         this.downloadReport(
           "/work-daily/report/month",
-          { month },
+          params,
           `牛马日常月报-${month}.md`
         );
         return;
@@ -350,9 +419,13 @@ export default {
         }
         const start = this.formatDate(this.reportRange[0]);
         const end = this.formatDate(this.reportRange[1]);
+        const params = { start_date: start, end_date: end };
+        if (this.reportModel) {
+          params.model = this.reportModel;
+        }
         this.downloadReport(
           "/work-daily/report/week",
-          { start_date: start, end_date: end },
+          params,
           `牛马日常周报-${start}-${end}.md`
         );
         return;
@@ -363,9 +436,13 @@ export default {
           return;
         }
         const year = this.formatYear(this.reportYear);
+        const params = { year };
+        if (this.reportModel) {
+          params.model = this.reportModel;
+        }
         this.downloadReport(
           "/work-daily/report/year",
-          { year },
+          params,
           `牛马日常年报-${year}.md`
         );
       }
@@ -437,34 +514,72 @@ export default {
 </script>
 
 <style scoped>
+.daily-toolbar-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.daily-panel {
+  border: 1px solid rgba(31, 35, 41, 0.08);
+  border-radius: 16px;
+  padding: 18px 18px 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+.daily-panel--accent {
+  background:
+    radial-gradient(circle at top right, rgba(49, 130, 246, 0.09), transparent 32%),
+    linear-gradient(180deg, #fcfdff 0%, #f7faff 100%);
+}
+
+.daily-panel__head {
+  margin-bottom: 10px;
+}
+
+.daily-panel__title {
+  color: #24324a;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.daily-panel__desc {
+  color: #738196;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+.daily-form {
+  margin-bottom: 0;
+}
+
+.daily-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.daily-form ::v-deep .el-form-item {
+  margin-bottom: 14px;
+}
+
+.daily-form ::v-deep .el-input__inner,
+.daily-form ::v-deep .el-range-editor.el-input__inner,
+.daily-form ::v-deep .el-date-editor.el-input__inner {
+  border-radius: 10px;
+}
+
+.daily-form ::v-deep .el-button {
+  border-radius: 10px;
+}
+
 .text-ellipsis {
   display: inline-block;
   max-width: 260px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.md-preview-popover {
-  max-height: 420px;
-  overflow: auto;
-}
-
-.md-preview-header {
-  font-weight: 600;
-  font-size: 14px;
-  color: #303133;
-  margin: 0 0 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #ebeef5;
-}
-
-.md-preview-popover ::v-deep .v-note-wrapper {
-  border: none;
-  min-height: auto;
-}
-
-.md-preview-popover ::v-deep .v-note-panel {
-  min-height: auto;
 }
 </style>

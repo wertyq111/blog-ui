@@ -149,7 +149,7 @@ export default {
             if (res.data.code === 0) {
               this.$message({type: 'success', message: res.data.msg});
               if (!this.isUpdate) {
-                this.form = {};
+                this.form = this.initFormData();
               }
               this.updateVisible(false);
               this.$emit('done');
@@ -167,16 +167,32 @@ export default {
     },
     /* 初始化form数据 */
     initFormData(data) {
-      // 初始化默认值
-      let form = {status: 1};
+      const form = {
+        status: 1,
+        sources: [""]
+      };
+
       if (data) {
-        data.sources = JSON.parse(data.sources)
-        Object.assign(form, data);
-      } else {
-        Object.assign(form, data, {
-          sources: [""],
-        });
+        const tempData = Object.assign({}, data);
+        let sources = [];
+
+        if (Array.isArray(tempData.sources)) {
+          sources = tempData.sources;
+        } else if (typeof tempData.sources === 'string' && tempData.sources.trim()) {
+          try {
+            const parsedSources = JSON.parse(tempData.sources);
+            if (Array.isArray(parsedSources)) {
+              sources = parsedSources;
+            }
+          } catch (e) {
+            sources = [tempData.sources];
+          }
+        }
+
+        tempData.sources = sources.length ? sources : [""];
+        Object.assign(form, tempData);
       }
+
       return form;
     },
     /* 更新visible */

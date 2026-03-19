@@ -61,9 +61,15 @@
           </el-form-item>
         </el-col>
         <el-col :sm="12">
-          <el-form-item label="来源:" prop="source">
-            <el-input v-model="form.source" placeholder="如链接/项目名" />
-            <div class="field-desc">记录文档来源或关联项目。</div>
+          <el-form-item label="项目来源:" prop="source">
+            <el-select v-model="form.source" clearable filterable placeholder="请选择工作平台" style="width: 100%">
+              <el-option
+                v-for="item in sourceOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value" />
+            </el-select>
+            <div class="field-desc">项目来源直接复用工作平台，便于统一管理。</div>
           </el-form-item>
         </el-col>
       </el-row>
@@ -129,9 +135,25 @@ export default {
         categoryId: [{required: true, message: '请选择分类', trigger: 'change'}],
         content: [{required: true, message: '请输入内容', trigger: 'blur'}]
       },
+      projectSources: [],
       loading: false,
       isUpdate: false
     };
+  },
+  computed: {
+    sourceOptions() {
+      const options = (this.projectSources || []).map(item => ({
+        label: item.name,
+        value: item.name
+      }));
+      if (this.form.source && !options.some(item => item.value === this.form.source)) {
+        options.unshift({
+          label: `${this.form.source}（历史值）`,
+          value: this.form.source
+        });
+      }
+      return options;
+    }
   },
   watch: {
     data() {
@@ -156,7 +178,21 @@ export default {
       }
     }
   },
+  created() {
+    this.fetchProjectSources();
+  },
   methods: {
+    fetchProjectSources() {
+      this.$http.get('/work-platform/list', {params: {status: 1}}).then(res => {
+        if (res.data.code === 0) {
+          this.projectSources = res.data.data || [];
+        } else {
+          this.projectSources = [];
+        }
+      }).catch(() => {
+        this.projectSources = [];
+      });
+    },
     resetForm() {
       this.form = {
         id: null,
