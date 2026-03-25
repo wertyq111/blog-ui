@@ -209,7 +209,7 @@
       :category-tree="categoryTree"
       @done="loadCategories" />
 
-    <el-dialog
+    <app-dialog
       :visible.sync="showPreview"
       :fullscreen="previewFullscreen"
       :show-close="false"
@@ -292,7 +292,7 @@
           :editable="false"
           class="doc-preview" />
       </div>
-    </el-dialog>
+    </app-dialog>
   </div>
 </template>
 

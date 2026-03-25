@@ -1,12 +1,12 @@
 <!-- 顶栏右侧区域按钮 -->
 <template>
-  <div class="ele-admin-header-tool">
+  <div class="ele-admin-header-tool cyber-header-tool">
     <!-- 全屏切换 -->
-    <div id="full-screen" class="ele-admin-header-tool-item hidden-xs-only" @click="changeFullscreen">
+    <div id="full-screen" class="ele-admin-header-tool-item cyber-header-tool-item hidden-xs-only" @click="changeFullscreen">
       <i :class="fullscreen ? 'el-icon-_screen-restore' : 'el-icon-_screen-full'"></i>
     </div>
     <!-- 语言切换 -->
-    <div id="language-select" class="ele-admin-header-tool-item">
+    <div id="language-select" class="ele-admin-header-tool-item cyber-header-tool-item">
       <el-dropdown placement="bottom" @command="changeLanguage">
         <i class="el-icon-_language"></i>
         <el-dropdown-menu slot="dropdown">
@@ -23,13 +23,13 @@
       </el-dropdown>
     </div>
     <!-- 消息通知 -->
-    <div id="notice-receive" class="ele-admin-header-tool-item">
+    <div id="notice-receive" class="ele-admin-header-tool-item cyber-header-tool-item">
       <ele-notice/>
     </div>
     <!-- 用户信息 -->
-    <div id="user-info" class="ele-admin-header-tool-item">
+    <div id="user-info" class="ele-admin-header-tool-item cyber-header-tool-item">
       <el-dropdown @command="onUserDropClick">
-        <div class="ele-admin-header-avatar">
+        <div class="ele-admin-header-avatar cyber-header-avatar">
           <el-avatar :src="loginUser.member ? loginUser.member.avatar : null"/>
           <span class="hidden-xs-only">{{ loginUser.member ? loginUser.member.nickname : loginUser.username }}</span>
           <i class="el-icon-arrow-down hidden-xs-only"></i>
@@ -48,7 +48,7 @@
       </el-dropdown>
     </div>
     <!-- 主题设置 -->
-    <div v-if="showSetting" class="ele-admin-header-tool-item" @click="openSetting">
+    <div v-if="showSetting" class="ele-admin-header-tool-item cyber-header-tool-item" @click="openSetting">
       <i class="el-icon-_more"></i>
     </div>
   </div>

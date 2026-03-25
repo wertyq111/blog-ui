@@ -1,7 +1,6 @@
 <!-- 修改密码弹窗 -->
 <template>
-  <el-dialog
-    :append-to-body="true"
+  <app-dialog
     :lock-scroll="false"
     :visible="visible"
     title="修改密码"
@@ -37,7 +36,7 @@
       <el-button @click="cancel">取消</el-button>
       <el-button type="primary" @click="save">确定</el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

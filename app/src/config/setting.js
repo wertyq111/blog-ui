@@ -88,7 +88,7 @@ export default {
   // 是否是色弱模式
   weakMode: false,
   // 是否是暗黑模式
-  darkMode: false,
+  darkMode: true,
   // 默认主题色
   color: null,
   /**

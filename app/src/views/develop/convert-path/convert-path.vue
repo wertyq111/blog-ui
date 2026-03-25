@@ -1,6 +1,6 @@
 <!-- 编辑弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :title="'转换路径'"
@@ -53,7 +53,7 @@
         @click="copy">复制路径
       </el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

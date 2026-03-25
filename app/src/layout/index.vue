@@ -2,6 +2,7 @@
 <template>
   <ele-pro-layout
     ref="layout"
+    class="cyber-admin-layout"
     :body-full="theme.bodyFull"
     :collapse="theme.collapse"
     :color="theme.color"
@@ -48,7 +49,9 @@
     @set-home-components="setHomeComponents">
     <!-- logo图标 -->
     <template slot="logo">
-      <img alt="logo" src="@/assets/logo.png"/>
+      <div class="cyber-admin-logo">
+        <img alt="logo" src="@/assets/logo.png"/>
+      </div>
     </template>
     <!-- 顶栏右侧区域 -->
     <template slot="right">

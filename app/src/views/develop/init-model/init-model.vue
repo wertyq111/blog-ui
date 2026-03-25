@@ -1,6 +1,6 @@
 <!-- 编辑弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :title="'生成模板'"
@@ -57,7 +57,7 @@
         @click="copy">复制模板
       </el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

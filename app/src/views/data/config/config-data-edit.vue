@@ -1,6 +1,6 @@
 <!-- 编辑弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :title="isUpdate?'修改配置项':'添加配置项'"
@@ -111,7 +111,7 @@
         @click="save">保存
       </el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

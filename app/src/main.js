@@ -8,6 +8,7 @@ import permission from './utils/permission';
 import './styles/index.scss';
 import EleAdmin from 'ele-admin';
 import DialogDirective from 'ele-admin/packages/dialog-directive';
+import AppDialog from './components/AppDialog.vue';
 import VueClipboard from 'vue-clipboard2';
 import i18n from './lang';
 import VueLazyload from 'vue-lazyload'
@@ -19,6 +20,7 @@ Vue.use(EleAdmin, {
 Vue.use(permission);
 Vue.use(DialogDirective);
 Vue.use(VueClipboard);
+Vue.component('AppDialog', AppDialog);
 
 // 懒加载配置
 Vue.use(VueLazyload, {
