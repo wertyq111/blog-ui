@@ -1,10 +1,19 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never">
+  <div class="ele-body develop-page develop-page--config">
+    <el-card shadow="never" class="develop-shell">
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Develop Config</div>
+          <div class="develop-hero__title">模型初始化</div>
+          <div class="develop-hero__desc">集中管理初始化模板、参考格式和转换入口，把框架配置维护成一致的配置工作台。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <!-- 搜索表单 -->
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="77px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -38,6 +47,15 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
+
+      <section class="develop-table-shell">
+      <div class="develop-table-shell__header">
+        <div>
+          <div class="develop-table-shell__title">初始化模型列表</div>
+          <div class="develop-table-shell__desc">围绕框架编码、名称、参考格式和转换动作组织成统一的配置列表。</div>
+        </div>
+      </div>
       <!-- 数据表格 -->
       <ele-pro-table
         ref="table"
@@ -95,6 +113,7 @@
           </el-popconfirm>
         </template>
       </ele-pro-table>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <init-model-edit

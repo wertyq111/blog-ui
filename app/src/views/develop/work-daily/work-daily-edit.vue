@@ -33,12 +33,12 @@
           <el-form-item label="各平台内容:" prop="platformContents">
             <div v-for="pid in form.platformIds" :key="pid" class="daily-edit-platform-card">
               <div class="daily-edit-platform-card__title">{{ findPlatformName(pid) || pid }}</div>
-              <mavon-editor v-model="form.platformContents[pid]" :toolbarsFlag="true" :subfield="true" />
+              <mavon-editor v-model="form.platformContents[pid]" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
             </div>
             <el-input v-if="allowCustom" v-model="form.customPlatformName" class="daily-edit-custom-name" placeholder="新增临时平台名（可选）"/>
             <div v-if="allowCustom && form.customPlatformName" class="daily-edit-platform-card daily-edit-platform-card--custom">
               <div class="daily-edit-platform-card__title">{{ form.customPlatformName }}</div>
-              <mavon-editor v-model="form.customPlatformContent" :toolbarsFlag="true" :subfield="true" />
+              <mavon-editor v-model="form.customPlatformContent" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
             </div>
           </el-form-item>
         </el-col>
@@ -54,6 +54,7 @@
 <script>
 import {mavonEditor} from 'mavon-editor';
 import 'mavon-editor/dist/css/index.css';
+import mavonLocalAssets from '@/utils/mavon-local-assets';
 
 export default {
   name: 'WorkDailyEdit',
@@ -68,6 +69,10 @@ export default {
     findPlatformName: {
       type: Function,
       default: () => ''
+    },
+    mavonExternalLink: {
+      type: Object,
+      default: () => mavonLocalAssets
     }
   },
   data() {

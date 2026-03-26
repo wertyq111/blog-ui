@@ -4,10 +4,10 @@
     :lock-scroll="false"
     :title="isUpdate ? '修改分类' : '添加分类'"
     :visible="visible"
-    custom-class="ele-dialog-form"
+    custom-class="ele-dialog-form develop-dialog"
     width="520px"
     @update:visible="updateVisible">
-    <el-form ref="form" :model="form" :rules="rules" label-width="90px">
+    <el-form ref="form" class="develop-dialog-form" :model="form" :rules="rules" label-width="90px">
       <el-form-item label="分类名称:" prop="name">
         <el-input v-model="form.name" placeholder="请输入分类名称" />
         <div class="field-desc">支持多级分类，建议短小清晰。</div>
@@ -58,7 +58,7 @@
         <div class="field-desc">描述该分类的用途或范围。</div>
       </el-form-item>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
       <el-button :loading="loading" type="primary" @click="save">保存</el-button>
     </div>

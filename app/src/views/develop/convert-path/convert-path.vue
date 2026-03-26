@@ -5,23 +5,24 @@
     :lock-scroll="false"
     :title="'转换路径'"
     :visible="visible"
-    custom-class="ele-dialog-form"
+    custom-class="ele-dialog-form develop-dialog"
     width="680px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
+      class="develop-dialog-form"
       :model="form"
       :rules="rules"
       label-width="100px">
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="项目编码:" prop="code">
-            {{form.code}}
+            <div class="develop-dialog-static">{{form.code}}</div>
           </el-form-item>
         </el-col>
         <el-col :sm="12">
           <el-form-item label="项目名称:" prop="name">
-            {{form.name}}
+            <div class="develop-dialog-static">{{form.name}}</div>
           </el-form-item>
         </el-col>
       </el-row>
@@ -35,10 +36,15 @@
           type="textarea"/>
       </el-form-item>
       <el-form-item label="转换结果:">
-        {{result}}
+        <el-input
+          v-model="result"
+          :rows="5"
+          clearable
+          readonly
+          type="textarea"/>
       </el-form-item>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button
         @click="updateVisible(false)">取消
       </el-button>
@@ -139,4 +145,10 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-static {
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  line-height: 1.5;
+}
 </style>

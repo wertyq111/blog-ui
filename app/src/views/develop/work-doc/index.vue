@@ -1,10 +1,29 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never" v-loading="loading">
-      <el-row :gutter="15">
+  <div class="ele-body develop-page develop-page--doc work-doc-page">
+    <el-card shadow="never" class="develop-shell develop-shell--doc" v-loading="loading">
+      <section class="develop-hero develop-hero--doc">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Develop Workspace</div>
+          <div class="develop-hero__title">工作文档</div>
+          <div class="develop-hero__desc">统一管理分类目录、模板文档和项目来源，作为 develop 栏目的知识工作台。</div>
+        </div>
+        <div class="develop-hero__meta">
+          <div class="develop-hero__meta-card">
+            <span class="develop-hero__meta-label">当前分类</span>
+            <strong>{{ currentCategory ? currentCategory.name : "全部文档" }}</strong>
+          </div>
+          <div class="develop-hero__meta-card">
+            <span class="develop-hero__meta-label">模板数</span>
+            <strong>{{ templates.length }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <el-row :gutter="18" class="develop-doc-layout">
         <!-- 左侧分类树 -->
         <el-col :lg="6" style="margin-bottom: 15px;">
-          <div class="ele-table-tool ele-table-tool-default ele-toolbar-actions">
+          <div class="develop-panel develop-panel--sidebar">
+          <div class="ele-table-tool ele-table-tool-default ele-toolbar-actions doc-tree-actions">
             <div class="ele-table-tool-title">
               <el-button
                 class="ele-btn-icon"
@@ -73,11 +92,12 @@
               </div>
             </el-tree>
           </div>
+          </div>
         </el-col>
 
         <!-- 右侧文档列表 -->
         <el-col :lg="18" style="margin-bottom: 15px;">
-          <div class="doc-panel">
+          <div class="develop-panel develop-panel--workspace doc-panel">
             <div class="doc-panel__header">
               <div class="doc-panel__title">
                 <div class="doc-panel__heading">文档列表</div>
@@ -92,7 +112,7 @@
 
             <el-form
               :model="where"
-              class="ele-form-search"
+              class="ele-form-search develop-form"
               label-width="90px"
               @keyup.enter.native="reloadDocs"
               @submit.native.prevent>
@@ -126,6 +146,7 @@
               </el-row>
             </el-form>
 
+            <div class="develop-table-shell">
             <ele-pro-table
               ref="table"
               :columns="columns"
@@ -190,6 +211,7 @@
                 </div>
               </template>
             </ele-pro-table>
+            </div>
           </div>
         </el-col>
       </el-row>
@@ -200,6 +222,7 @@
       :visible.sync="showEdit"
       :categories="categoryList"
       :templates="templates"
+      :mavon-external-link="mavonExternalLink"
       @done="reloadDocs" />
 
     <work-doc-category-edit
@@ -286,6 +309,7 @@
         </div>
         <mavon-editor
           v-model="previewDoc.content"
+          :externalLink="mavonExternalLink"
           :toolbarsFlag="false"
           :subfield="false"
           defaultOpen="preview"
@@ -301,12 +325,14 @@ import WorkDocEdit from './work-doc-edit.vue';
 import WorkDocCategoryEdit from './work-doc-category-edit.vue';
 import {mavonEditor} from 'mavon-editor';
 import 'mavon-editor/dist/css/index.css';
+import mavonLocalAssets from '@/utils/mavon-local-assets';
 
 export default {
   name: 'WorkDoc',
   components: {WorkDocEdit, WorkDocCategoryEdit, mavonEditor},
   data() {
     return {
+      mavonExternalLink: mavonLocalAssets,
       loading: false,
       url: '/work-doc/index',
       columns: [

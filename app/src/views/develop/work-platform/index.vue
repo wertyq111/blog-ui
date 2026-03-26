@@ -1,9 +1,18 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never" id="table_form">
+  <div class="ele-body develop-page develop-page--platform">
+    <el-card shadow="never" class="develop-shell" id="table_form">
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Develop Workspace</div>
+          <div class="develop-hero__title">工作平台</div>
+          <div class="develop-hero__desc">维护项目来源、启用状态和展示顺序，为工作日常与工作文档提供统一的平台基座。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="90px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -29,8 +38,14 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
 
-      <div class="ele-card-header">
+      <section class="develop-table-shell">
+      <div class="develop-table-shell__header">
+        <div>
+          <div class="develop-table-shell__title">平台排序列表</div>
+          <div class="develop-table-shell__desc">拖拽左侧手柄即可调整顺序，保存后会同步影响 develop 栏目的平台选项。</div>
+        </div>
         <el-button
           v-if="canOperate"
           class="ele-btn-icon"
@@ -101,6 +116,7 @@
           </el-table-column>
         </el-table>
       </el-table-draggable>
+      </section>
     </el-card>
 
     <work-platform-edit

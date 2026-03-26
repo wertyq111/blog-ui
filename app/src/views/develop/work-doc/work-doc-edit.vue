@@ -4,11 +4,12 @@
     :lock-scroll="false"
     :title="isUpdate ? '修改文档' : '添加文档'"
     :visible="visible"
-    custom-class="ele-dialog-form"
+    custom-class="ele-dialog-form develop-dialog"
     width="900px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
+      class="develop-dialog-form"
       :model="form"
       :rules="rules"
       label-width="100px">
@@ -84,13 +85,13 @@
       <el-row :gutter="15">
         <el-col :sm="24">
           <el-form-item label="内容:" prop="content">
-            <mavon-editor v-model="form.content" :toolbarsFlag="true" :subfield="true" />
+            <mavon-editor v-model="form.content" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
             <div class="field-desc">支持 Markdown 编写，建议包含问题、结论和步骤。</div>
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
       <el-button :loading="loading" type="primary" @click="save">保存</el-button>
     </div>
@@ -100,6 +101,7 @@
 <script>
 import {mavonEditor} from 'mavon-editor';
 import 'mavon-editor/dist/css/index.css';
+import mavonLocalAssets from '@/utils/mavon-local-assets';
 
 export default {
   name: 'WorkDocEdit',
@@ -114,6 +116,10 @@ export default {
     templates: {
       type: Array,
       default: () => []
+    },
+    mavonExternalLink: {
+      type: Object,
+      default: () => mavonLocalAssets
     }
   },
   data() {

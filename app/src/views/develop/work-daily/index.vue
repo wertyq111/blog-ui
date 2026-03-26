@@ -1,6 +1,24 @@
 <template>
-  <div class="ele-body work-daily-page">
+  <div class="ele-body develop-page develop-page--daily work-daily-page">
     <el-card shadow="never" class="daily-page-card">
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Develop Workspace</div>
+          <div class="develop-hero__title">工作日常</div>
+          <div class="develop-hero__desc">统一记录平台日报、导入 Markdown 和生成周报月报年报，作为 develop 栏目的日常工作台。</div>
+        </div>
+        <div class="develop-hero__meta">
+          <div class="develop-hero__meta-card">
+            <span class="develop-hero__meta-label">平台数</span>
+            <strong>{{ platforms.length }}</strong>
+          </div>
+          <div class="develop-hero__meta-card">
+            <span class="develop-hero__meta-label">模型数</span>
+            <strong>{{ reportModelOptions.length }}</strong>
+          </div>
+        </div>
+      </section>
+
       <div class="daily-toolbar-grid">
         <section class="daily-panel">
           <div class="daily-panel__head">
@@ -185,6 +203,7 @@
                   <div class="daily-markdown-preview">
                     <mavon-editor
                       :value="p.content || ''"
+                      :externalLink="mavonExternalLink"
                       :toolbarsFlag="false"
                       :subfield="false"
                       defaultOpen="preview"
@@ -233,6 +252,7 @@
       :visible.sync="showEdit"
       :platforms="platforms"
       :findPlatformName="findPlatformName"
+      :mavon-external-link="mavonExternalLink"
       @done="reload" />
   </div>
 </template>
@@ -242,6 +262,7 @@ import { mapGetters } from "vuex";
 import WorkDailyEdit from "./work-daily-edit.vue";
 import { mavonEditor } from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
+import mavonLocalAssets from "@/utils/mavon-local-assets";
 
 export default {
   name: "WorkDaily",
@@ -258,6 +279,7 @@ export default {
   },
   data() {
     return {
+      mavonExternalLink: mavonLocalAssets,
       url: "/work-daily/index",
       columns: [
         {

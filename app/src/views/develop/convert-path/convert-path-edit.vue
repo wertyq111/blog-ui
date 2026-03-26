@@ -5,11 +5,12 @@
     :lock-scroll="false"
     :title="isUpdate?'修改项目编码':'添加项目编码'"
     :visible="visible"
-    custom-class="ele-dialog-form"
+    custom-class="ele-dialog-form develop-dialog"
     width="680px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
+      class="develop-dialog-form"
       :model="form"
       :rules="rules"
       label-width="100px">
@@ -34,7 +35,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="15">
-        <el-col :sm="21">
+        <el-col :sm="24">
           <el-form-item label="服务器地址:" prop="target">
             <el-input
               v-model="form.target"
@@ -67,7 +68,7 @@
           </span>
         </el-row>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button
         @click="updateVisible(false)">取消
       </el-button>
@@ -209,12 +210,20 @@ span {
 }
 
 .change-icon {
+  align-items: center;
+  color: #7aa126;
+  display: inline-flex;
   font-size: 22px;
   cursor: pointer;
+  height: 42px;
 }
 
 .change-icon-add {
+  align-items: center;
+  color: #c3cbbf;
+  display: inline-flex;
   font-size: 22px;
   cursor: no-drop;
+  height: 42px;
 }
 </style>
