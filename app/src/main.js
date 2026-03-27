@@ -12,8 +12,10 @@ import AppDialog from './components/AppDialog.vue';
 import VueClipboard from 'vue-clipboard2';
 import i18n from './lang';
 import VueLazyload from 'vue-lazyload'
+import '@google/model-viewer';
 
 Vue.config.productionTip = false;
+Vue.config.ignoredElements = (Vue.config.ignoredElements || []).concat(['model-viewer']);
 Vue.use(EleAdmin, {
   i18n: (key, value) => i18n.t(key, value)
 });

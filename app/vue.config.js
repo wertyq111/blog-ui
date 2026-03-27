@@ -4,7 +4,17 @@ const path = require('node:path')
 
 module.exports = {
   productionSourceMap: false,
-  transpileDependencies: ['element-ui', 'ele-admin', 'vue-i18n'],
+  transpileDependencies: [
+    'element-ui',
+    'ele-admin',
+    'vue-i18n',
+    '@google/model-viewer',
+    'lit',
+    'lit-html',
+    'lit-element',
+    /@lit\/.*/,
+    /@monogrid\/gainmap-js/
+  ],
   chainWebpack: (config) => {
     config.plugins.delete('prefetch');
     if (process.env.NODE_ENV !== 'development') {
