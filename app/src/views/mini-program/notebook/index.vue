@@ -1,10 +1,20 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--notebook">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell">
+
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Mini Program Console</div>
+          <div class="develop-hero__title">文章管理</div>
+          <div class="develop-hero__desc">维护小程序文章内容、分类与发布信息，统一图文内容工作台。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <!-- 搜索表单 -->
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="77px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -51,7 +61,15 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
       <!-- 数据表格 -->
+      <section class="develop-table-shell">
+        <div class="develop-table-shell__header">
+          <div>
+            <div class="develop-table-shell__title">文章列表</div>
+            <div class="develop-table-shell__desc">支持按标题、分类与发布者快速筛选。</div>
+          </div>
+        </div>
       <ele-pro-table
         ref="table"
         :columns="columns"
@@ -93,6 +111,7 @@
           </el-popconfirm>
         </template>
       </ele-pro-table>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <notebook-edit

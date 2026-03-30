@@ -30,7 +30,7 @@
     <div id="user-info" class="ele-admin-header-tool-item cyber-header-tool-item">
       <el-dropdown @command="onUserDropClick">
         <div class="ele-admin-header-avatar cyber-header-avatar">
-          <el-avatar :src="loginUser.member ? loginUser.member.avatar : null"/>
+          <el-avatar :src="headerAvatar"/>
           <span class="hidden-xs-only">{{ loginUser.member ? loginUser.member.nickname : loginUser.username }}</span>
           <i class="el-icon-arrow-down hidden-xs-only"></i>
         </div>
@@ -57,6 +57,7 @@
 <script>
 import EleNotice from './notice.vue';
 import {isFullscreen, toggleFullscreen} from 'ele-admin/packages/util';
+import defaultAvatar from '@/assets/avatar.png';
 
 export default {
   name: 'EleHeaderRight',
@@ -73,6 +74,10 @@ export default {
     // 当前登录用户信息
     loginUser() {
       return this.$store.state.user.user;
+    },
+    headerAvatar() {
+      const member = this.loginUser && this.loginUser.member ? this.loginUser.member : null;
+      return member && member.avatar ? member.avatar : defaultAvatar;
     },
     // 当前语言
     language() {

@@ -4,15 +4,21 @@
     :destroy-on-close="true"
     :lock-scroll="false"
     :visible="visible"
+    custom-class="ele-dialog-form develop-dialog"
     title="分配权限"
     width="440px"
     @update:visible="updateVisible">
+    <div class="develop-dialog-form develop-dialog-auth">
+      <div class="field-desc">勾选菜单和按钮权限后保存，半选节点会随树结构一起提交。</div>
+    </div>
     <el-scrollbar
+      class="develop-dialog-auth__scroll"
       v-loading="authLoading"
       style="height: 50vh;"
       wrapStyle="overflow-x: hidden;">
       <el-tree
         ref="tree"
+        class="develop-dialog-auth__tree"
         :data="authData"
         :default-checked-keys="checked"
         :default-expand-all="true"
@@ -25,7 +31,7 @@
         </span>
       </el-tree>
     </el-scrollbar>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
       <el-button
         :loading="loading"
@@ -118,4 +124,7 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-auth__scroll {
+  padding: 6px 2px 0;
+}
 </style>

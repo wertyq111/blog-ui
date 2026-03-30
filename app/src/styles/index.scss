@@ -1410,3 +1410,202 @@ body.cyber-theme-light .work-doc-page .doc-meta {
     justify-content: flex-start;
   }
 }
+
+.admin-workspace-page .develop-shell > .el-card__body {
+  padding: 22px 22px 20px;
+}
+
+.admin-workspace-page .develop-hero {
+  margin-bottom: 16px;
+  padding: 2px 4px 0;
+  gap: 16px;
+}
+
+.admin-workspace-page .develop-hero__copy {
+  max-width: 780px;
+}
+
+.admin-workspace-page .develop-hero__eyebrow {
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+.admin-workspace-page .develop-hero__title {
+  font-size: 24px;
+}
+
+.admin-workspace-page .develop-hero__desc {
+  max-width: 760px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.admin-workspace-page .develop-panel--filter {
+  padding-top: 16px;
+  padding-bottom: 14px;
+}
+
+.admin-workspace-page .develop-form .el-form-item {
+  margin-bottom: 12px;
+}
+
+.admin-workspace-page .develop-form .el-input__inner,
+.admin-workspace-page .develop-form .el-textarea__inner,
+.admin-workspace-page .develop-form .el-select .el-input__inner,
+.admin-workspace-page .develop-form .el-date-editor.el-input__inner {
+  border-radius: 12px;
+}
+
+.admin-workspace-page .develop-table-shell {
+  padding: 16px 18px 18px;
+}
+
+.admin-workspace-page .develop-table-shell__header {
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.admin-workspace-page .develop-table-shell__title {
+  font-size: 17px;
+}
+
+.admin-workspace-page .develop-table-shell__desc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.admin-workspace-page .develop-table-shell .ele-pro-table {
+  margin-top: 0;
+}
+
+.admin-workspace-page .develop-table-shell .ele-table-tool {
+  margin-bottom: 12px;
+}
+
+.admin-workspace-page .develop-table-shell .ele-table-tool .ele-btn-icon + .ele-btn-icon {
+  margin-left: 8px;
+}
+
+.admin-workspace-page .develop-panel--workspace {
+  min-height: auto;
+}
+
+.admin-workspace-page--user-info .develop-panel--workspace {
+  padding-top: 18px;
+}
+
+.admin-workspace-form-panel__header {
+  margin-bottom: 16px;
+}
+
+.admin-workspace-form .el-row {
+  margin-bottom: 4px;
+}
+
+.admin-workspace-form .el-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.admin-workspace-form__actions {
+  margin-top: 6px;
+}
+
+.admin-workspace-tree-shell {
+  min-height: calc(100vh - 270px);
+}
+
+.admin-workspace-tree-shell .org-tree-group,
+.admin-workspace-tree-shell .doc-tree-group {
+  margin-top: 12px;
+}
+
+.admin-workspace-tree-shell .ele-table-tool {
+  margin-bottom: 0;
+}
+
+.admin-workspace-page .develop-shell .ele-admin-watermark {
+  display: none;
+}
+
+body.cyber-theme-light .admin-workspace-page .develop-hero__title {
+  color: #2e3b2d;
+}
+
+body.cyber-theme-light .admin-workspace-page .develop-panel--filter,
+body.cyber-theme-light .admin-workspace-page .develop-table-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 251, 244, 0.78) 100%);
+}
+
+body.cyber-theme-light .admin-workspace-page .develop-table-shell .el-table thead tr,
+body.cyber-theme-light .admin-workspace-page .develop-table-shell .el-table thead th {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+body.cyber-theme-light .admin-workspace-page .develop-table-shell__title {
+  color: #334131;
+}
+
+body.cyber-theme-light .admin-workspace-page .develop-table-shell__desc,
+body.cyber-theme-light .admin-workspace-page .develop-hero__desc {
+  color: rgba(92, 107, 89, 0.84);
+}
+
+body.cyber-theme-light .admin-workspace-form .el-input__inner,
+body.cyber-theme-light .admin-workspace-form .el-textarea__inner,
+body.cyber-theme-light .admin-workspace-form .el-select .el-input__inner,
+body.cyber-theme-light .admin-workspace-form .el-date-editor.el-input__inner,
+body.cyber-theme-light .admin-workspace-form .el-input-number__decrease,
+body.cyber-theme-light .admin-workspace-form .el-input-number__increase {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(215, 228, 205, 0.8);
+  color: #304030;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 10px 20px rgba(172, 196, 159, 0.08);
+}
+
+body.cyber-theme-light .develop-dialog-auth__scroll,
+body.cyber-theme-light .develop-dialog-upload__dropzone .el-upload-dragger {
+  border: 1px solid rgba(215, 228, 205, 0.8);
+  background:
+    radial-gradient(circle at top right, rgba(172, 236, 109, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(246, 251, 241, 0.8) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 32px rgba(168, 190, 150, 0.12);
+  border-radius: 18px;
+}
+
+body.cyber-theme-light .develop-dialog-upload__dropzone .el-upload-dragger {
+  padding: 14px 12px;
+}
+
+body.cyber-theme-light .develop-dialog-upload__dropzone .el-upload__text,
+body.cyber-theme-light .develop-dialog-upload__dropzone .el-upload__tip,
+body.cyber-theme-light .develop-dialog-auth .field-desc {
+  color: rgba(92, 107, 89, 0.84);
+}
+
+body.cyber-theme-light .develop-dialog-auth__tree {
+  color: #445042;
+}
+
+@media (max-width: 991px) {
+  .admin-workspace-page .develop-shell > .el-card__body {
+    padding: 18px;
+  }
+
+  .admin-workspace-page .develop-hero__title {
+    font-size: 22px;
+  }
+
+  .admin-workspace-page .develop-panel,
+  .admin-workspace-page .develop-table-shell {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

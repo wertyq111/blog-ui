@@ -1,13 +1,30 @@
 <template>
-  <div class="ele-body">
-    <el-card header="基本信息" shadow="never">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--user-info">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell">
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">System Management</div>
+          <div class="develop-hero__title">用户资料</div>
+          <div class="develop-hero__desc">维护账号基础信息、组织归属与角色状态，统一后台用户资料页的编辑体验。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--workspace admin-workspace-form-panel">
+        <div class="develop-table-shell__header admin-workspace-form-panel__header">
+          <div>
+            <div class="develop-table-shell__title">基本信息</div>
+            <div class="develop-table-shell__desc">支持头像、身份信息、组织角色与联系资料的统一维护。</div>
+          </div>
+        </div>
       <el-form
         ref="form"
         :model="form"
         :rules="rules"
+        class="develop-dialog-form admin-workspace-form"
         label-width="82px">
         <el-form-item label="头像：">
           <uploadImage v-model="form.avatar" :limit="1"></uploadImage>
+          <div class="field-desc">建议使用清晰的方形头像素材，便于后台和资料页统一展示。</div>
         </el-form-item>
         <el-row :gutter="15">
           <el-col :sm="12">
@@ -146,7 +163,7 @@
             placeholder="请输入个人简介"
             type="textarea"/>
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="admin-workspace-form__actions">
           <el-button
             :loading="loading"
             type="primary"
@@ -154,6 +171,7 @@
           </el-button>
         </el-form-item>
       </el-form>
+      </section>
     </el-card>
   </div>
 </template>

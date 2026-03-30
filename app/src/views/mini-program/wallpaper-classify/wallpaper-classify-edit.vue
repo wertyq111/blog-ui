@@ -5,10 +5,12 @@
     :lock-scroll="false"
     :title="isUpdate?'修改壁纸分类':'添加壁纸分类'"
     :visible="visible"
+    custom-class="ele-dialog-form develop-dialog"
     width="500px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
+      class="develop-dialog-form"
       :model="form"
       :rules="rules"
       label-width="82px">
@@ -43,7 +45,7 @@
         <el-switch v-model="form.select" />
       </el-form-item>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
       <el-button
         :loading="loading"

@@ -21,6 +21,7 @@
 
 <script>
 import axios from "axios";
+import setting from "@/config/setting";
 
 export default {
   props: {
@@ -91,6 +92,19 @@ export default {
     },
   },
   methods: {
+    async getUpToken() {
+      const res = await this.$http.get("/qiniu/up-token");
+      if (res.data.code !== 0) {
+        throw new Error(res.data.msg || "获取上传凭证失败");
+      }
+
+      return res.data.data.upToken;
+    },
+    buildQiniuKey(file) {
+      const suffixIndex = file.name.lastIndexOf(".");
+      const suffix = suffixIndex !== -1 ? file.name.substring(suffixIndex) : "";
+      return `upload/${Date.now()}${Math.floor(Math.random() * 1000)}${suffix}`;
+    },
     deleteImg(index) {
       this.photo.splice(index, 1);
       if (this.limit == 1) {
@@ -126,6 +140,9 @@ export default {
     },
     add_img(event) {
       let file = event.target.files[0];
+      if (!file) {
+        return;
+      }
       if (/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(event.target.value)) {
         let MAXSIZE = 10 * 1024 * 1024;
         let size = file.size;
@@ -152,32 +169,39 @@ export default {
               fileItem = self.dataURItoBlob(base);
             }
             let formdata = new window.FormData();
-            formdata.append("file", fileItem);
-            axios({
-              method: "POST",
-              url: "/upload/uploadImage",
-              data: formdata,
-              timeout: 1000000,
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
+            self.getUpToken().then((token) => {
+              const key = self.buildQiniuKey(file);
+              formdata.append("file", fileItem);
+              formdata.append("token", token);
+              formdata.append("key", key);
+              return axios({
+                method: "POST",
+                url: setting.qiniuUploadUrl,
+                data: formdata,
+                timeout: 1000000,
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              });
             })
               .then((res) => {
-                if (res.data.code == 0) {
+                if (res.data.key) {
                   event.target.value = "";
-                  self.photo.push(res.data.data);
+                  self.photo.push(`${setting.qiniuDownloadnUrl}/${res.data.key}`);
                   self.loading = false;
                 } else {
-                  this.$notify.error({
+                  event.target.value = "";
+                  self.loading = false;
+                  self.$notify.error({
                     title: "错误提示",
-                    message: res.data.msg,
+                    message: "上传失败",
                   });
                 }
               })
               .catch((e) => {
                 event.target.value = "";
                 self.loading = false;
-                this.$message.error(e.message);
+                self.$message.error(e.message);
               });
           };
         };

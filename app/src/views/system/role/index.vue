@@ -1,10 +1,20 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--role">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell">
+
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">System Management</div>
+          <div class="develop-hero__title">角色管理</div>
+          <div class="develop-hero__desc">维护角色标识、授权能力与状态信息，统一后台权限角色体系。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <!-- 搜索表单 -->
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="77px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -30,7 +40,15 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
       <!-- 数据表格 -->
+      <section class="develop-table-shell">
+        <div class="develop-table-shell__header">
+          <div>
+            <div class="develop-table-shell__title">角色列表</div>
+            <div class="develop-table-shell__desc">支持批量删除、角色编辑与权限维护。</div>
+          </div>
+        </div>
       <ele-pro-table
         ref="table"
         :columns="columns"
@@ -95,6 +113,7 @@
             @change="editStatus(row)"/>
         </template>
       </ele-pro-table>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <role-edit

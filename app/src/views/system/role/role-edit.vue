@@ -5,10 +5,12 @@
     :lock-scroll="false"
     :title="isUpdate?'修改角色':'添加角色'"
     :visible="visible"
+    custom-class="ele-dialog-form develop-dialog"
     width="460px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
+      class="develop-dialog-form"
       :model="form"
       :rules="rules"
       label-width="82px">
@@ -54,7 +56,7 @@
           type="textarea"/>
       </el-form-item>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
       <el-button
         :loading="loading"

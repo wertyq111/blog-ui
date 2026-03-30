@@ -4,16 +4,20 @@
     :destroy-on-close="true"
     :lock-scroll="false"
     :visible="visible"
+    custom-class="ele-dialog-form develop-dialog"
     title="导入用户"
     width="480px"
     @update:visible="updateVisible">
+    <div class="develop-dialog-form develop-dialog-upload">
+      <div class="field-desc">上传模板文件后将自动导入职级数据，请先下载模板并按格式填写。</div>
+    </div>
     <el-upload
       v-loading="loading"
       :before-upload="beforeUpload"
       :show-file-list="false"
       accept=".xls,.xlsx"
       action=""
-      class="ele-block"
+      class="ele-block develop-dialog-upload__dropzone"
       drag>
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
@@ -79,5 +83,9 @@ export default {
 .ele-block ::v-deep .el-upload,
 .ele-block ::v-deep .el-upload-dragger {
   width: 100%;
+}
+
+.develop-dialog-upload__dropzone {
+  margin-top: 8px;
 }
 </style>
