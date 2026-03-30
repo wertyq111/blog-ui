@@ -320,7 +320,7 @@ export default {
       let params = Object.assign({
         "status": row.status
       })
-      this.$http.post(`/members/${row.id}`, params).then(res => {
+      this.$http.post(`/members/status/${row.id}`, params).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
