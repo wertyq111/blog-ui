@@ -1054,3 +1054,82 @@ export default {
   }
 }
 </style>
+
+<style>
+body.cyber-theme-dark .develop-page--control .workplace-hero {
+  border-bottom-color: var(--page-border-soft);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-hero__weather {
+  background: var(--page-surface-float);
+  border-color: var(--page-border-soft);
+  color: var(--page-text-secondary);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    var(--page-accent-glow);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-hero__weather i,
+body.cyber-theme-dark .develop-page--control .workplace-overview__label i,
+body.cyber-theme-dark .develop-page--control .workplace-tool-item__icon {
+  color: #69b6ff;
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-overview__item,
+body.cyber-theme-dark .develop-page--control .workplace-panel,
+body.cyber-theme-dark .develop-page--control .workplace-summary-card {
+  border-color: var(--page-border-soft);
+  background: var(--page-surface-card);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 36px rgba(2, 10, 23, 0.24);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-log-item,
+body.cyber-theme-dark .develop-page--control .workplace-doc-item,
+body.cyber-theme-dark .develop-page--control .workplace-mini-list__item {
+  background: var(--page-surface-card-soft);
+  border-color: var(--page-border-soft);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-overview__label,
+body.cyber-theme-dark .develop-page--control .workplace-panel__desc,
+body.cyber-theme-dark .develop-page--control .workplace-doc-item__meta,
+body.cyber-theme-dark .develop-page--control .workplace-mini-list__meta,
+body.cyber-theme-dark .develop-page--control .workplace-log-item__content,
+body.cyber-theme-dark .develop-page--control .workplace-platform-summary__text,
+body.cyber-theme-dark .develop-page--control .workplace-tool-item__desc,
+body.cyber-theme-dark .develop-page--control .workplace-state {
+  color: var(--page-text-muted);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-overview__value,
+body.cyber-theme-dark .develop-page--control .workplace-panel__title,
+body.cyber-theme-dark .develop-page--control .workplace-doc-item__title,
+body.cyber-theme-dark .develop-page--control .workplace-mini-list__title,
+body.cyber-theme-dark .develop-page--control .workplace-log-item__date,
+body.cyber-theme-dark .develop-page--control .workplace-platform-summary__count,
+body.cyber-theme-dark .develop-page--control .workplace-tool-item__title,
+body.cyber-theme-dark .develop-page--control .workplace-summary-card__head {
+  color: var(--page-text-primary);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-chip {
+  background: var(--page-accent-soft);
+  color: #8dc7ff;
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-chip--strong,
+body.cyber-theme-dark .develop-page--control .workplace-tool-item__icon {
+  background: rgba(52, 120, 246, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-tool-item {
+  border-top-color: rgba(93, 153, 214, 0.12);
+}
+
+body.cyber-theme-dark .develop-page--control .workplace-state--error {
+  color: #ffb4c0;
+}
+</style>

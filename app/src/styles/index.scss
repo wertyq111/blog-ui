@@ -1395,6 +1395,48 @@ body.cyber-theme-light .work-doc-page .doc-meta {
   color: rgba(96, 108, 94, 0.8);
 }
 
+body.cyber-theme-dark .develop-page--control,
+body.cyber-theme-dark .work-doc-page {
+  --page-surface-bg:
+    radial-gradient(circle at top right, rgba(31, 116, 255, 0.16), transparent 28%),
+    linear-gradient(180deg, rgba(14, 25, 39, 0.94) 0%, rgba(9, 18, 31, 0.98) 100%);
+  --page-surface-card:
+    radial-gradient(circle at top right, rgba(41, 123, 255, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(18, 30, 46, 0.94) 0%, rgba(11, 20, 33, 0.98) 100%);
+  --page-surface-card-soft:
+    radial-gradient(circle at top right, rgba(41, 123, 255, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(16, 29, 44, 0.88) 0%, rgba(10, 18, 30, 0.94) 100%);
+  --page-surface-float: rgba(11, 21, 34, 0.82);
+  --page-border-soft: rgba(93, 153, 214, 0.18);
+  --page-text-primary: #eef6ff;
+  --page-text-secondary: rgba(208, 227, 246, 0.86);
+  --page-text-muted: rgba(147, 177, 209, 0.72);
+  --page-accent-soft: rgba(52, 120, 246, 0.14);
+  --page-accent-strong: rgba(52, 120, 246, 0.28);
+  --page-accent-glow: 0 18px 38px rgba(24, 132, 255, 0.16);
+}
+
+body.cyber-theme-dark .profile-page {
+  --page-surface-bg:
+    radial-gradient(circle at 18% 16%, rgba(32, 201, 178, 0.16), transparent 30%),
+    radial-gradient(circle at 84% 12%, rgba(214, 255, 114, 0.12), transparent 26%),
+    linear-gradient(180deg, rgba(8, 22, 26, 0.94) 0%, rgba(9, 24, 29, 0.98) 100%);
+  --page-surface-card:
+    radial-gradient(circle at top right, rgba(32, 201, 178, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(15, 35, 38, 0.94) 0%, rgba(9, 24, 29, 0.98) 100%);
+  --page-surface-card-soft:
+    radial-gradient(circle at top right, rgba(32, 201, 178, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(17, 40, 42, 0.86) 0%, rgba(10, 24, 29, 0.92) 100%);
+  --page-surface-float: rgba(11, 30, 31, 0.8);
+  --page-border-soft: rgba(102, 216, 195, 0.2);
+  --page-text-primary: #f1fcf8;
+  --page-text-secondary: rgba(209, 240, 234, 0.86);
+  --page-text-muted: rgba(145, 187, 179, 0.76);
+  --page-accent-soft: rgba(32, 201, 178, 0.16);
+  --page-accent-strong: rgba(32, 201, 178, 0.32);
+  --page-accent-glow: 0 22px 44px rgba(32, 201, 178, 0.14);
+}
+
 @media (max-width: 991px) {
   .develop-page .develop-shell > .el-card__body {
     padding: 18px;

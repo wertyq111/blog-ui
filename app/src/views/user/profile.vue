@@ -973,3 +973,117 @@ export default {
   }
 }
 </style>
+
+<style>
+body.cyber-theme-dark .profile-page__backdrop {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(32, 201, 178, 0.18), transparent 30%),
+    radial-gradient(circle at 84% 12%, rgba(214, 255, 114, 0.12), transparent 26%),
+    var(--page-surface-bg);
+}
+
+body.cyber-theme-dark .profile-page .profile-hero,
+body.cyber-theme-dark .profile-page .profile-panel {
+  border-color: var(--page-border-soft);
+  background: var(--page-surface-card);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 26px 56px rgba(2, 10, 16, 0.3);
+}
+
+body.cyber-theme-dark .profile-page .profile-hero__eyebrow,
+body.cyber-theme-dark .profile-page .profile-hero__meta-item,
+body.cyber-theme-dark .profile-page .profile-chip,
+body.cyber-theme-dark .profile-page .profile-avatar-upload,
+body.cyber-theme-dark .profile-page .profile-account-item {
+  background: var(--page-surface-float);
+  border: 1px solid var(--page-border-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.cyber-theme-dark .profile-page .profile-hero__eyebrow,
+body.cyber-theme-dark .profile-page .profile-panel__kicker,
+body.cyber-theme-dark .profile-page .el-tabs__item.is-active {
+  color: #53e3cf;
+}
+
+body.cyber-theme-dark .profile-page .profile-hero__headline h2,
+body.cyber-theme-dark .profile-page .profile-model-shell__fallback h3,
+body.cyber-theme-dark .profile-page .profile-panel__header h3,
+body.cyber-theme-dark .profile-page .profile-hero__meta-item strong,
+body.cyber-theme-dark .profile-page .profile-account-item__content strong {
+  color: var(--page-text-primary);
+}
+
+body.cyber-theme-dark .profile-page .profile-hero__headline p,
+body.cyber-theme-dark .profile-page .profile-model-shell__overlay,
+body.cyber-theme-dark .profile-page .profile-model-shell__fallback,
+body.cyber-theme-dark .profile-page .profile-hero__meta-item span,
+body.cyber-theme-dark .profile-page .profile-chip,
+body.cyber-theme-dark .profile-page .profile-panel__header p,
+body.cyber-theme-dark .profile-page .profile-avatar-upload__label,
+body.cyber-theme-dark .profile-page .profile-account-item__content p,
+body.cyber-theme-dark .profile-page .el-form-item__label,
+body.cyber-theme-dark .profile-page .el-tabs__item {
+  color: var(--page-text-muted);
+}
+
+body.cyber-theme-dark .profile-page .profile-model-shell {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(146, 255, 233, 0.14), transparent 40%),
+    linear-gradient(180deg, rgba(13, 34, 36, 0.94), rgba(9, 24, 29, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 18px 44px rgba(2, 10, 16, 0.24);
+}
+
+body.cyber-theme-dark .profile-page .profile-model-shell::after {
+  border-color: rgba(124, 226, 206, 0.18);
+}
+
+body.cyber-theme-dark .profile-page .profile-model-shell:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    var(--page-accent-glow);
+}
+
+body.cyber-theme-dark .profile-page .profile-model-shell__overlay,
+body.cyber-theme-dark .profile-page .profile-model-shell__fallback {
+  background: linear-gradient(180deg, rgba(9, 24, 29, 0.42), rgba(10, 28, 31, 0.92));
+}
+
+body.cyber-theme-dark .profile-page .profile-avatar-upload .finish_room2 .room_img,
+body.cyber-theme-dark .profile-page .profile-avatar-upload .room_add_img {
+  background: var(--page-surface-card-soft);
+  box-shadow: inset 0 0 0 1px rgba(102, 216, 195, 0.14);
+}
+
+body.cyber-theme-dark .profile-page .el-input__inner,
+body.cyber-theme-dark .profile-page .el-textarea__inner,
+body.cyber-theme-dark .profile-page .el-select .el-input__inner {
+  background: var(--page-surface-float);
+  border-color: var(--page-border-soft);
+  color: var(--page-text-primary);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.cyber-theme-dark .profile-page .el-input__inner::placeholder,
+body.cyber-theme-dark .profile-page .el-textarea__inner::placeholder {
+  color: rgba(145, 187, 179, 0.58);
+}
+
+body.cyber-theme-dark .profile-page .el-input__inner:focus,
+body.cyber-theme-dark .profile-page .el-textarea__inner:focus {
+  border-color: rgba(84, 230, 206, 0.48);
+  box-shadow: 0 0 0 4px rgba(32, 201, 178, 0.12);
+}
+
+body.cyber-theme-dark .profile-page .el-tabs__active-bar {
+  background: linear-gradient(90deg, #20c9b2, #7de8d2);
+}
+
+body.cyber-theme-dark .profile-page .el-button--primary {
+  background: linear-gradient(135deg, #20c9b2, #59e5cf);
+  box-shadow: 0 16px 30px rgba(32, 201, 178, 0.2);
+}
+</style>

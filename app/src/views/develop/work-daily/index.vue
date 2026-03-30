@@ -449,7 +449,7 @@ export default {
     },
     truncateText(md, len) {
       const plain = (md || "")
-        .replace(/[#>*_`~\[\]\(\)!-]/g, " ")
+        .replace(/[#>*_`~[\]()!-]/g, " ")
         .replace(/\n+/g, " ")
         .replace(/\s+/g, " ")
         .trim();
