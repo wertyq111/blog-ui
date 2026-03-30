@@ -323,6 +323,20 @@ export default {
     this.getUserInfo();
   },
   methods: {
+    mapUserInfoToForm(userData = {}) {
+      const member = userData.member || {};
+
+      return Object.assign(createDefaultForm(), {
+        avatar: member.avatar || '',
+        realname: member.realname || '',
+        nickname: member.nickname || '',
+        gender: Number(member.gender || 1),
+        mobile: userData.phone || '',
+        email: userData.email || '',
+        address: member.address || '',
+        intro: member.intro || ''
+      });
+    },
     resetModelState() {
       this.modelLoading = true;
       this.modelError = false;
@@ -337,10 +351,10 @@ export default {
     },
     getUserInfo() {
       if (setting.userUrl) {
-        this.$http.get(setting.userUrl).then((res) => {
+        this.$http.get(setting.userUrl, {params: {include: ['member']}}).then((res) => {
           const result = setting.parseUser ? setting.parseUser(res.data) : res.data;
           if (result.code === 0) {
-            this.form = Object.assign(createDefaultForm(), result.data || {});
+            this.form = this.mapUserInfoToForm(result.data || {});
           } else {
             this.$message.error(result.msg);
           }
