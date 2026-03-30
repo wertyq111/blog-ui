@@ -153,6 +153,8 @@ function getState(setting) {
     changeWeakMode(true);
   }
 
+  applyCyberThemeMode(state.darkMode);
+
   // 恢复上次主题色
   if (state.color || state.darkMode) {
     window.addEventListener('load', () => {
@@ -192,6 +194,20 @@ function changeWeakMode(weakMode) {
   } else {
     document.body.classList.remove(weakClass);
   }
+}
+
+/**
+ * 应用赛博主题模式类名
+ * 为明暗两套赛博主题同步 body 类名
+ * @param darkMode 是否暗黑模式
+ */
+function applyCyberThemeMode(darkMode) {
+  const baseClass = 'cyber-theme';
+  const darkClass = 'cyber-theme-dark';
+  const lightClass = 'cyber-theme-light';
+  document.body.classList.add(baseClass);
+  document.body.classList.toggle(darkClass, !!darkMode);
+  document.body.classList.toggle(lightClass, !darkMode);
 }
 
 /**
@@ -285,6 +301,7 @@ export default {
     setDarkMode({commit, state}, value) {
       return new Promise((resolve, reject) => {
         doChangeTheme(state.color, value).then(() => {
+          applyCyberThemeMode(value);
           commit('SET', {key: 'darkMode', value: value});
           return resolve();
         }).catch((e) => {

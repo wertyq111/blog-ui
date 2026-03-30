@@ -1,15 +1,16 @@
 <!-- 编辑弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :title="isUpdate?'修改框架模板':'添加框架模板'"
     :visible="visible"
-    custom-class="ele-dialog-form"
+    custom-class="ele-dialog-form develop-dialog"
     width="680px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
+      class="develop-dialog-form"
       :model="form"
       :rules="rules"
       label-width="100px">
@@ -58,7 +59,7 @@
         </el-col>
       </el-row>
     </el-form>
-    <div slot="footer">
+    <div slot="footer" class="develop-dialog-footer">
       <el-button
         @click="updateVisible(false)">取消
       </el-button>
@@ -68,7 +69,7 @@
         @click="save">保存
       </el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="admin-workspace-org-users">
     <!-- 数据表格 -->
     <ele-pro-table
       ref="table"
@@ -9,13 +9,13 @@
       height="calc(100vh - 261px)"
       tool-class="ele-toolbar-form">
       <!-- 表头工具栏 -->
-      <template slot="toolbar">
-        <el-form
-          :model="where"
-          class="ele-form-search"
-          size="small"
-          @keyup.enter.native="reload"
-          @submit.native.prevent>
+        <template slot="toolbar">
+          <el-form
+            :model="where"
+            class="ele-form-search develop-form"
+            size="small"
+            @keyup.enter.native="reload"
+            @submit.native.prevent>
           <el-row :gutter="10">
             <el-col :md="8">
               <el-form-item>

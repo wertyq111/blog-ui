@@ -8,17 +8,21 @@ import permission from './utils/permission';
 import './styles/index.scss';
 import EleAdmin from 'ele-admin';
 import DialogDirective from 'ele-admin/packages/dialog-directive';
+import AppDialog from './components/AppDialog.vue';
 import VueClipboard from 'vue-clipboard2';
 import i18n from './lang';
 import VueLazyload from 'vue-lazyload'
+import '@google/model-viewer';
 
 Vue.config.productionTip = false;
+Vue.config.ignoredElements = (Vue.config.ignoredElements || []).concat(['model-viewer']);
 Vue.use(EleAdmin, {
   i18n: (key, value) => i18n.t(key, value)
 });
 Vue.use(permission);
 Vue.use(DialogDirective);
 Vue.use(VueClipboard);
+Vue.component('AppDialog', AppDialog);
 
 // 懒加载配置
 Vue.use(VueLazyload, {

@@ -1,10 +1,19 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never">
+  <div class="ele-body develop-page develop-page--tool">
+    <el-card shadow="never" class="develop-shell">
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Develop Tooling</div>
+          <div class="develop-hero__title">路径转换</div>
+          <div class="develop-hero__desc">统一维护项目地址、服务器目标和转换入口，让开发路径切换更清晰、更可追踪。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <!-- 搜索表单 -->
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="77px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -30,6 +39,15 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
+
+      <section class="develop-table-shell">
+      <div class="develop-table-shell__header">
+        <div>
+          <div class="develop-table-shell__title">转换项目列表</div>
+          <div class="develop-table-shell__desc">项目网址、服务器地址和转换动作统一集中到一个工具工作区。</div>
+        </div>
+      </div>
       <!-- 数据表格 -->
       <ele-pro-table
         ref="table"
@@ -91,6 +109,7 @@
           </el-popconfirm>
         </template>
       </ele-pro-table>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <convert-path-edit

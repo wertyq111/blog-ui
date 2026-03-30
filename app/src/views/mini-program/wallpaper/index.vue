@@ -1,10 +1,20 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--wallpaper">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell">
+
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">Mini Program Console</div>
+          <div class="develop-hero__title">壁纸管理</div>
+          <div class="develop-hero__desc">维护壁纸资源、分类关系与发布信息，统一壁纸内容工作台。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <!-- 搜索表单 -->
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="77px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -43,7 +53,15 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
       <!-- 数据表格 -->
+      <section class="develop-table-shell">
+        <div class="develop-table-shell__header">
+          <div>
+            <div class="develop-table-shell__title">壁纸列表</div>
+            <div class="develop-table-shell__desc">支持分类筛选、标签查看与图片预览。</div>
+          </div>
+        </div>
       <ele-pro-table
         ref="table"
         :columns="columns"
@@ -111,6 +129,7 @@
           </el-popconfirm>
         </template>
       </ele-pro-table>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <wallpaper-edit

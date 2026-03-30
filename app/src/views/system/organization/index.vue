@@ -1,9 +1,25 @@
 <template>
-  <div class="ele-body">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--organization">
     <el-card
+      class="develop-shell admin-workspace-shell"
       v-loading="loading"
       body-style="padding-bottom: 0;"
       shadow="never">
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">System Management</div>
+          <div class="develop-hero__title">机构管理</div>
+          <div class="develop-hero__desc">维护机构树和所属用户关系，统一后台组织结构与人员归属。</div>
+        </div>
+      </section>
+
+      <section class="develop-table-shell admin-workspace-tree-shell">
+        <div class="develop-table-shell__header">
+          <div>
+            <div class="develop-table-shell__title">机构与用户视图</div>
+            <div class="develop-table-shell__desc">左侧维护机构树，右侧查看并管理当前机构下的用户列表。</div>
+          </div>
+        </div>
       <el-row :gutter="15">
         <el-col :lg="6" style="margin-bottom: 15px;">
           <!-- 操作按钮 -->
@@ -55,6 +71,7 @@
             :organization-list="data"/>
         </el-col>
       </el-row>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <org-edit

@@ -1,6 +1,6 @@
 <!-- 用户导入弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :visible="visible"
@@ -28,7 +28,7 @@
         </el-link>
       </div>
     </el-upload>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <!-- 详情弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :visible="visible"
@@ -77,7 +77,7 @@
       <el-button @click="updateVisible(false)">关闭
       </el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>

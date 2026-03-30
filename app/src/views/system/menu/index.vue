@@ -1,10 +1,20 @@
 <template>
-  <div class="ele-body">
-    <el-card shadow="never">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--menu">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell">
+
+      <section class="develop-hero">
+        <div class="develop-hero__copy">
+          <div class="develop-hero__eyebrow">System Management</div>
+          <div class="develop-hero__title">菜单管理</div>
+          <div class="develop-hero__desc">维护菜单层级、路由能力与权限标识，统一后台导航入口。</div>
+        </div>
+      </section>
+
+      <section class="develop-panel develop-panel--filter">
       <!-- 搜索表单 -->
       <el-form
         :model="where"
-        class="ele-form-search"
+        class="ele-form-search develop-form"
         label-width="77px"
         @keyup.enter.native="reload"
         @submit.native.prevent>
@@ -30,7 +40,15 @@
           </el-col>
         </el-row>
       </el-form>
+      </section>
       <!-- 数据表格 -->
+      <section class="develop-table-shell">
+        <div class="develop-table-shell__header">
+          <div>
+            <div class="develop-table-shell__title">菜单列表</div>
+            <div class="develop-table-shell__desc">支持层级查看、展开收起和菜单结构维护。</div>
+          </div>
+        </div>
       <ele-pro-table
         ref="table"
         :columns="columns"
@@ -119,6 +137,7 @@
           </el-popconfirm>
         </template>
       </ele-pro-table>
+      </section>
     </el-card>
     <!-- 编辑弹窗 -->
     <menu-edit

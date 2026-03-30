@@ -1,6 +1,6 @@
 <!-- 角色权限分配弹窗 -->
 <template>
-  <el-dialog
+  <app-dialog
     :destroy-on-close="true"
     :lock-scroll="false"
     :visible="visible"
@@ -33,7 +33,7 @@
         @click="save">保存
       </el-button>
     </div>
-  </el-dialog>
+  </app-dialog>
 </template>
 
 <script>
