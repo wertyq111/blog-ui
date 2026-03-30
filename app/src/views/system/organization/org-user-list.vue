@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="develop-panel develop-panel--workspace admin-workspace-org-users-panel">
     <div class="develop-table-shell__header">
       <div>
@@ -82,6 +83,95 @@
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
+=======
+  <div class="admin-workspace-org-users">
+    <!-- 数据表格 -->
+    <ele-pro-table
+      ref="table"
+      :columns="columns"
+      :datasource="url"
+      :where="where"
+      height="calc(100vh - 261px)"
+      tool-class="ele-toolbar-form">
+      <!-- 表头工具栏 -->
+        <template slot="toolbar">
+          <el-form
+            :model="where"
+            class="ele-form-search develop-form"
+            size="small"
+            @keyup.enter.native="reload"
+            @submit.native.prevent>
+          <el-row :gutter="10">
+            <el-col :md="8">
+              <el-form-item>
+                <el-input
+                  v-model="where.username"
+                  clearable
+                  placeholder="请输入用户账号"
+                  size="small"/>
+              </el-form-item>
+            </el-col>
+            <el-col :md="8">
+              <el-form-item>
+                <el-input
+                  v-model="where.nickname"
+                  clearable
+                  placeholder="请输入用户名"
+                  size="small"/>
+              </el-form-item>
+            </el-col>
+            <el-col :md="8">
+              <el-form-item>
+                <el-button
+                  class="ele-btn-icon"
+                  icon="el-icon-search"
+                  size="small"
+                  type="primary"
+                  @click="reload">查询
+                </el-button>
+                <el-button
+                  class="ele-btn-icon"
+                  icon="el-icon-plus"
+                  size="small"
+                  type="primary"
+                  @click="openEdit(null)">添加
+                </el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </template>
+      <!-- 角色列 -->
+      <template slot="roles" slot-scope="{row}">
+        <el-tag
+          v-for="item in row.roles"
+          :key="item.roleId"
+          size="mini"
+          type="primary">
+          {{ item.roleName }}
+        </el-tag>
+      </template>
+      <!-- 状态列 -->
+      <template slot="state" slot-scope="{row}">
+        <el-switch
+          v-model="row.state"
+          :active-value="0"
+          :inactive-value="1"
+          @change="editState(row)"/>
+      </template>
+      <!-- 操作列 -->
+      <template slot="action" slot-scope="{row}">
+        <el-link
+          :underline="false"
+          icon="el-icon-edit"
+          type="primary"
+          @click="openEdit(row)">修改
+        </el-link>
+        <el-popconfirm
+          class="ele-action"
+          title="确定要删除此用户吗？"
+          @confirm="remove(row)">
+>>>>>>> efda26ebb1669c0719a2a23e74494cc9f1d18af1
           <el-link
             :underline="false"
             icon="el-icon-edit"
