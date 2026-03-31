@@ -13,7 +13,7 @@
         </div>
       </section>
 
-      <section class="develop-table-shell admin-workspace-tree-shell">
+      <section class="develop-panel develop-panel--workspace admin-workspace-tree-shell">
         <div class="develop-table-shell__header">
           <div>
             <div class="develop-table-shell__title">机构与用户视图</div>
@@ -168,10 +168,7 @@ export default {
 
 <style scoped>
 .org-tree-group {
-  border: 1px solid hsla(0, 0%, 60%, .15);
-  height: calc(100vh - 262px);
   box-sizing: border-box;
-  overflow: auto;
 }
 
 .org-tree-group ::v-deep .el-tree-node__content {

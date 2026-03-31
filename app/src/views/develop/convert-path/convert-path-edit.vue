@@ -14,59 +14,68 @@
       :model="form"
       :rules="rules"
       label-width="100px">
-      <el-row :gutter="15">
-        <el-col :sm="12">
-          <el-form-item label="项目编码:" prop="code">
-            <el-input
-              v-model="form.code"
-              :maxlength="20"
-              clearable
-              placeholder="请输入项目编码"/>
-          </el-form-item>
-        </el-col>
-        <el-col :sm="12">
-          <el-form-item label="项目名称:" prop="name">
-            <el-input
-              v-model="form.name"
-              :maxlength="20"
-              clearable
-              placeholder="请输入项目名称"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="15">
-        <el-col :sm="24">
-          <el-form-item label="服务器地址:" prop="target">
-            <el-input
-              v-model="form.target"
-              :maxlength="200"
-              clearable
-              placeholder="请输入服务器地址"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-        <el-row v-for="(item, index) in form.sources" :key="index" :gutter="15">
-          <el-col :sm="21">
-            <el-form-item :label=sourceNum(index) prop="sources">
-              <el-input
-                v-model="form.sources[index]"
-                :maxlength="200"
-                clearable
-                placeholder="请输入来源地址"/>
-            </el-form-item>
-          </el-col>
-          <!-- 若表单中没有值则不可以新增sources -->
-          <span v-if="index === 0"
-                :class="form.sources[form.sources.length - 1] === '' ? 'change-icon-add': 'change-icon'">
-          <i :style="{pointerEvents:form.sources[form.sources.length - 1] === '' ? 'none' : 'auto'}"
-             class="el-icon-plus"
-             @click="addSource()"
-          ></i>
-        </span>
-          <span v-else class="change-icon" @click="deleteSource(index)">
-            <i class="el-icon-minus"></i>
-          </span>
-        </el-row>
+      <div class="develop-dialog-card">
+        <div class="develop-dialog-card__title">基础信息</div>
+        <div class="develop-dialog-card__body">
+          <el-row :gutter="15">
+            <el-col :sm="12">
+              <el-form-item label="项目编码:" prop="code">
+                <el-input
+                  v-model="form.code"
+                  :maxlength="20"
+                  clearable
+                  placeholder="请输入项目编码"/>
+              </el-form-item>
+            </el-col>
+            <el-col :sm="12">
+              <el-form-item label="项目名称:" prop="name">
+                <el-input
+                  v-model="form.name"
+                  :maxlength="20"
+                  clearable
+                  placeholder="请输入项目名称"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="15">
+            <el-col :sm="24">
+              <el-form-item label="服务器地址:" prop="target">
+                <el-input
+                  v-model="form.target"
+                  :maxlength="200"
+                  clearable
+                  placeholder="请输入服务器地址"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row
+            v-for="(item, index) in form.sources"
+            :key="index"
+            :gutter="15">
+            <el-col :sm="21">
+              <el-form-item :label="sourceNum(index)" prop="sources">
+                <el-input
+                  v-model="form.sources[index]"
+                  :maxlength="200"
+                  clearable
+                  placeholder="请输入来源地址"/>
+              </el-form-item>
+            </el-col>
+            <!-- 若表单中没有值则不可以新增sources -->
+            <span
+              v-if="index === 0"
+              :class="form.sources[form.sources.length - 1] === '' ? 'change-icon-add': 'change-icon'">
+              <i
+                :style="{pointerEvents:form.sources[form.sources.length - 1] === '' ? 'none' : 'auto'}"
+                class="el-icon-plus"
+                @click="addSource()"></i>
+            </span>
+            <span v-else class="change-icon" @click="deleteSource(index)">
+              <i class="el-icon-minus"></i>
+            </span>
+          </el-row>
+        </div>
+      </div>
     </el-form>
     <div slot="footer" class="develop-dialog-footer">
       <el-button
@@ -205,25 +214,50 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-card {
+  padding: 16px;
+  border: 1px solid var(--develop-dialog-card-border, rgba(215, 228, 205, 0.86));
+  border-radius: 18px;
+  background: var(--develop-dialog-card-bg,
+    radial-gradient(circle at top right, rgba(173, 236, 109, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 243, 0.76) 100%));
+  box-shadow: var(--develop-dialog-card-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 14px 28px rgba(160, 186, 145, 0.12));
+}
+
+.develop-dialog-card__title {
+  margin-bottom: 14px;
+  color: var(--develop-dialog-card-title, #2d392d);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.develop-dialog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 span {
   margin: 0 8px;
 }
 
-.change-icon {
+.change-icon,
+.change-icon-add {
   align-items: center;
-  color: #7aa126;
   display: inline-flex;
   font-size: 22px;
-  cursor: pointer;
   height: 42px;
 }
 
+.change-icon {
+  color: #7aa126;
+  cursor: pointer;
+}
+
 .change-icon-add {
-  align-items: center;
   color: #c3cbbf;
-  display: inline-flex;
-  font-size: 22px;
   cursor: no-drop;
-  height: 42px;
 }
 </style>

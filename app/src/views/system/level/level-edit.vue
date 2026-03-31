@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">职级用于区分岗位层级，排序号越小越靠前。</div>
       <el-form-item
         label="职级名称:"
         prop="name">

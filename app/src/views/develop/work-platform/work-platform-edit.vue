@@ -14,31 +14,36 @@
       :model="form"
       :rules="rules"
       label-width="90px">
-      <el-row :gutter="15">
-        <el-col :sm="24">
-          <el-form-item label="平台名称:" prop="name">
-            <el-input v-model="form.name" :maxlength="50" clearable placeholder="请输入平台名称"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="15">
-        <el-col :sm="12">
-          <el-form-item label="状态:" prop="status">
-            <el-switch
-              v-model="form.status"
-              :active-value="1"
-              :inactive-value="0"
-              active-color="#13ce66"
-              inactive-color="#c0c4cc"
-              aria-label="平台启用状态开关"/>
-          </el-form-item>
-        </el-col>
-        <el-col :sm="12">
-          <el-form-item label="排序:" prop="sort">
-            <el-input-number v-model="form.sort" :min="0" style="width: 100%"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <div class="develop-dialog-card">
+        <div class="develop-dialog-card__title">平台信息</div>
+        <div class="develop-dialog-card__body">
+          <el-row :gutter="15">
+            <el-col :sm="24">
+              <el-form-item label="平台名称:" prop="name">
+                <el-input v-model="form.name" :maxlength="50" clearable placeholder="请输入平台名称"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="15">
+            <el-col :sm="12">
+              <el-form-item label="状态:" prop="status">
+                <el-switch
+                  v-model="form.status"
+                  :active-value="1"
+                  :inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#c0c4cc"
+                  aria-label="平台启用状态开关"/>
+              </el-form-item>
+            </el-col>
+            <el-col :sm="12">
+              <el-form-item label="排序:" prop="sort">
+                <el-input-number v-model="form.sort" :min="0" style="width: 100%"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
     </el-form>
     <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
@@ -111,4 +116,28 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-card {
+  padding: 16px;
+  border: 1px solid var(--develop-dialog-card-border, rgba(215, 228, 205, 0.86));
+  border-radius: 18px;
+  background: var(--develop-dialog-card-bg,
+    radial-gradient(circle at top right, rgba(173, 236, 109, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 243, 0.76) 100%));
+  box-shadow: var(--develop-dialog-card-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 14px 28px rgba(160, 186, 145, 0.12));
+}
+
+.develop-dialog-card__title {
+  margin-bottom: 14px;
+  color: var(--develop-dialog-card-title, #2d392d);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.develop-dialog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 </style>

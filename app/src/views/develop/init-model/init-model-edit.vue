@@ -14,50 +14,60 @@
       :model="form"
       :rules="rules"
       label-width="100px">
-      <el-row :gutter="15">
-        <el-col :sm="12">
-          <el-form-item label="框架编码:" prop="code">
-            <el-input
-              v-model="form.code"
-              :maxlength="20"
-              clearable
-              placeholder="请输入框架编码"/>
-          </el-form-item>
-        </el-col>
-        <el-col :sm="12">
-          <el-form-item label="框架名称:" prop="name">
-            <el-input
-              v-model="form.name"
-              :maxlength="20"
-              clearable
-              placeholder="请输入框架名称"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="15">
-        <el-col :sm="21">
-          <el-form-item label="模板提示:" prop="tip">
-            <el-input
-              v-model="form.tip"
-              :maxlength="200"
-              clearable
-              placeholder="请输入模板提示"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="15">
-        <el-col :sm="21">
-          <el-form-item label="模型模板:" prop="template">
-            <el-input
-              v-model="form.template"
-              :maxlength="200"
-              :rows="4"
-              clearable
-              placeholder="请输入模型模板"
-              type="textarea" />
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <div class="develop-dialog-card">
+        <div class="develop-dialog-card__title">基础信息</div>
+        <div class="develop-dialog-card__body">
+          <el-row :gutter="15">
+            <el-col :sm="12">
+              <el-form-item label="框架编码:" prop="code">
+                <el-input
+                  v-model="form.code"
+                  :maxlength="20"
+                  clearable
+                  placeholder="请输入框架编码"/>
+              </el-form-item>
+            </el-col>
+            <el-col :sm="12">
+              <el-form-item label="框架名称:" prop="name">
+                <el-input
+                  v-model="form.name"
+                  :maxlength="20"
+                  clearable
+                  placeholder="请输入框架名称"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="15">
+            <el-col :sm="21">
+              <el-form-item label="模板提示:" prop="tip">
+                <el-input
+                  v-model="form.tip"
+                  :maxlength="200"
+                  clearable
+                  placeholder="请输入模板提示"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+      <div class="develop-dialog-card develop-dialog-card--result">
+        <div class="develop-dialog-card__title">模型模板</div>
+        <div class="develop-dialog-card__body">
+          <el-row :gutter="15">
+            <el-col :sm="21">
+              <el-form-item label="模型模板:" prop="template">
+                <el-input
+                  v-model="form.template"
+                  :maxlength="200"
+                  :rows="4"
+                  clearable
+                  placeholder="请输入模型模板"
+                  type="textarea" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
     </el-form>
     <div slot="footer" class="develop-dialog-footer">
       <el-button
@@ -158,4 +168,32 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-card {
+  padding: 16px;
+  border: 1px solid var(--develop-dialog-card-border, rgba(215, 228, 205, 0.86));
+  border-radius: 18px;
+  background: var(--develop-dialog-card-bg,
+    radial-gradient(circle at top right, rgba(173, 236, 109, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 243, 0.76) 100%));
+  box-shadow: var(--develop-dialog-card-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 14px 28px rgba(160, 186, 145, 0.12));
+}
+
+.develop-dialog-card + .develop-dialog-card {
+  margin-top: 14px;
+}
+
+.develop-dialog-card__title {
+  margin-bottom: 14px;
+  color: var(--develop-dialog-card-title, #2d392d);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.develop-dialog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 </style>

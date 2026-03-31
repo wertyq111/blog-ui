@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">会员等级用于成长体系和权益分层。</div>
       <el-form-item
         label="等级名称:"
         prop="name">

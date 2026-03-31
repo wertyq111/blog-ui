@@ -16,6 +16,7 @@
       label-width="92px"
       @keyup.enter.native="save"
       @submit.native.prevent>
+      <div class="field-desc">维护部门名称、编码、层级和排序，保持组织树展示一致。</div>
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="部门名称:" prop="name">

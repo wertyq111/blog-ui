@@ -16,6 +16,7 @@
       label-width="92px"
       @keyup.enter.native="save"
       @submit.native.prevent>
+      <div class="field-desc">配置菜单层级、打开方式和权限节点，决定路由与按钮权限展示。</div>
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="上级菜单:">

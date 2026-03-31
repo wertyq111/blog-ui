@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">维护机构层级、类型和基础信息，统一组织树结构。</div>
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="上级机构:">

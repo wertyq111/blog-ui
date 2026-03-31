@@ -19,14 +19,13 @@
     :layout-style="theme.layoutStyle"
     :logo-auto-size="theme.logoAutoSize"
     :menus="user.menus"
-    :need-setting="setting.needSetting"
+    :need-setting="false"
     :project-name="projectName"
     :repeatable-tabs="setting.repeatableTabs"
     :show-content="showContent"
     :show-footer="theme.showFooter"
-    :show-setting.sync="showSetting"
     :show-tabs="theme.showTabs"
-    :side-menu-style="theme.sideMenuStyle"
+    side-menu-style="default"
     :side-style="theme.sideStyle"
     :side-unique-open="theme.sideUniqueOpen"
     :tab-style="theme.tabStyle"
@@ -57,7 +56,7 @@
     <template slot="right">
       <ele-header-right
         ref="header"
-        :show-setting="setting.needSetting"
+        :show-setting="setting.showSetting"
         @change-language="changeLanguage"
         @item-click="onItemClick"/>
     </template>
@@ -67,6 +66,29 @@
     </template>
     <!-- 修改密码弹窗 -->
     <ele-password :visible.sync="showPassword"/>
+    <!-- 主题设置抽屉 -->
+    <ele-setting-drawer
+      :visible.sync="showSetting"
+      :color="theme.color"
+      :dark-mode="theme.darkMode"
+      :weak-mode="theme.weakMode"
+      :show-tabs="theme.showTabs"
+      :tab-style="theme.tabStyle"
+      :body-full="theme.bodyFull"
+      :head-style="theme.headStyle"
+      :side-style="theme.sideStyle"
+      :fixed-body="theme.fixedBody"
+      :show-footer="theme.showFooter"
+      :fixed-header="theme.fixedHeader"
+      :layout-style="theme.layoutStyle"
+      :fixed-sidebar="theme.fixedSidebar"
+      :colorful-icon="theme.colorfulIcon"
+      :logo-auto-size="theme.logoAutoSize"
+      :side-unique-open="theme.sideUniqueOpen"
+      @change-style="changeStyle"
+      @change-color="changeColor"
+      @change-dark-mode="changeDarkMode"
+      @change-weak-mode="changeWeakMode"/>
   </ele-pro-layout>
 </template>
 
@@ -75,6 +97,7 @@ import {mapGetters} from 'vuex';
 import EleHeaderRight from './header-right.vue';
 import ElePassword from './password.vue';
 import EleFooter from './footer.vue';
+import EleSettingDrawer from './setting-drawer.vue';
 import setting from '@/config/setting';
 import {
   addPageTab,
@@ -91,7 +114,8 @@ export default {
   components: {
     EleHeaderRight,
     ElePassword,
-    EleFooter
+    EleFooter,
+    EleSettingDrawer
   },
   computed: {
     // 主页标题, 移除国际化上面template中使用:home-title="setting.homeTitle"
@@ -115,10 +139,17 @@ export default {
     };
   },
   created() {
+    this.ensureDefaultSideMenuStyle();
     // 获取用户信息
     this.getUserInfo();
   },
   methods: {
+    /* 禁用侧栏双排菜单并清理已缓存配置 */
+    ensureDefaultSideMenuStyle() {
+      if (this.theme.sideMenuStyle !== 'default') {
+        this.$store.dispatch('theme/set', {key: 'sideMenuStyle', value: 'default'});
+      }
+    },
     /* 获取当前用户信息 */
     getUserInfo() {
       if (setting.userUrl) {

@@ -71,26 +71,29 @@
         height="calc(100vh - 315px)">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
-          <el-button
-            v-if="permission.includes('sys:photo:add')"
-            class="ele-btn-icon"
-            icon="el-icon-plus"
-            size="small"
-            type="primary"
-            @click="openEdit(null)">添加
-          </el-button>
-          <el-button
-            v-if="permission.includes('sys:photo:dall')"
-            class="ele-btn-icon"
-            icon="el-icon-delete"
-            size="small"
-            type="danger"
-            @click="removeBatch">删除
-          </el-button>
+          <div class="mini-program-toolbar">
+            <el-button
+              v-if="permission.includes('sys:photo:add')"
+              class="ele-btn-icon"
+              icon="el-icon-plus"
+              size="small"
+              type="primary"
+              @click="openEdit(null)">添加
+            </el-button>
+            <el-button
+              v-if="permission.includes('sys:photo:dall')"
+              class="ele-btn-icon"
+              icon="el-icon-delete"
+              size="small"
+              type="danger"
+              @click="removeBatch">删除
+            </el-button>
+          </div>
         </template>
         <!-- 略缩图 -->
         <template slot="smallPicUrl" slot-scope="{row}">
           <el-image
+            class="mini-program-preview"
             style="width: 100px; height: 100px"
             fit="contain"
             :src="row.smallPicUrl"
@@ -335,4 +338,15 @@ export default {
 </script>
 
 <style scoped>
+.mini-program-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mini-program-preview ::v-deep .el-image__inner {
+  background: #f7f9fc;
+  object-fit: contain;
+}
 </style>

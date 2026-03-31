@@ -1,6 +1,6 @@
 <template>
-  <div class="ele-body develop-page develop-page--platform">
-    <el-card shadow="never" class="develop-shell" id="table_form">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--platform develop-page--platform">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell" id="table_form">
       <section class="develop-hero">
         <div class="develop-hero__copy">
           <div class="develop-hero__eyebrow">Develop Workspace</div>

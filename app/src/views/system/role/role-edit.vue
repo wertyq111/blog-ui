@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">维护角色标识、状态和排序，关联权限分配使用。</div>
       <el-form-item
         label="角色名称:"
         prop="name">

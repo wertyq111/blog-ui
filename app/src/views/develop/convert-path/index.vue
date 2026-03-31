@@ -1,6 +1,6 @@
 <template>
-  <div class="ele-body develop-page develop-page--tool">
-    <el-card shadow="never" class="develop-shell">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--tool develop-page--tool">
+    <el-card shadow="never" class="develop-shell admin-workspace-shell">
       <section class="develop-hero">
         <div class="develop-hero__copy">
           <div class="develop-hero__eyebrow">Develop Tooling</div>

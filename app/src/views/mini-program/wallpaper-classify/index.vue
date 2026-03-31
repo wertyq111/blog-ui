@@ -58,22 +58,24 @@
         height="calc(100vh - 315px)">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
-          <el-button
-            v-if="permission.includes('sys:wallpaper-classify:add')"
-            class="ele-btn-icon"
-            icon="el-icon-plus"
-            size="small"
-            type="primary"
-            @click="openEdit(null)">添加
-          </el-button>
-          <el-button
-            v-if="permission.includes('sys:wallpaper-classify:dall')"
-            class="ele-btn-icon"
-            icon="el-icon-delete"
-            size="small"
-            type="danger"
-            @click="removeBatch">删除
-          </el-button>
+          <div class="mini-program-toolbar">
+            <el-button
+              v-if="permission.includes('sys:wallpaper-classify:add')"
+              class="ele-btn-icon"
+              icon="el-icon-plus"
+              size="small"
+              type="primary"
+              @click="openEdit(null)">添加
+            </el-button>
+            <el-button
+              v-if="permission.includes('sys:wallpaper-classify:dall')"
+              class="ele-btn-icon"
+              icon="el-icon-delete"
+              size="small"
+              type="danger"
+              @click="removeBatch">删除
+            </el-button>
+          </div>
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
@@ -231,4 +233,10 @@ export default {
 </script>
 
 <style scoped>
+.mini-program-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 </style>

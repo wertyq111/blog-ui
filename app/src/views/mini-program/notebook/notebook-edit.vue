@@ -24,7 +24,10 @@
         </el-col>
       </el-form-item>
       <el-form-item label="内容:" prop="title">
-        <tinymce-editor :height="300" v-model="form.content" :init="initEditor"/>
+        <div class="develop-dialog-editor-card">
+          <div class="field-desc">支持图文混排，建议先完成正文结构，再补充封面图。</div>
+          <tinymce-editor :height="300" v-model="form.content" :init="initEditor"/>
+        </div>
       </el-form-item>
       <el-form-item label="文章分类:" prop="categoryId">
         <el-col :span="8">
@@ -54,14 +57,16 @@
         </el-col>
       </el-form-item>
       <el-form-item label="背景:" prop="cover">
-        <upload-qiniu-picture
-          v-model="form.cover"
-          :isAdmin="false"
-          :prefix="'articleCover'"
-          style="margin-top: 10px"
-          :maxSize="2"
-          :maxNumber="1"
-          @addPicture="handleCover"/>
+        <div class="develop-dialog-media-card">
+          <div class="field-desc">建议使用横图或留白充足的封面，便于文章卡片与详情页统一展示。</div>
+          <upload-qiniu-picture
+            v-model="form.cover"
+            :isAdmin="false"
+            :prefix="'articleCover'"
+            :maxSize="2"
+            :maxNumber="1"
+            @addPicture="handleCover"/>
+        </div>
       </el-form-item>
       <el-form-item label="启用评论:" prop="comment_status">
         <el-switch
@@ -162,14 +167,12 @@ export default {
       return {
         height: 300,
         branding: false,
-        skin_url: '/tinymce/skins/ui/oxide',
-        content_css: '/tinymce/skins/content/default/content.css',
         language_url: '/tinymce/langs/zh_CN.js',
         language: 'zh_CN',
         plugins: 'code print preview fullscreen paste searchreplace save autosave link autolink image imagetools media table codesample lists advlist hr charmap emoticons anchor directionality pagebreak quickbars nonbreaking visualblocks visualchars wordcount',
         toolbar: 'fullscreen preview code | undo redo | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | formatselect fontselect fontsizeselect | link image media emoticons charmap anchor pagebreak codesample | ltr rtl',
         toolbar_drawer: 'sliding',
-        images_upload_handler: async (blobInfo, success, error) => {``
+        images_upload_handler: async (blobInfo, success, error) => {
           let file = blobInfo.blob();
 
           // 上传到七牛云
@@ -315,6 +318,101 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-form {
+  padding-top: 4px;
+}
+
+.develop-dialog-form ::v-deep .el-form-item {
+  margin-bottom: 16px;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--notebook-dialog-item-border, rgba(214, 222, 232, 0.92));
+  border-radius: 16px;
+  background: var(--notebook-dialog-item-bg, linear-gradient(180deg, #ffffff 0%, #f8fafc 100%));
+  box-shadow: var(--notebook-dialog-item-shadow, 0 12px 28px rgba(15, 23, 42, 0.05));
+}
+
+.develop-dialog-form ::v-deep .el-form-item__label {
+  padding: 0 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--notebook-dialog-label, #4b5563);
+}
+
+.develop-dialog-form ::v-deep .el-input__inner,
+.develop-dialog-form ::v-deep .el-textarea__inner,
+.develop-dialog-form ::v-deep .el-select .el-input__inner,
+.develop-dialog-form ::v-deep .el-input-number .el-input__inner {
+  border-radius: 12px;
+  border-color: var(--notebook-dialog-input-border, rgba(210, 218, 230, 0.95));
+  background: var(--notebook-dialog-input-bg, rgba(255, 255, 255, 0.96));
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.develop-dialog-form ::v-deep .el-input__inner:focus,
+.develop-dialog-form ::v-deep .el-textarea__inner:focus,
+.develop-dialog-form ::v-deep .el-select .el-input__inner:focus,
+.develop-dialog-form ::v-deep .el-input-number .el-input__inner:focus {
+  border-color: var(--notebook-dialog-input-focus-border, #98aecd);
+  box-shadow: var(--notebook-dialog-input-focus-shadow, 0 0 0 3px rgba(82, 126, 196, 0.08));
+}
+
+.develop-dialog-form ::v-deep .field-desc {
+  margin-bottom: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--notebook-dialog-desc, #8a94a6);
+}
+
+.develop-dialog-form ::v-deep .el-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.develop-dialog-media-card,
+.develop-dialog-editor-card {
+  padding: 14px;
+  border: 1px solid var(--notebook-dialog-panel-border, rgba(208, 217, 230, 0.96));
+  border-radius: 18px;
+  background: var(--notebook-dialog-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 249, 252, 0.98) 100%));
+  box-shadow: var(--notebook-dialog-panel-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 10px 24px rgba(15, 23, 42, 0.05));
+}
+
+.develop-dialog-media-card ::v-deep .avatar-uploader .el-upload,
+.develop-dialog-media-card ::v-deep .upload-demo .el-upload,
+.develop-dialog-media-card ::v-deep .el-upload-dragger {
+  width: 100%;
+  min-height: 176px;
+  border-radius: 14px;
+  border-color: var(--notebook-dialog-upload-border, rgba(186, 198, 214, 0.96));
+  background: var(--notebook-dialog-upload-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(242, 246, 251, 0.96) 100%));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.develop-dialog-media-card ::v-deep .avatar-uploader .el-upload:hover,
+.develop-dialog-media-card ::v-deep .upload-demo .el-upload:hover,
+.develop-dialog-media-card ::v-deep .el-upload-dragger:hover {
+  border-color: var(--notebook-dialog-upload-hover-border, #8ba6cf);
+}
+
+.develop-dialog-media-card ::v-deep .avatar-uploader-icon,
+.develop-dialog-media-card ::v-deep .el-upload__text,
+.develop-dialog-media-card ::v-deep .el-upload__tip {
+  color: var(--notebook-dialog-upload-text, #647083);
+}
+
+.develop-dialog-editor-card ::v-deep .tox-tinymce {
+  border: 0 !important;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.develop-dialog-editor-card ::v-deep .tox-editor-container,
+.develop-dialog-editor-card ::v-deep .tox-editor-header {
+  border-radius: 14px;
+}
+
 .score {
   margin-top: 10px;
 }

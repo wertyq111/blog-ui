@@ -1,6 +1,6 @@
 <template>
-  <div class="ele-body develop-page develop-page--daily work-daily-page">
-    <el-card shadow="never" class="daily-page-card">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--daily develop-page--daily work-daily-page">
+    <el-card shadow="never" class="daily-page-card admin-workspace-shell">
       <section class="develop-hero">
         <div class="develop-hero__copy">
           <div class="develop-hero__eyebrow">Develop Workspace</div>
@@ -199,7 +199,7 @@
                 :key="idx"
                 class="daily-content-item">
                 <div class="daily-content-item__platform">{{ p.platformName || p.platform_name || findPlatformName(p.platformId || p.platform_id) }}</div>
-                <el-popover placement="top" width="520" trigger="hover">
+                <el-popover placement="top" width="520" trigger="hover" popper-class="work-daily-preview-popper">
                   <div class="daily-markdown-preview">
                     <mavon-editor
                       :value="p.content || ''"

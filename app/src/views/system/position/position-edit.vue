@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">岗位信息用于用户任职与筛选，便于统一维护。</div>
       <el-form-item
         label="岗位名称:"
         prop="name">

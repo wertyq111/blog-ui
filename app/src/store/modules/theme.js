@@ -92,8 +92,6 @@ function getState(setting) {
     tabStyle: 'default',
     // 布局风格: side(默认), top(顶栏菜单), mix(混合菜单)
     layoutStyle: 'side',
-    // 侧边栏菜单风格: default(默认), mix(双排菜单)
-    sideMenuStyle: 'default',
     // 是否固定侧栏
     fixedSidebar: true,
     // 是否固定顶栏

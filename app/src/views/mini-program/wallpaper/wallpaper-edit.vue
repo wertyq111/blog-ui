@@ -15,14 +15,16 @@
       :rules="rules"
       label-width="82px">
       <el-form-item label="壁纸:" prop="smallPicUrl">
-        <upload-qiniu-picture
-          v-model="form.smallPicUrl"
-          :isAdmin="false"
-          :prefix="'wallpaper'"
-          style="margin-top: 10px"
-          :maxSize="2"
-          :maxNumber="1"
-          @addPicture="handleWallpaper"/>
+        <div class="develop-dialog-media-card">
+          <div class="field-desc">建议上传高清壁纸，列表封面和详情预览会统一使用这张图。</div>
+          <upload-qiniu-picture
+            v-model="form.smallPicUrl"
+            :isAdmin="false"
+            :prefix="'wallpaper'"
+            :maxSize="2"
+            :maxNumber="1"
+            @addPicture="handleWallpaper"/>
+        </div>
       </el-form-item>
       <el-form-item label="壁纸分类:" prop="classId">
         <el-col :span="8">
@@ -226,6 +228,88 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-form {
+  padding-top: 4px;
+}
+
+.develop-dialog-form ::v-deep .el-form-item {
+  margin-bottom: 16px;
+  padding: 14px 16px 16px;
+  border: 1px solid rgba(214, 222, 232, 0.92);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.develop-dialog-form ::v-deep .el-form-item__label {
+  padding: 0 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.develop-dialog-form ::v-deep .el-input__inner,
+.develop-dialog-form ::v-deep .el-textarea__inner,
+.develop-dialog-form ::v-deep .el-select .el-input__inner,
+.develop-dialog-form ::v-deep .el-input-number .el-input__inner {
+  border-radius: 12px;
+  border-color: rgba(210, 218, 230, 0.95);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.develop-dialog-form ::v-deep .el-input__inner:focus,
+.develop-dialog-form ::v-deep .el-textarea__inner:focus,
+.develop-dialog-form ::v-deep .el-select .el-input__inner:focus,
+.develop-dialog-form ::v-deep .el-input-number .el-input__inner:focus {
+  border-color: #98aecd;
+  box-shadow: 0 0 0 3px rgba(82, 126, 196, 0.08);
+}
+
+.develop-dialog-form ::v-deep .field-desc {
+  margin-bottom: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8a94a6;
+}
+
+.develop-dialog-form ::v-deep .el-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.develop-dialog-media-card {
+  padding: 14px;
+  border: 1px solid rgba(208, 217, 230, 0.96);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 249, 252, 0.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.develop-dialog-media-card ::v-deep .avatar-uploader .el-upload,
+.develop-dialog-media-card ::v-deep .upload-demo .el-upload,
+.develop-dialog-media-card ::v-deep .el-upload-dragger {
+  width: 100%;
+  min-height: 176px;
+  border-radius: 14px;
+  border-color: rgba(186, 198, 214, 0.96);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(242, 246, 251, 0.96) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.develop-dialog-media-card ::v-deep .avatar-uploader .el-upload:hover,
+.develop-dialog-media-card ::v-deep .upload-demo .el-upload:hover,
+.develop-dialog-media-card ::v-deep .el-upload-dragger:hover {
+  border-color: #8ba6cf;
+}
+
+.develop-dialog-media-card ::v-deep .avatar-uploader-icon,
+.develop-dialog-media-card ::v-deep .el-upload__text,
+.develop-dialog-media-card ::v-deep .el-upload__tip {
+  color: #647083;
+}
+
 .score {
   margin-top: 10px;
 }

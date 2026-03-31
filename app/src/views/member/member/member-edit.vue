@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">维护会员基础资料、城市和等级信息，统一会员画像。</div>
       <el-form-item label="会员账号:">
         <span class="ele-text-primary">{{ form.user ? form.user.username : null }}</span>
       </el-form-item>

@@ -1,6 +1,6 @@
 <template>
-  <div class="ele-body develop-page develop-page--doc work-doc-page">
-    <el-card shadow="never" class="develop-shell develop-shell--doc" v-loading="loading">
+  <div class="ele-body develop-page admin-workspace-page admin-workspace-page--doc develop-page--doc work-doc-page">
+    <el-card shadow="never" class="develop-shell develop-shell--doc admin-workspace-shell" v-loading="loading">
       <section class="develop-hero develop-hero--doc">
         <div class="develop-hero__copy">
           <div class="develop-hero__eyebrow">Develop Workspace</div>
@@ -237,7 +237,7 @@
       :fullscreen="previewFullscreen"
       :show-close="false"
       width="80%"
-      custom-class="doc-preview-dialog">
+      custom-class="develop-dialog doc-preview-dialog">
       <div slot="title" class="doc-preview-title">
         <div class="doc-preview-name">
           <div class="doc-preview-name__text">{{ previewDoc.title }}</div>
@@ -288,7 +288,7 @@
           </el-tooltip>
         </div>
       </div>
-      <div class="doc-preview-shell">
+      <div class="doc-preview-shell develop-dialog-card">
         <div class="doc-preview-hero">
           <div class="doc-preview-hero__eyebrow">Work Doc</div>
           <div class="doc-preview-hero__summary">
@@ -1120,6 +1120,12 @@ export default {
     linear-gradient(180deg, rgba(244, 248, 253, .95) 0%, rgba(248, 250, 252, 1) 100%);
 }
 
+.doc-preview-shell.develop-dialog-card {
+  border: 1px solid rgba(31, 35, 41, .08);
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(36, 50, 74, .08);
+}
+
 .doc-preview-hero {
   margin-bottom: 16px;
   padding: 16px 18px;
@@ -1231,6 +1237,56 @@ export default {
 </style>
 
 <style>
+body.cyber-theme-light .doc-preview-dialog.el-dialog {
+  background: #f6f8fb;
+  border: 1px solid rgba(31, 35, 41, 0.08);
+  box-shadow: 0 22px 44px rgba(36, 50, 74, 0.12);
+}
+
+body.cyber-theme-light .doc-preview-dialog.el-dialog .el-dialog__header {
+  padding: 18px 22px 10px;
+  border-bottom: 1px solid rgba(31, 35, 41, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(52, 120, 246, 0.12), transparent 42%),
+    linear-gradient(180deg, #fbfcff 0%, #f3f7fc 100%);
+}
+
+body.cyber-theme-light .doc-preview-dialog.el-dialog .el-dialog__body {
+  padding: 0;
+}
+
+body.cyber-theme-light .doc-preview-dialog.el-dialog .el-dialog__headerbtn {
+  top: 18px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(31, 35, 41, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(36, 50, 74, 0.08);
+  transition: all 0.2s ease;
+}
+
+body.cyber-theme-light .doc-preview-dialog.el-dialog .el-dialog__headerbtn .el-dialog__close {
+  color: #5f6b7a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+body.cyber-theme-light .doc-preview-dialog.el-dialog .el-dialog__headerbtn:hover {
+  background: #eef4ff;
+  border-color: rgba(52, 120, 246, 0.26);
+  box-shadow: 0 10px 20px rgba(52, 120, 246, 0.12);
+  transform: translateY(-1px);
+}
+
+body.cyber-theme-light .doc-preview-dialog.el-dialog .el-dialog__headerbtn:hover .el-dialog__close {
+  color: #2f6bff;
+}
+
 body.cyber-theme-dark .work-doc-page .doc-tree-group {
   border-color: var(--page-border-soft);
   background: var(--page-surface-card-soft);
@@ -1248,10 +1304,11 @@ body.cyber-theme-dark .work-doc-page .doc-tree-toolbar {
 body.cyber-theme-dark .work-doc-page .doc-tree-toolbar__title,
 body.cyber-theme-dark .work-doc-page .doc-panel__heading,
 body.cyber-theme-dark .work-doc-page .doc-preview-name__text,
-body.cyber-theme-dark .work-doc-page .doc-preview .markdown-body,
-body.cyber-theme-dark .work-doc-page .doc-preview .markdown-body h1,
-body.cyber-theme-dark .work-doc-page .doc-preview .markdown-body h2,
-body.cyber-theme-dark .work-doc-page .doc-preview .markdown-body h3 {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-name__text,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .markdown-body,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .markdown-body h1,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .markdown-body h2,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .markdown-body h3 {
   color: var(--page-text-primary);
 }
 
@@ -1259,7 +1316,8 @@ body.cyber-theme-dark .work-doc-page .doc-tree-toolbar__tips,
 body.cyber-theme-dark .work-doc-page .doc-panel__desc,
 body.cyber-theme-dark .work-doc-page .doc-meta,
 body.cyber-theme-dark .work-doc-page .doc-tree-node__meta,
-body.cyber-theme-dark .work-doc-page .doc-preview-hero__summary {
+body.cyber-theme-dark .work-doc-page .doc-preview-hero__summary,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-hero__summary {
   color: var(--page-text-muted);
 }
 
@@ -1285,7 +1343,8 @@ body.cyber-theme-dark .work-doc-page .doc-tree-group .el-tree-node__drop-inner {
 }
 
 body.cyber-theme-dark .work-doc-page .doc-tree-node__label,
-body.cyber-theme-dark .work-doc-page .doc-preview-hero__eyebrow {
+body.cyber-theme-dark .work-doc-page .doc-preview-hero__eyebrow,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-hero__eyebrow {
   color: var(--page-text-secondary);
 }
 
@@ -1298,7 +1357,8 @@ body.cyber-theme-dark .work-doc-page .doc-panel {
 }
 
 body.cyber-theme-dark .work-doc-page .doc-panel__desc i,
-body.cyber-theme-dark .work-doc-page .doc-preview-meta__item i {
+body.cyber-theme-dark .work-doc-page .doc-preview-meta__item i,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-meta__item i {
   color: #6bb6ff;
 }
 
@@ -1306,70 +1366,79 @@ body.cyber-theme-dark .work-doc-page .doc-panel__dot {
   color: rgba(126, 159, 192, 0.64);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-dialog .el-dialog {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog {
   background: var(--page-surface-card);
   border: 1px solid var(--page-border-soft);
   box-shadow: 0 30px 60px rgba(2, 8, 19, 0.38);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-dialog .el-dialog__header {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .el-dialog__header {
   border-bottom-color: var(--page-border-soft);
   background:
     radial-gradient(circle at top left, rgba(52, 120, 246, 0.16), transparent 40%),
     linear-gradient(180deg, rgba(15, 26, 40, 0.94) 0%, rgba(12, 21, 34, 0.98) 100%);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-dialog .el-dialog__headerbtn {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .el-dialog__body {
+  padding: 0;
+}
+
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .el-dialog__headerbtn {
   background: var(--page-surface-float);
   border-color: var(--page-border-soft);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-dialog .el-dialog__headerbtn .el-dialog__close,
-body.cyber-theme-dark .work-doc-page .doc-preview-actions,
-body.cyber-theme-dark .work-doc-page .doc-preview-meta__item {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .el-dialog__headerbtn .el-dialog__close,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-actions,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-meta__item {
   color: var(--page-text-secondary);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-dialog .el-dialog__headerbtn:hover {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .el-dialog__headerbtn:hover {
   background: rgba(52, 120, 246, 0.18);
   border-color: rgba(93, 168, 255, 0.32);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-shell {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-shell {
   background: var(--page-surface-bg);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-hero {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-shell.develop-dialog-card {
+  border-color: var(--page-border-soft);
+  box-shadow: 0 20px 38px rgba(2, 10, 23, 0.24);
+}
+
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-hero {
   background:
     linear-gradient(135deg, rgba(52, 120, 246, 0.12), rgba(28, 180, 140, 0.08)),
     var(--page-surface-card-soft);
   border-color: var(--page-border-soft);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview-hero__tag,
-body.cyber-theme-dark .work-doc-page .doc-preview-meta__item {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-hero__tag,
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview-meta__item {
   background: var(--page-surface-float);
   border-color: var(--page-border-soft);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview .v-note-wrapper {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .v-note-wrapper {
   border-color: var(--page-border-soft);
   background: var(--page-surface-card-soft);
   box-shadow: 0 20px 38px rgba(2, 10, 23, 0.24);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview .v-note-show {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .v-note-show {
   background: linear-gradient(180deg, rgba(10, 19, 31, 0.98) 0%, rgba(13, 24, 38, 1) 100%);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview .markdown-body blockquote {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .markdown-body blockquote {
   color: var(--page-text-secondary);
   background: rgba(52, 120, 246, 0.1);
   border-left-color: rgba(110, 175, 255, 0.72);
 }
 
-body.cyber-theme-dark .work-doc-page .doc-preview .markdown-body code {
+body.cyber-theme-dark .doc-preview-dialog.el-dialog .doc-preview .markdown-body code {
   color: #ffc4bb;
   background: rgba(191, 74, 63, 0.18);
 }

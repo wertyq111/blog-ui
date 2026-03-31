@@ -71,18 +71,21 @@
         height="calc(100vh - 315px)">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
-          <el-button
-            v-if="permission.includes('sys:wallpaper:add')"
-            class="ele-btn-icon"
-            icon="el-icon-plus"
-            size="small"
-            type="primary"
-            @click="openEdit(null)">添加
-          </el-button>
+          <div class="mini-program-toolbar">
+            <el-button
+              v-if="permission.includes('sys:wallpaper:add')"
+              class="ele-btn-icon"
+              icon="el-icon-plus"
+              size="small"
+              type="primary"
+              @click="openEdit(null)">添加
+            </el-button>
+          </div>
         </template>
         <!-- 略缩图 -->
         <template slot="smallPicUrl" slot-scope="{row}">
           <el-image
+            class="mini-program-preview"
             style="width: 100px; height: 100px"
             fit="contain"
             :src="row.smallPicUrl"
@@ -91,20 +94,26 @@
         </template>
         <!-- 标签 -->
         <template slot="tags" slot-scope="{row}">
-          <el-tag v-for="(item, index) in row.tags" :key="index"
-            type="primary"
-            size="mini">
-            {{ item }}
-          </el-tag>
+          <div class="mini-program-tags">
+            <el-tag
+              v-for="(item, index) in row.tags"
+              :key="index"
+              type="primary"
+              size="mini">
+              {{ item }}
+            </el-tag>
+          </div>
         </template>
         <!-- 评分 -->
         <template slot="score" slot-scope="{row}">
-          <el-rate
-            v-model="row.score"
-            disabled
-            show-score
-            text-color="#ff9900"
-            score-template="{value}分" />
+          <div class="mini-program-score">
+            <el-rate
+              v-model="row.score"
+              disabled
+              show-score
+              text-color="#ff9900"
+              score-template="{value}分" />
+          </div>
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
@@ -327,4 +336,28 @@ export default {
 </script>
 
 <style scoped>
+.mini-program-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mini-program-preview ::v-deep .el-image__inner {
+  background: #f7f9fc;
+  object-fit: contain;
+}
+
+.mini-program-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mini-program-score {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+}
 </style>

@@ -8,55 +8,65 @@
     width="520px"
     @update:visible="updateVisible">
     <el-form ref="form" class="develop-dialog-form" :model="form" :rules="rules" label-width="90px">
-      <el-form-item label="分类名称:" prop="name">
-        <el-input v-model="form.name" placeholder="请输入分类名称" />
-        <div class="field-desc">支持多级分类，建议短小清晰。</div>
-      </el-form-item>
-      <el-form-item label="分类图标:" prop="icon">
-        <div class="icon-picker">
-          <div
-            v-for="item in iconOptions"
-            :key="item"
-            class="icon-picker__item"
-            :class="{'is-active': form.icon === item}"
-            @click="selectIcon(item)">
-            <i :class="item" />
-          </div>
+      <div class="develop-dialog-card">
+        <div class="develop-dialog-card__title">分类信息</div>
+        <div class="develop-dialog-card__body">
+          <el-form-item label="分类名称:" prop="name">
+            <el-input v-model="form.name" placeholder="请输入分类名称" />
+            <div class="field-desc">支持多级分类，建议短小清晰。</div>
+          </el-form-item>
+          <el-form-item label="分类图标:" prop="icon">
+            <div class="icon-picker">
+              <div
+                v-for="item in iconOptions"
+                :key="item"
+                class="icon-picker__item"
+                :class="{'is-active': form.icon === item}"
+                @click="selectIcon(item)">
+                <i :class="item" />
+              </div>
+            </div>
+            <div class="icon-picker__footer">
+              <div class="icon-picker__preview develop-dialog-static">
+                <i :class="form.icon || defaultIcon" />
+                <span>{{ form.icon || '未选择时默认使用文件夹图标' }}</span>
+              </div>
+              <el-button type="text" @click="selectIcon('')">清空图标</el-button>
+            </div>
+          </el-form-item>
+          <el-form-item label="上级分类:" prop="parentId">
+            <el-select v-model="form.parentId" placeholder="顶级分类" style="width: 100%">
+              <el-option
+                v-for="item in parentOptions"
+                :key="item.id"
+                :label="item.label"
+                :value="item.id"
+                :disabled="item.disabled" />
+            </el-select>
+            <div class="field-desc">用于左侧多级菜单结构。</div>
+          </el-form-item>
         </div>
-        <div class="icon-picker__footer">
-          <div class="icon-picker__preview">
-            <i :class="form.icon || defaultIcon" />
-            <span>{{ form.icon || '未选择时默认使用文件夹图标' }}</span>
-          </div>
-          <el-button type="text" @click="selectIcon('')">清空图标</el-button>
+      </div>
+      <div class="develop-dialog-card develop-dialog-card--secondary">
+        <div class="develop-dialog-card__title">层级设置</div>
+        <div class="develop-dialog-card__body">
+          <el-form-item label="排序:" prop="sort">
+            <el-input-number v-model="form.sort" :min="0" :max="999" style="width: 100%" />
+            <div class="field-desc">数字越小越靠前。</div>
+          </el-form-item>
+          <el-form-item label="状态:" prop="status">
+            <el-select v-model="form.status" style="width: 100%">
+              <el-option label="启用" :value="1" />
+              <el-option label="停用" :value="0" />
+            </el-select>
+            <div class="field-desc">停用后不会出现在左侧菜单。</div>
+          </el-form-item>
+          <el-form-item label="说明:" prop="description">
+            <el-input type="textarea" v-model="form.description" placeholder="可选说明" />
+            <div class="field-desc">描述该分类的用途或范围。</div>
+          </el-form-item>
         </div>
-      </el-form-item>
-      <el-form-item label="上级分类:" prop="parentId">
-        <el-select v-model="form.parentId" placeholder="顶级分类" style="width: 100%">
-          <el-option
-            v-for="item in parentOptions"
-            :key="item.id"
-            :label="item.label"
-            :value="item.id"
-            :disabled="item.disabled" />
-        </el-select>
-        <div class="field-desc">用于左侧多级菜单结构。</div>
-      </el-form-item>
-      <el-form-item label="排序:" prop="sort">
-        <el-input-number v-model="form.sort" :min="0" :max="999" style="width: 100%" />
-        <div class="field-desc">数字越小越靠前。</div>
-      </el-form-item>
-      <el-form-item label="状态:" prop="status">
-        <el-select v-model="form.status" style="width: 100%">
-          <el-option label="启用" :value="1" />
-          <el-option label="停用" :value="0" />
-        </el-select>
-        <div class="field-desc">停用后不会出现在左侧菜单。</div>
-      </el-form-item>
-      <el-form-item label="说明:" prop="description">
-        <el-input type="textarea" v-model="form.description" placeholder="可选说明" />
-        <div class="field-desc">描述该分类的用途或范围。</div>
-      </el-form-item>
+      </div>
     </el-form>
     <div slot="footer" class="develop-dialog-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
@@ -256,9 +266,38 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-card {
+  padding: 16px;
+  border: 1px solid var(--develop-dialog-card-border, rgba(215, 228, 205, 0.86));
+  border-radius: 18px;
+  background: var(--develop-dialog-card-bg,
+    radial-gradient(circle at top right, rgba(173, 236, 109, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 243, 0.76) 100%));
+  box-shadow: var(--develop-dialog-card-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 14px 28px rgba(160, 186, 145, 0.12));
+}
+
+.develop-dialog-card + .develop-dialog-card {
+  margin-top: 14px;
+}
+
+.develop-dialog-card__title {
+  margin-bottom: 14px;
+  color: var(--develop-dialog-card-title, #2d392d);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.develop-dialog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .field-desc {
   font-size: 12px;
-  color: #999;
+  color: var(--develop-dialog-card-muted, #999);
   margin-top: 4px;
 }
 
@@ -270,28 +309,30 @@ export default {
 
 .icon-picker__item {
   align-items: center;
-  border: 1px solid #e6e8eb;
+  border: 1px solid var(--develop-dialog-icon-border, #e6e8eb);
   border-radius: 10px;
-  color: #5f6b7a;
+  color: var(--develop-dialog-icon-color, #5f6b7a);
   cursor: pointer;
   display: flex;
   font-size: 18px;
   height: 42px;
   justify-content: center;
+  background: var(--develop-dialog-icon-bg, rgba(255, 255, 255, 0.76));
+  box-shadow: var(--develop-dialog-icon-shadow, none);
   transition: all 0.18s ease;
 }
 
 .icon-picker__item:hover {
-  border-color: #89b4ff;
-  color: #2f6bff;
+  border-color: var(--develop-dialog-icon-hover-border, #89b4ff);
+  color: var(--develop-dialog-icon-hover-color, #2f6bff);
   transform: translateY(-1px);
 }
 
 .icon-picker__item.is-active {
-  background: #edf4ff;
-  border-color: #2f6bff;
-  box-shadow: inset 0 0 0 1px rgba(47, 107, 255, 0.08);
-  color: #2f6bff;
+  background: var(--develop-dialog-icon-active-bg, #edf4ff);
+  border-color: var(--develop-dialog-icon-active-border, #2f6bff);
+  box-shadow: var(--develop-dialog-icon-active-shadow, inset 0 0 0 1px rgba(47, 107, 255, 0.08));
+  color: var(--develop-dialog-icon-active-color, #2f6bff);
 }
 
 .icon-picker__footer {
@@ -303,14 +344,19 @@ export default {
 
 .icon-picker__preview {
   align-items: center;
-  color: #5f6b7a;
+  color: var(--develop-dialog-icon-preview-color, #5f6b7a);
   display: flex;
   font-size: 12px;
   gap: 8px;
 }
 
+.icon-picker__preview.develop-dialog-static {
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
 .icon-picker__preview i {
-  color: #2f6bff;
+  color: var(--develop-dialog-icon-preview-accent, #2f6bff);
   font-size: 16px;
 }
 </style>

@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">维护后台账号、角色和状态，保证访问权限一致。</div>
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="邮箱:" prop="email">

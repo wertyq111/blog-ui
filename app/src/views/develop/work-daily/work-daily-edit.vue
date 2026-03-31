@@ -14,35 +14,52 @@
       :model="form"
       :rules="rules"
       label-width="90px">
-      <el-row :gutter="15">
-        <el-col :sm="12">
-          <el-form-item label="日期:" prop="logDate">
-            <el-date-picker v-model="form.logDate" type="date" placeholder="选择日期" style="width: 100%"/>
-          </el-form-item>
-        </el-col>
-        <el-col :sm="12">
-          <el-form-item label="平台:" prop="platformIds">
-            <el-select v-model="form.platformIds" multiple placeholder="请选择平台" style="width: 100%">
-              <el-option v-for="item in platforms" :key="item.id" :label="item.name" :value="item.id"/>
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="15">
-        <el-col :sm="24">
-          <el-form-item label="各平台内容:" prop="platformContents">
-            <div v-for="pid in form.platformIds" :key="pid" class="daily-edit-platform-card">
-              <div class="daily-edit-platform-card__title">{{ findPlatformName(pid) || pid }}</div>
-              <mavon-editor v-model="form.platformContents[pid]" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
-            </div>
-            <el-input v-if="allowCustom" v-model="form.customPlatformName" class="daily-edit-custom-name" placeholder="新增临时平台名（可选）"/>
-            <div v-if="allowCustom && form.customPlatformName" class="daily-edit-platform-card daily-edit-platform-card--custom">
-              <div class="daily-edit-platform-card__title">{{ form.customPlatformName }}</div>
-              <mavon-editor v-model="form.customPlatformContent" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
-            </div>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <div class="develop-dialog-card">
+        <div class="develop-dialog-card__title">基础信息</div>
+        <div class="develop-dialog-card__body">
+          <el-row :gutter="15">
+            <el-col :sm="12">
+              <el-form-item label="日期:" prop="logDate">
+                <el-date-picker v-model="form.logDate" type="date" placeholder="选择日期" style="width: 100%"/>
+              </el-form-item>
+            </el-col>
+            <el-col :sm="12">
+              <el-form-item label="平台:" prop="platformIds">
+                <el-select v-model="form.platformIds" multiple placeholder="请选择平台" style="width: 100%">
+                  <el-option v-for="item in platforms" :key="item.id" :label="item.name" :value="item.id"/>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="15">
+            <el-col :sm="24">
+              <el-form-item label="临时平台:" prop="customPlatformName">
+                <el-input v-if="allowCustom" v-model="form.customPlatformName" class="daily-edit-custom-name" placeholder="新增临时平台名（可选）"/>
+                <div v-else class="field-desc">当前未开启临时平台补充。</div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+      <div class="develop-dialog-card develop-dialog-card--content">
+        <div class="develop-dialog-card__title">平台内容</div>
+        <div class="develop-dialog-card__body">
+          <el-row :gutter="15">
+            <el-col :sm="24">
+              <el-form-item label="各平台内容:" prop="platformContents">
+                <div v-for="pid in form.platformIds" :key="pid" class="daily-edit-platform-card">
+                  <div class="daily-edit-platform-card__title">{{ findPlatformName(pid) || pid }}</div>
+                  <mavon-editor v-model="form.platformContents[pid]" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
+                </div>
+                <div v-if="allowCustom && form.customPlatformName" class="daily-edit-platform-card daily-edit-platform-card--custom">
+                  <div class="daily-edit-platform-card__title">{{ form.customPlatformName }}</div>
+                  <mavon-editor v-model="form.customPlatformContent" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
+                </div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
     </el-form>
     <div slot="footer" class="daily-edit-footer">
       <el-button @click="updateVisible(false)">取消</el-button>
@@ -198,6 +215,35 @@ export default {
 </script>
 
 <style scoped>
+.develop-dialog-card {
+  padding: 16px;
+  border: 1px solid rgba(98, 174, 239, 0.18);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(43, 160, 255, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(14, 24, 37, 0.88) 0%, rgba(10, 18, 30, 0.92) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 16px 28px rgba(2, 8, 18, 0.18);
+}
+
+.develop-dialog-card + .develop-dialog-card {
+  margin-top: 14px;
+}
+
+.develop-dialog-card__title {
+  margin-bottom: 14px;
+  color: #f0f7ff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.develop-dialog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .daily-edit-form ::v-deep .el-form-item__label {
   color: rgba(226, 240, 255, 0.88);
   font-weight: 600;
@@ -220,9 +266,9 @@ export default {
 
 .daily-edit-platform-card {
   margin-bottom: 16px;
+  padding: 14px;
   border: 1px solid rgba(98, 174, 239, 0.18);
   border-radius: 18px;
-  padding: 14px;
   background:
     radial-gradient(circle at top right, rgba(43, 160, 255, 0.14), transparent 28%),
     linear-gradient(180deg, rgba(14, 24, 37, 0.88) 0%, rgba(10, 18, 30, 0.92) 100%);

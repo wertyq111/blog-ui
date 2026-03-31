@@ -14,6 +14,7 @@
       :model="form"
       :rules="rules"
       label-width="82px">
+      <div class="field-desc">在当前机构下维护账号、角色和联系方式。</div>
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="所属机构:">
