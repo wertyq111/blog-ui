@@ -150,17 +150,17 @@ export default {
 .develop-dialog-form ::v-deep .el-form-item {
   margin-bottom: 16px;
   padding: 14px 16px 16px;
-  border: 1px solid rgba(214, 222, 232, 0.92);
+  border: 1px solid var(--notebook-dialog-item-border, rgba(214, 222, 232, 0.92));
   border-radius: 16px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+  background: var(--notebook-dialog-item-bg, linear-gradient(180deg, #ffffff 0%, #f8fafc 100%));
+  box-shadow: var(--notebook-dialog-item-shadow, 0 12px 28px rgba(15, 23, 42, 0.05));
 }
 
 .develop-dialog-form ::v-deep .el-form-item__label {
   padding: 0 12px 0 0;
   font-size: 13px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--notebook-dialog-label, #4b5563);
 }
 
 .develop-dialog-form ::v-deep .el-input__inner,
@@ -168,8 +168,8 @@ export default {
 .develop-dialog-form ::v-deep .el-select .el-input__inner,
 .develop-dialog-form ::v-deep .el-input-number .el-input__inner {
   border-radius: 12px;
-  border-color: rgba(210, 218, 230, 0.95);
-  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--notebook-dialog-input-border, rgba(210, 218, 230, 0.95));
+  background: var(--notebook-dialog-input-bg, rgba(255, 255, 255, 0.96));
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
@@ -177,8 +177,8 @@ export default {
 .develop-dialog-form ::v-deep .el-textarea__inner:focus,
 .develop-dialog-form ::v-deep .el-select .el-input__inner:focus,
 .develop-dialog-form ::v-deep .el-input-number .el-input__inner:focus {
-  border-color: #98aecd;
-  box-shadow: 0 0 0 3px rgba(82, 126, 196, 0.08);
+  border-color: var(--notebook-dialog-input-focus-border, #98aecd);
+  box-shadow: var(--notebook-dialog-input-focus-shadow, 0 0 0 3px rgba(82, 126, 196, 0.08));
 }
 
 .develop-dialog-form ::v-deep .field-desc {

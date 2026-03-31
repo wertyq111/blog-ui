@@ -156,17 +156,17 @@ export default {
 .develop-dialog-form ::v-deep .el-form-item {
   margin-bottom: 16px;
   padding: 14px 16px 16px;
-  border: 1px solid rgba(214, 222, 232, 0.92);
+  border: 1px solid var(--notebook-dialog-item-border, rgba(214, 222, 232, 0.92));
   border-radius: 16px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+  background: var(--notebook-dialog-item-bg, linear-gradient(180deg, #ffffff 0%, #f8fafc 100%));
+  box-shadow: var(--notebook-dialog-item-shadow, 0 12px 28px rgba(15, 23, 42, 0.05));
 }
 
 .develop-dialog-form ::v-deep .el-form-item__label {
   padding: 0 12px 0 0;
   font-size: 13px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--notebook-dialog-label, #4b5563);
 }
 
 .develop-dialog-form ::v-deep .el-input__inner,
@@ -174,8 +174,8 @@ export default {
 .develop-dialog-form ::v-deep .el-select .el-input__inner,
 .develop-dialog-form ::v-deep .el-input-number .el-input__inner {
   border-radius: 12px;
-  border-color: rgba(210, 218, 230, 0.95);
-  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--notebook-dialog-input-border, rgba(210, 218, 230, 0.95));
+  background: var(--notebook-dialog-input-bg, rgba(255, 255, 255, 0.96));
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
@@ -183,15 +183,15 @@ export default {
 .develop-dialog-form ::v-deep .el-textarea__inner:focus,
 .develop-dialog-form ::v-deep .el-select .el-input__inner:focus,
 .develop-dialog-form ::v-deep .el-input-number .el-input__inner:focus {
-  border-color: #98aecd;
-  box-shadow: 0 0 0 3px rgba(82, 126, 196, 0.08);
+  border-color: var(--notebook-dialog-input-focus-border, #98aecd);
+  box-shadow: var(--notebook-dialog-input-focus-shadow, 0 0 0 3px rgba(82, 126, 196, 0.08));
 }
 
 .develop-dialog-form ::v-deep .field-desc {
   margin-bottom: 10px;
   font-size: 12px;
   line-height: 1.6;
-  color: #8a94a6;
+  color: var(--notebook-dialog-desc, #8a94a6);
 }
 
 .develop-dialog-form ::v-deep .el-form-item:last-child {
@@ -200,12 +200,12 @@ export default {
 
 .develop-dialog-media-card {
   padding: 14px;
-  border: 1px solid rgba(208, 217, 230, 0.96);
+  border: 1px solid var(--notebook-dialog-panel-border, rgba(208, 217, 230, 0.96));
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 249, 252, 0.98) 100%);
-  box-shadow:
+  background: var(--notebook-dialog-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 249, 252, 0.98) 100%));
+  box-shadow: var(--notebook-dialog-panel-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    0 10px 24px rgba(15, 23, 42, 0.05);
+    0 10px 24px rgba(15, 23, 42, 0.05));
 }
 
 .develop-dialog-media-card ::v-deep .avatar-uploader .el-upload,
@@ -214,20 +214,20 @@ export default {
   width: 100%;
   min-height: 176px;
   border-radius: 14px;
-  border-color: rgba(186, 198, 214, 0.96);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(242, 246, 251, 0.96) 100%);
+  border-color: var(--notebook-dialog-upload-border, rgba(186, 198, 214, 0.96));
+  background: var(--notebook-dialog-upload-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(242, 246, 251, 0.96) 100%));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 .develop-dialog-media-card ::v-deep .avatar-uploader .el-upload:hover,
 .develop-dialog-media-card ::v-deep .upload-demo .el-upload:hover,
 .develop-dialog-media-card ::v-deep .el-upload-dragger:hover {
-  border-color: #8ba6cf;
+  border-color: var(--notebook-dialog-upload-hover-border, #8ba6cf);
 }
 
 .develop-dialog-media-card ::v-deep .avatar-uploader-icon,
 .develop-dialog-media-card ::v-deep .el-upload__text,
 .develop-dialog-media-card ::v-deep .el-upload__tip {
-  color: #647083;
+  color: var(--notebook-dialog-upload-text, #647083);
 }
 </style>
