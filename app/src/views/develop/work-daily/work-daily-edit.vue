@@ -5,12 +5,12 @@
     :lock-scroll="false"
     :title="isUpdate?'修改日常':'添加日常'"
     :visible="visible"
-    custom-class="ele-dialog-form daily-edit-dialog"
+    custom-class="ele-dialog-form develop-dialog daily-edit-dialog"
     width="900px"
     @update:visible="updateVisible">
     <el-form
       ref="form"
-      class="daily-edit-form"
+      class="develop-dialog-form daily-edit-form"
       :model="form"
       :rules="rules"
       label-width="90px">
@@ -217,14 +217,14 @@ export default {
 <style scoped>
 .develop-dialog-card {
   padding: 16px;
-  border: 1px solid rgba(98, 174, 239, 0.18);
+  border: 1px solid var(--develop-dialog-card-border, rgba(215, 228, 205, 0.86));
   border-radius: 18px;
-  background:
-    radial-gradient(circle at top right, rgba(43, 160, 255, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(14, 24, 37, 0.88) 0%, rgba(10, 18, 30, 0.92) 100%);
-  box-shadow:
+  background: var(--develop-dialog-card-bg,
+    radial-gradient(circle at top right, rgba(173, 236, 109, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 243, 0.76) 100%));
+  box-shadow: var(--develop-dialog-card-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 16px 28px rgba(2, 8, 18, 0.18);
+    0 16px 28px rgba(160, 186, 145, 0.12));
 }
 
 .develop-dialog-card + .develop-dialog-card {
@@ -233,7 +233,7 @@ export default {
 
 .develop-dialog-card__title {
   margin-bottom: 14px;
-  color: #f0f7ff;
+  color: var(--develop-dialog-card-title, #2d392d);
   font-size: 14px;
   font-weight: 700;
 }
@@ -244,42 +244,22 @@ export default {
   gap: 12px;
 }
 
-.daily-edit-form ::v-deep .el-form-item__label {
-  color: rgba(226, 240, 255, 0.88);
-  font-weight: 600;
-}
-
-.daily-edit-form ::v-deep .el-input__inner,
-.daily-edit-form ::v-deep .el-textarea__inner,
-.daily-edit-form ::v-deep .el-date-editor.el-input__inner {
-  background: rgba(8, 15, 26, 0.82);
-  border: 1px solid rgba(97, 160, 224, 0.2);
-  border-radius: 14px;
-  color: #eef6ff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.daily-edit-form ::v-deep .el-input__inner::placeholder,
-.daily-edit-form ::v-deep .el-textarea__inner::placeholder {
-  color: rgba(152, 181, 214, 0.56);
-}
-
 .daily-edit-platform-card {
   margin-bottom: 16px;
   padding: 14px;
-  border: 1px solid rgba(98, 174, 239, 0.18);
+  border: 1px solid var(--develop-dialog-card-border, rgba(215, 228, 205, 0.86));
   border-radius: 18px;
-  background:
-    radial-gradient(circle at top right, rgba(43, 160, 255, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(14, 24, 37, 0.88) 0%, rgba(10, 18, 30, 0.92) 100%);
-  box-shadow:
+  background: var(--develop-dialog-card-bg,
+    radial-gradient(circle at top right, rgba(173, 236, 109, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 243, 0.76) 100%));
+  box-shadow: var(--develop-dialog-card-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 16px 28px rgba(2, 8, 18, 0.18);
+    0 16px 28px rgba(160, 186, 145, 0.12));
 }
 
 .daily-edit-platform-card__title {
   margin-bottom: 10px;
-  color: #f0f7ff;
+  color: var(--develop-dialog-card-title, #2d392d);
   font-size: 14px;
   font-weight: 700;
 }
@@ -306,8 +286,10 @@ export default {
   min-height: 360px;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(94, 153, 214, 0.18);
-  box-shadow: 0 14px 28px rgba(2, 9, 19, 0.18);
+  border: 1px solid var(--develop-dialog-markdown-border, rgba(215, 228, 205, 0.86));
+  box-shadow: var(--develop-dialog-markdown-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 14px 28px rgba(160, 186, 145, 0.12));
 }
 
 .daily-edit-form ::v-deep .v-note-op,
@@ -316,16 +298,17 @@ export default {
 .daily-edit-form ::v-deep .content-input-wrapper,
 .daily-edit-form ::v-deep .auto-textarea-input,
 .daily-edit-form ::v-deep .v-note-show {
-  background: #0b1421 !important;
-  color: #eef6ff !important;
+  background: var(--develop-dialog-markdown-panel-bg, rgba(255, 255, 255, 0.88)) !important;
+  color: var(--develop-dialog-markdown-text, #304030) !important;
 }
 
 .daily-edit-form ::v-deep .v-note-op {
-  border-bottom: 1px solid rgba(94, 153, 214, 0.16);
+  background: var(--develop-dialog-markdown-toolbar-bg, rgba(255, 255, 255, 0.94)) !important;
+  border-bottom: 1px solid var(--develop-dialog-markdown-border, rgba(215, 228, 205, 0.86));
 }
 
 .daily-edit-form ::v-deep .v-note-op .op-icon,
 .daily-edit-form ::v-deep .v-note-op .op-icon.dropdown-wrapper {
-  color: rgba(200, 224, 248, 0.78) !important;
+  color: var(--develop-dialog-markdown-text, #304030) !important;
 }
 </style>
