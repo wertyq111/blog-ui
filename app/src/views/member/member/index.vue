@@ -86,7 +86,7 @@
         </template>
         <!-- 头像 -->
         <template slot="avatar" slot-scope="{row}">
-          <el-avatar :size="25" :src="row.avatar" shape="square"/>
+          <el-avatar :size="25" :src="getAvatar(row.avatar)" shape="square"/>
         </template>
         <!-- 设备类型列 -->
         <template slot="device" slot-scope="{row}">
@@ -148,6 +148,7 @@
 <script>
 import {mapGetters} from "vuex";
 import MemberEdit from './member-edit.vue';
+import defaultAvatar from '@/assets/avatar.png';
 
 export default {
   name: 'Member',
@@ -282,6 +283,9 @@ export default {
     };
   },
   methods: {
+    getAvatar(avatar) {
+      return avatar || defaultAvatar;
+    },
     /* 刷新表格 */
     reload() {
       console.log(this.$refs.table.data)
