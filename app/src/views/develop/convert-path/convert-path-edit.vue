@@ -39,6 +39,17 @@
           </el-row>
           <el-row :gutter="15">
             <el-col :sm="24">
+              <el-form-item label="网址:" prop="url">
+                <el-input
+                  v-model="form.url"
+                  :maxlength="120"
+                  clearable
+                  placeholder="请输入项目网址"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="15">
+            <el-col :sm="24">
               <el-form-item label="服务器地址:" prop="target">
                 <el-input
                   v-model="form.target"
@@ -73,6 +84,17 @@
             <span v-else class="change-icon" @click="deleteSource(index)">
               <i class="el-icon-minus"></i>
             </span>
+          </el-row>
+          <el-row :gutter="15">
+            <el-col :sm="12">
+              <el-form-item label="排序:">
+                <el-input-number
+                  v-model="form.sort"
+                  :min="0"
+                  controls-position="right"
+                  style="width: 100%"/>
+              </el-form-item>
+            </el-col>
           </el-row>
         </div>
       </div>
@@ -179,6 +201,8 @@ export default {
     initFormData(data) {
       const form = {
         status: 1,
+        url: '',
+        sort: 0,
         sources: [""]
       };
 
