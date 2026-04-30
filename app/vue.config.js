@@ -1,6 +1,41 @@
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
-const fs = require('node:fs')
-const path = require('node:path')
+
+const requiredEnv = (name) => {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`${name} is required`)
+  }
+  return value
+}
+
+const requiredPort = (name) => {
+  const value = Number.parseInt(requiredEnv(name), 10)
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`${name} must be a positive integer`)
+  }
+  return value
+}
+
+const devServer = process.env.NODE_ENV === 'development'
+  ? {
+      historyApiFallback: true,
+      host: requiredEnv('VUE_APP_DEV_SERVER_HOST'),
+      port: requiredPort('VUE_APP_DEV_SERVER_PORT'),
+      allowedHosts: ['all'],
+      sockHost: requiredEnv('VUE_APP_DEV_SERVER_SOCK_HOST'),
+      sockPort: requiredPort('VUE_APP_DEV_SERVER_SOCK_PORT'),
+      sockPath: '/sockjs-node',
+      // headers: {
+      //   'Access-Control-Allow-Origin': '*',
+      // },
+      // public: 'www.chouy.xyz',
+      // hotOnly: false,
+      // disableHostCheck: true,
+      // https: true,
+      // cert: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.crt')),
+      // key: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.key'))
+    }
+  : undefined
 
 module.exports = {
   productionSourceMap: false,
@@ -28,24 +63,7 @@ module.exports = {
       }));
     }
   },
-  devServer: {
-    historyApiFallback: true,
-    host: '0.0.0.0',
-    port: 8080,
-    allowedHosts: ['all'],
-    sockHost: '192.168.128.2',
-    sockPort: 8080,
-    sockPath: '/sockjs-node',
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*',
-    // },
-    // public: 'www.chouy.xyz',
-    // hotOnly: false,
-    // disableHostCheck: true,
-    // https: true,
-    // cert: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.crt')),
-    // key: fs.readFileSync(path.join(__dirname, 'ssl/chouy.xyz.key'))
-  },
+  ...(devServer ? { devServer } : {}),
   css: {
     loaderOptions: {
       sass: {

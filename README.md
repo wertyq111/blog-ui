@@ -22,7 +22,7 @@
 
 ```text
 blog-ui
-├── compose.yaml          Docker 开发入口，映射 8082 -> 8080
+├── compose.yaml          Docker 开发入口，端口从 `.env` 读取
 ├── README.md             仓库级说明
 └── app/
     ├── Dockerfile        Node 16 开发镜像
@@ -63,27 +63,38 @@ blog-ui
 
 ## 环境变量
 
-前端当前没有提交 `.env.example`。代码直接读取这两个变量：
+前端环境入口分两层：
+
+| 文件 | 用途 |
+| --- | --- |
+| 根目录 `.env` | Docker Compose 读取 |
+| `app/.env.development` | Vue CLI 本地开发读取 |
+
+代码直接读取这些变量：
 
 | 环境变量 | 用途 |
 | --- | --- |
 | `VUE_APP_NAME` | 浏览器标题和布局里的项目名 |
 | `VUE_APP_API_BASE_URL` | Axios 接口前缀、模板下载地址、上传示例地址 |
+| `VUE_APP_DEV_SERVER_HOST` | Vue devServer 监听地址 |
+| `VUE_APP_DEV_SERVER_PORT` | Vue devServer 容器内或本机端口 |
+| `VUE_APP_DEV_SERVER_SOCK_HOST` | 热更新 WebSocket 主机 |
+| `VUE_APP_DEV_SERVER_SOCK_PORT` | 热更新 WebSocket 端口 |
+| `VUE_APP_DOCKER_HOST_PORT` | Docker 模式暴露到宿主机的端口 |
 
 本地开发时在 `app/` 下创建 `.env.development`：
 
 ```bash
 cd app
-cat > .env.development <<'EOF'
-VUE_APP_NAME=Blog Admin
-VUE_APP_API_BASE_URL=http://localhost:3925/api
-EOF
+cp .env.example .env.development
 ```
 
-远端开发环境使用：
+远端开发环境不要把 IP 写进仓库，直接在 `.env.development` 或部署环境里改变量：
 
 ```dotenv
-VUE_APP_API_BASE_URL=http://10.10.9.184:3925/api
+VUE_APP_API_HOST=<remote-host>
+VUE_APP_API_PORT=<backend-port>
+VUE_APP_DEV_SERVER_SOCK_HOST=<remote-host>
 ```
 
 ## 本地启动
@@ -100,13 +111,14 @@ npm run serve
 
 | 目标 | 地址 |
 | --- | --- |
-| Vue dev server | `http://localhost:8080` |
+| Vue dev server | `http://localhost:${VUE_APP_DEV_SERVER_PORT}` |
 
 ## Docker 启动
 
 在仓库根目录启动：
 
 ```bash
+cp .env.example .env
 docker compose up --build
 ```
 
@@ -116,7 +128,7 @@ docker compose up --build
 
 | 目标 | 地址 |
 | --- | --- |
-| Vue dev server | `http://localhost:8082` |
+| Vue dev server | `http://localhost:${VUE_APP_DOCKER_HOST_PORT}` |
 
 ## 常用脚本
 
@@ -135,18 +147,18 @@ npm run lint
 
 ## devServer 配置
 
-`app/vue.config.js` 当前固定了这些开发服务配置：
+`app/vue.config.js` 当前从环境变量读取这些开发服务配置：
 
-| 配置 | 当前值 |
+| 配置 | 环境变量 |
 | --- | --- |
-| `host` | `0.0.0.0` |
-| `port` | `8080` |
+| `host` | `VUE_APP_DEV_SERVER_HOST` |
+| `port` | `VUE_APP_DEV_SERVER_PORT` |
 | `allowedHosts` | `['all']` |
-| `sockHost` | `192.168.128.2` |
-| `sockPort` | `8080` |
+| `sockHost` | `VUE_APP_DEV_SERVER_SOCK_HOST` |
+| `sockPort` | `VUE_APP_DEV_SERVER_SOCK_PORT` |
 | `sockPath` | `/sockjs-node` |
 
-如果热更新连不上，先检查 `sockHost` 是否还是当前开发机地址。
+如果热更新连不上，先检查 `VUE_APP_DEV_SERVER_SOCK_HOST` 是否是当前访问前端的主机。
 
 ## 后端接口约定
 

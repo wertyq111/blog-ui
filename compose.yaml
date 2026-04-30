@@ -2,7 +2,18 @@ services:
     web:
         build: app
         ports:
-            - 8082:8080
+            - "${VUE_APP_DOCKER_HOST_PORT}:${VUE_APP_DEV_SERVER_PORT}"
+        environment:
+            VUE_APP_NAME: ${VUE_APP_NAME}
+            VUE_APP_API_PROTOCOL: ${VUE_APP_API_PROTOCOL}
+            VUE_APP_API_HOST: ${VUE_APP_API_HOST}
+            VUE_APP_API_PORT: ${VUE_APP_API_PORT}
+            VUE_APP_API_PREFIX: ${VUE_APP_API_PREFIX}
+            VUE_APP_API_BASE_URL: ${VUE_APP_API_PROTOCOL}://${VUE_APP_API_HOST}:${VUE_APP_API_PORT}${VUE_APP_API_PREFIX}
+            VUE_APP_DEV_SERVER_HOST: ${VUE_APP_DEV_SERVER_HOST}
+            VUE_APP_DEV_SERVER_PORT: ${VUE_APP_DEV_SERVER_PORT}
+            VUE_APP_DEV_SERVER_SOCK_HOST: ${VUE_APP_DEV_SERVER_SOCK_HOST}
+            VUE_APP_DEV_SERVER_SOCK_PORT: ${VUE_APP_DEV_SERVER_SOCK_PORT}
         volumes:
             - ./app:/project
             - /project/node_modules

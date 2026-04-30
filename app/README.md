@@ -17,19 +17,20 @@
 
 ## 运行前准备
 
-当前目录没有提交 `.env.example`，但代码依赖以下变量：
+当前目录提供 `.env.example`，先复制为本地环境文件：
+
+```bash
+cp .env.example .env.development
+```
+
+代码依赖以下变量：
 
 - `VUE_APP_NAME`
 - `VUE_APP_API_BASE_URL`
-
-先手动创建 `.env.development`：
-
-```bash
-cat > .env.development <<'EOF'
-VUE_APP_NAME=Blog Admin
-VUE_APP_API_BASE_URL=http://localhost:3925/api
-EOF
-```
+- `VUE_APP_DEV_SERVER_HOST`
+- `VUE_APP_DEV_SERVER_PORT`
+- `VUE_APP_DEV_SERVER_SOCK_HOST`
+- `VUE_APP_DEV_SERVER_SOCK_PORT`
 
 ## 本地开发
 
@@ -38,9 +39,9 @@ npm install
 npm run serve
 ```
 
-默认端口：
+默认访问端口由环境变量决定：
 
-- `8080`
+- `VUE_APP_DEV_SERVER_PORT`
 
 ## Docker 开发
 
@@ -52,7 +53,7 @@ docker compose up --build
 
 根目录 compose 默认把页面暴露到：
 
-- `http://localhost:8082`
+- `http://localhost:${VUE_APP_DOCKER_HOST_PORT}`
 
 ## 常用脚本
 
@@ -89,4 +90,4 @@ app
 
 - `src/config/axios-config.js` 会直接读取 `VUE_APP_API_BASE_URL` 作为接口前缀
 - `public/index.html` 和布局标题会读取 `VUE_APP_NAME`
-- `vue.config.js` 当前把 devServer 固定在 `0.0.0.0:8080`，并写死了 `sockHost: 192.168.128.2`；如果热更新异常，先检查这里是否需要改成当前开发机地址
+- `vue.config.js` 会从 `VUE_APP_DEV_SERVER_*` 读取 devServer 和热更新地址
