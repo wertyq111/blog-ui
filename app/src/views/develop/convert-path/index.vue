@@ -48,6 +48,40 @@
           <div class="develop-table-shell__desc">项目网址、服务器地址和转换动作统一集中到一个工具工作区。</div>
         </div>
       </div>
+
+      <!-- 转换面板 -->
+      <div v-if="convertPanelVisible" class="convert-panel">
+        <div class="convert-panel__body">
+          <div class="convert-panel__col">
+            <div class="convert-panel__label">输入路径 (每行一个)</div>
+            <el-input
+              v-model="convertInput"
+              type="textarea"
+              :rows="6"
+              placeholder="粘贴或输入需要转换的路径..."
+              @input="onConvertInput"/>
+          </div>
+          <div class="convert-panel__col">
+            <div class="convert-panel__label">转换结果</div>
+            <el-input
+              v-model="convertOutput"
+              type="textarea"
+              :rows="6"
+              readonly/>
+          </div>
+        </div>
+        <div class="convert-panel__footer">
+          <el-button size="small" @click="clearConvert">清空</el-button>
+          <el-button
+            v-if="convertOutput"
+            size="small"
+            type="primary"
+            icon="el-icon-document-copy"
+            @click="copyResult">复制结果
+          </el-button>
+        </div>
+      </div>
+
       <!-- 数据表格 -->
       <ele-pro-table
         ref="table"
@@ -74,6 +108,13 @@
             type="danger"
             @click="removeBatch">删除
           </el-button>
+          <el-button
+            class="ele-btn-icon"
+            :icon="convertPanelVisible ? 'el-icon-close' : 'el-icon-sort'"
+            size="small"
+            :type="convertPanelVisible ? 'warning' : 'primary'"
+            @click="toggleConvertPanel">路径转换
+          </el-button>
         </template>
         <!-- 网址 -->
         <template slot="url" slot-scope="{row}">
@@ -81,13 +122,6 @@
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
-          <el-link
-            v-if="permission.includes('sys:convert-path:convert')"
-            :underline="false"
-            icon="el-icon-_surveying"
-            type="primary"
-            @click="openConvert(row)">转换
-          </el-link>
           <el-link
             v-if="permission.includes('sys:convert-path:edit')"
             :underline="false"
@@ -116,22 +150,16 @@
       :data="current"
       :visible.sync="showEdit"
       @done="reload"/>
-    <!-- 转换弹窗 -->
-    <convert-server-path
-      :data="current"
-      :visible.sync="showConvert"
-      @done="reload"/>
   </div>
 </template>
 
 <script>
 import {mapGetters} from "vuex";
 import ConvertPathEdit from './convert-path-edit.vue';
-import ConvertServerPath from './convert-path.vue';
 
 export default {
   name: 'ConvertPath',
-  components: {ConvertPathEdit, ConvertServerPath},
+  components: {ConvertPathEdit},
   computed: {
     ...mapGetters(["permission"]),
   },
@@ -187,7 +215,7 @@ export default {
         {
           columnKey: 'action',
           label: '操作',
-          width: 190,
+          width: 130,
           align: 'center',
           resizable: false,
           slot: 'action',
@@ -202,10 +230,12 @@ export default {
       current: null,
       // 是否显示编辑弹窗
       showEdit: false,
-      // 是否显示转换弹窗
-      showConvert: false,
-      // 是否显示导入弹窗
-      showImport: false
+      // 转换面板
+      convertPanelVisible: false,
+      convertInput: '',
+      convertOutput: '',
+      allServerPaths: [],
+      convertTimer: null
     };
   },
   methods: {
@@ -223,10 +253,83 @@ export default {
       this.current = row;
       this.showEdit = true;
     },
-    /* 显示转换 */
-    openConvert(row) {
-      this.current = row;
-      this.showConvert = true;
+    /* 切换转换面板 */
+    toggleConvertPanel() {
+      this.convertPanelVisible = !this.convertPanelVisible;
+      if (this.convertPanelVisible && !this.allServerPaths.length) {
+        this.fetchAllServerPaths();
+      }
+    },
+    /* 加载全部项目配置 */
+    fetchAllServerPaths() {
+      this.$http.get('/server-path/index', {params: {page: 1, per_page: 999}}).then(res => {
+        if (res.data.code === 0) {
+          this.allServerPaths = res.data.data || [];
+        }
+      }).catch(() => {
+        this.$message.error('加载项目配置失败');
+      });
+    },
+    /* 输入变化时防抖触发转换 */
+    onConvertInput() {
+      if (this.convertTimer) clearTimeout(this.convertTimer);
+      this.convertTimer = setTimeout(() => {
+        this.autoConvert();
+      }, 300);
+    },
+    /* 自动转换逻辑 */
+    autoConvert() {
+      const input = this.convertInput;
+      if (!input || !input.trim()) {
+        this.convertOutput = '';
+        return;
+      }
+      const lines = input.split('\n');
+      const results = lines.map(line => {
+        if (!line.trim()) return '';
+        // 预处理: 清除中文, | → /
+        let processed = line
+          .replace(/[\u4e00-\u9fa5]/g, '')
+          .replace(/\|/g, '/')
+          .trim();
+        if (!processed) return '';
+        // 匹配项目配置
+        for (const item of this.allServerPaths) {
+          const sources = this.parseSources(item.sources);
+          for (const source of sources) {
+            const escaped = source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if (new RegExp(escaped).test(processed)) {
+              processed = processed.replace(new RegExp(escaped), item.target);
+              return processed.replace(/\\/g, '/');
+            }
+          }
+        }
+        return processed.replace(/\\/g, '/');
+      });
+      this.convertOutput = results.filter(Boolean).join(' ');
+    },
+    /* 解析 sources JSON */
+    parseSources(raw) {
+      try {
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+      } catch (e) {
+        return [];
+      }
+    },
+    /* 复制转换结果 */
+    copyResult() {
+      if (!this.convertOutput) return;
+      this.$copyText(this.convertOutput).then(() => {
+        this.$message.success('已复制到剪贴板');
+      }, () => {
+        this.$message.error('复制失败');
+      });
+    },
+    /* 清空转换 */
+    clearConvert() {
+      this.convertInput = '';
+      this.convertOutput = '';
     },
     /* 删除 */
     remove(row) {
@@ -271,4 +374,37 @@ export default {
 </script>
 
 <style scoped>
+.convert-panel {
+  margin: 14px 0 16px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px dashed var(--develop-border, rgba(215, 228, 205, 0.86));
+  background: var(--develop-panel-bg, rgba(247, 251, 243, 0.6));
+}
+
+.convert-panel__body {
+  display: flex;
+  gap: 16px;
+}
+
+.convert-panel__col {
+  flex: 1;
+  min-width: 0;
+}
+
+.convert-panel__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--develop-text-soft, #5e6e5a);
+}
+
+.convert-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
 </style>
