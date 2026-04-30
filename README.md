@@ -1,51 +1,76 @@
 # Blog UI
 
-## 项目概览
+这是当前 blog 工作区的 Vue 2 管理后台前端。仓库根目录负责 Docker 启动，真正的 Vue 应用在 `app/` 目录。
 
-当前前端仓库采用“两层结构”：
+## 当前技术栈
 
-- 仓库根目录负责容器化开发入口，核心文件是 `compose.yaml`
-- 真正的 Vue 应用位于 `app/` 目录
+| 项目 | 当前情况 |
+| --- | --- |
+| 运行镜像 | `node:16.20.0-alpine3.17` |
+| 包管理 | npm，使用 `package-lock.json` |
+| Vue | `2.6.14` |
+| Vue CLI | `4.4.6` |
+| Router | `vue-router` 3.5 |
+| 状态管理 | Vuex 3.6 |
+| UI | Element UI 2.15、EleAdmin 1.6 |
+| HTTP | Axios 0.21 |
+| 富文本 | Tinymce、mavon-editor |
+| 图表和表格 | ECharts、xlsx |
+| 3D 模型预览 | `@google/model-viewer` |
 
-`app/` 目前是一个基于 Vue 2 + Vue CLI 4 的后台管理前端，集成了 Element UI、EleAdmin、Vue Router、Vuex 和 Axios。
-
-## 当前目录说明
+## 目录结构
 
 ```text
 blog-ui
 ├── compose.yaml          Docker 开发入口，映射 8082 -> 8080
 ├── README.md             仓库级说明
 └── app/
-    ├── Dockerfile        前端开发镜像
-    ├── package.json      前端依赖与脚本
-    ├── public/           静态资源
-    ├── src/              应用源码
-    ├── vue.config.js     Vue CLI / devServer 配置
+    ├── Dockerfile        Node 16 开发镜像
+    ├── package.json      前端依赖和脚本
+    ├── package-lock.json npm 锁文件
+    ├── public/           静态资源、Tinymce 资源、模型资源
+    ├── src/              Vue 应用源码
+    ├── vue.config.js     Vue CLI 和 devServer 配置
     └── README.md         app 目录说明
 ```
 
-## 技术栈
+## 主要源码路径
 
-| 名称 | 当前情况 |
+| 路径 | 内容 |
 | --- | --- |
-| Node.js | Dockerfile 当前使用 `16.20.0-alpine3.17` |
-| npm | 使用 `package-lock.json`（lockfileVersion 2） |
-| Vue | `2.6.14` |
-| Vue CLI | `4.4.6` |
-| Vue Router | `3.5.2` |
-| Vuex | `3.6.2` |
-| Element UI | `2.15.3` |
-| EleAdmin | `1.6.0` |
-| Axios | `0.21.1` |
+| `app/src/config/axios-config.js` | Axios 前缀、Token Header、响应处理 |
+| `app/src/config/setting.js` | 后台壳层配置、菜单接口、用户接口、主题默认值 |
+| `app/src/router/index.js` | 登录/404 静态路由和后端菜单动态路由 |
+| `app/src/store` | Vuex 模块 |
+| `app/src/layout` | 基于 EleAdmin 的后台布局 |
+| `app/src/views` | 业务页面 |
+| `app/src/components` | 通用组件 |
+| `app/src/styles` | 全局样式 |
+
+## 主要页面模块
+
+| 模块 | 路径 |
+| --- | --- |
+| 首页 | `app/src/views/dashboard` |
+| 系统管理 | `app/src/views/system` |
+| 基础数据 | `app/src/views/data` |
+| 会员 | `app/src/views/member` |
+| 小程序内容 | `app/src/views/mini-program` |
+| 开发工作台 | `app/src/views/develop` |
+| 烟草业务 | `app/src/views/tobacco` |
+| 站点配置 | `app/src/views/config` |
+| 登录、用户、异常页 | `app/src/views/login`、`app/src/views/user`、`app/src/views/exception` |
 
 ## 环境变量
 
-当前仓库没有提交可直接复用的 `.env.example`，但代码里已经明确依赖下面两个变量：
+前端当前没有提交 `.env.example`。代码直接读取这两个变量：
 
-- `VUE_APP_NAME`
-- `VUE_APP_API_BASE_URL`
+| 环境变量 | 用途 |
+| --- | --- |
+| `VUE_APP_NAME` | 浏览器标题和布局里的项目名 |
+| `VUE_APP_API_BASE_URL` | Axios 接口前缀、模板下载地址、上传示例地址 |
 
-本地开发时，先在 `app/` 目录下创建 `.env.development`：
+本地开发时在 `app/` 下创建 `.env.development`：
 
 ```bash
 cd app
@@ -55,9 +80,15 @@ VUE_APP_API_BASE_URL=http://localhost:3925/api
 EOF
 ```
 
-如果前端运行在远程主机或 Docker 环境中，请把 `VUE_APP_API_BASE_URL` 改成对应的后端地址。
+远端开发环境使用：
+
+```dotenv
+VUE_APP_API_BASE_URL=http://10.10.9.184:3925/api
+```
 
 ## 本地启动
+
+直接启动 Vue 应用：
 
 ```bash
 cd app
@@ -67,88 +98,87 @@ npm run serve
 
 默认访问地址：
 
-- `http://localhost:8080`
-
-常用脚本：
-
-```bash
-npm run serve
-npm run build
-npm run build:dev
-npm run build:prod
-npm run lint
-```
+| 目标 | 地址 |
+| --- | --- |
+| Vue dev server | `http://localhost:8080` |
 
 ## Docker 启动
 
-在仓库根目录执行：
+在仓库根目录启动：
 
 ```bash
 docker compose up --build
 ```
 
-容器模式下默认访问地址：
+`compose.yaml` 会构建 `app/Dockerfile`，把 `./app` 挂载到 `/project`，并让容器内的 `node_modules` 独立保留。
 
-- `http://localhost:8082`
+容器模式默认访问地址：
 
-`compose.yaml` 当前会把根目录下的 `app/` 挂载进容器，所以改动源码后会直接反映到容器里的开发服务。
+| 目标 | 地址 |
+| --- | --- |
+| Vue dev server | `http://localhost:8082` |
 
-## 开发说明
+## 常用脚本
 
-### devServer 当前配置
+脚本都在 `app/` 目录执行：
 
-`app/vue.config.js` 中当前已固定这些关键项：
+```bash
+npm run serve
+npm run build
+npm run build:dev
+npm run build:test
+npm run build:prod
+npm run build:preview
+npm run build:report
+npm run lint
+```
 
-- `host: 0.0.0.0`
-- `port: 8080`
-- `allowedHosts: ['all']`
-- `sockHost: '192.168.128.2'`
-- `sockPort: 8080`
+## devServer 配置
 
-如果你更换了开发机 IP，浏览器热更新连接异常时，优先检查 `sockHost` 是否仍然指向正确地址。
+`app/vue.config.js` 当前固定了这些开发服务配置：
 
-### 接口基地址
+| 配置 | 当前值 |
+| --- | --- |
+| `host` | `0.0.0.0` |
+| `port` | `8080` |
+| `allowedHosts` | `['all']` |
+| `sockHost` | `192.168.128.2` |
+| `sockPort` | `8080` |
+| `sockPath` | `/sockjs-node` |
 
-`src/config/axios-config.js` 里直接使用：
+如果热更新连不上，先检查 `sockHost` 是否还是当前开发机地址。
+
+## 后端接口约定
+
+前端要求接口前缀是完整 URL：
 
 ```js
 axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
 ```
 
-因此 `VUE_APP_API_BASE_URL` 应该写成完整的 API 前缀，例如：
+后台壳层当前依赖的核心接口：
 
-- `http://localhost:3925/api`
-- `http://10.10.9.184:3925/api`
+| 用途 | API 路径 |
+| --- | --- |
+| 登录 | `/user/login` |
+| 当前用户 | `/users/getUserInfo` |
+| 动态菜单 | `/index/getMenuList` |
 
-## 主要业务模块
+路由会把后端菜单里的组件路径转换为本地 `views` 下的组件：
 
-`src/views/` 当前主要包含这些模块：
-
-- `system`：用户、角色、菜单、部门、岗位、日志
-- `data`：城市、字典、配置、友情链接
-- `member`：会员与会员等级
-- `mini-program`：笔记、壁纸、相册等小程序内容
-- `develop`：路径转换、模型初始化、日报、文档、平台配置
-- `tobacco`：烟草业务相关页面
-- `config`：站点配置
-- `dashboard`、`login`、`message`、`user`、`exception`
-
-## 代码结构
-
-```text
-app
-├── public/               Tinymce、模型文件、静态资源
-├── src/
-│   ├── assets/           图片等资源
-│   ├── components/       通用组件
-│   ├── config/           axios 与全局设置
-│   ├── layout/           后台布局
-│   ├── plugins/          插件注册
-│   ├── router/           路由配置
-│   ├── store/            Vuex 状态管理
-│   ├── styles/           全局样式
-│   ├── utils/            工具函数
-│   └── views/            页面模块
-├── package.json
-└── vue.config.js
+```js
+menuToRoutes(menus, (component) => import('@/views' + component))
 ```
+
+## 远端验证
+
+当前工作区涉及运行时验证时，以远端环境为准：
+
+| 项目 | 当前值 |
+| --- | --- |
+| SSH | `ubuntu@10.10.9.184` |
+| 前端远端目录 | `/data/personal/projects/blog-ui` |
+| 远端页面地址 | `http://10.10.9.184:8082/` |
+| 后端 API 前缀 | `http://10.10.9.184:3925/api` |
+
+本地和远端是同一仓库时，用 Git 同步。不要把 macOS `._*` 文件同步到远端。
