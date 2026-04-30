@@ -7,7 +7,6 @@ WORKDIR /project
 COPY . .
 
 RUN npm config set registry https://registry.npmjs.org/ && npm install -g @vue/cli && rm -f package-lock.json && npm install --legacy-peer-deps --no-fund --no-audit
-ENV HOST=0.0.0.0
 CMD ["npm", "run", "serve"]
 
 FROM development as dev-envs
