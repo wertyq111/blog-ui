@@ -169,16 +169,3 @@ axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
 ```js
 menuToRoutes(menus, (component) => import('@/views' + component))
 ```
-
-## 远端验证
-
-当前工作区涉及运行时验证时，以远端环境为准：
-
-| 项目 | 当前值 |
-| --- | --- |
-| SSH | `ubuntu@10.10.9.184` |
-| 前端远端目录 | `/data/personal/projects/blog-ui` |
-| 远端页面地址 | `http://10.10.9.184:8082/` |
-| 后端 API 前缀 | `http://10.10.9.184:3925/api` |
-
-本地和远端是同一仓库时，用 Git 同步。不要把 macOS `._*` 文件同步到远端。
