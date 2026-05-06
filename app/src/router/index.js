@@ -16,7 +16,7 @@ const routes = [
   {
     path: '/',
     component: () => import('@/views/landing/creator'),
-    meta: {title: 'Jack -- 3D Creator'}
+    meta: {title: '个人博客 -- 开发与知识工作台'}
   },
   {
     path: '/login',
