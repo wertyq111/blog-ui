@@ -8,7 +8,7 @@
       </FadeIn>
 
       <FadeIn class="creator-heading-wrap" :delay="0.15" :y="40">
-        <h1 class="hero-heading">Hi, i&apos;m jack</h1>
+        <h1 class="hero-heading">Blog hub</h1>
       </FadeIn>
 
       <FadeIn
@@ -21,22 +21,22 @@
           active-transition="transform 0.3s ease-out"
           inactive-transition="transform 0.6s ease-in-out">
           <img
-            src="@/assets/landing/jack-portrait.webp"
-            alt="Jack 3D portrait"
-            width="1450"
-            height="1570"
+            :src="currentAvatar"
+            :alt="currentAvatarAlt"
+            width="1024"
+            height="1536"
             fetchpriority="high">
         </Magnet>
       </FadeIn>
 
       <div id="contact" class="creator-hero-bottom">
         <FadeIn class="creator-intro" :delay="0.35" :y="20">
-          a 3d creator driven by crafting striking and unforgettable projects
+          记录开发日常、沉淀项目文档、管理平台来源与工具配置
         </FadeIn>
         <FadeIn class="creator-actions" :delay="0.5" :y="20">
           <router-link class="creator-login-entry" to="/login">
             <i class="el-icon-user"></i>
-            Login
+            登录
           </router-link>
           <ContactButton />
         </FadeIn>
@@ -51,53 +51,64 @@
 </template>
 
 <script>
-const MARQUEE_IMAGES = [
-  'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
-  'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
-  'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
-  'https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif',
-  'https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif',
-  'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
-  'https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif',
-  'https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif',
-  'https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif',
-  'https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif',
-  'https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif',
-  'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
-  'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
-  'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
-  'https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif',
-  'https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif',
-  'https://motionsites.ai/assets/hero-planet-orbit-preview-DWAP8Z1P.gif',
-  'https://motionsites.ai/assets/hero-new-era-preview-CocuDUm9.gif',
-  'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
-  'https://motionsites.ai/assets/hero-luminex-preview-CxOP7ce6.gif',
-  'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif'
+import setting from '@/config/setting';
+
+const AVATAR_GUEST = require('@/assets/landing/avatar-guest.webp');
+const AVATAR_MALE = require('@/assets/landing/avatar-male.webp');
+const AVATAR_FEMALE = require('@/assets/landing/avatar-female.webp');
+const BUNNY_LOGO = require('@/assets/logo.png');
+const MODULE_WORK_DAILY = require('@/assets/landing/module-work-daily.svg');
+const MODULE_WORK_DOC = require('@/assets/landing/module-work-doc.svg');
+const MODULE_WORK_PLATFORM = require('@/assets/landing/module-work-platform.svg');
+const MODULE_CONVERT_PATH = require('@/assets/landing/module-convert-path.svg');
+const MODULE_INIT_MODEL = require('@/assets/landing/module-init-model.svg');
+const MODULE_MEMBER = require('@/assets/landing/module-member.svg');
+const MODULE_MINI_PROGRAM = require('@/assets/landing/module-mini-program.svg');
+const MODULE_SYSTEM = require('@/assets/landing/module-system.svg');
+const MODULE_SITE_CONFIG = require('@/assets/landing/module-site-config.svg');
+const MODULE_API = require('@/assets/landing/module-api.svg');
+const MODULE_REMOTE = require('@/assets/landing/module-remote.svg');
+const PROJECT_UI = require('@/assets/landing/project-ui.svg');
+const PROJECT_BACKEND = require('@/assets/landing/project-backend.svg');
+const PROJECT_DEPLOY = require('@/assets/landing/project-deploy.svg');
+
+const MARQUEE_ITEMS = [
+  {title: '工作日常', desc: '日报 / 周报 / 月报', image: MODULE_WORK_DAILY},
+  {title: '开发文档', desc: '项目资料沉淀', image: MODULE_WORK_DOC},
+  {title: '平台来源', desc: '绑定项目上下文', image: MODULE_WORK_PLATFORM},
+  {title: '路径转换', desc: '网址与服务器地址', image: MODULE_CONVERT_PATH},
+  {title: '模型初始化', desc: '框架模板配置', image: MODULE_INIT_MODEL},
+  {title: '会员管理', desc: '用户资料与头像', image: MODULE_MEMBER},
+  {title: '小程序内容', desc: '壁纸 / 相册 / 记录', image: MODULE_MINI_PROGRAM},
+  {title: '系统管理', desc: '菜单 / 角色 / 权限', image: MODULE_SYSTEM},
+  {title: '站点配置', desc: '字典 / 参数 / 登录日志', image: MODULE_SITE_CONFIG},
+  {title: '接口后台', desc: 'Laravel API', image: MODULE_API},
+  {title: '远端验证', desc: 'Docker 运行环境', image: MODULE_REMOTE}
 ];
 
 const ABOUT_IMAGES = [
   {
     className: 'about-asset about-asset-moon',
-    src: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png',
-    alt: '3D moon icon',
+    src: BUNNY_LOGO,
+    alt: '网站兔子头像',
     fade: {delay: 0.1, x: -80, y: 0, duration: 0.9}
   },
   {
     className: 'about-asset about-asset-object',
-    src: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png',
-    alt: '3D abstract object',
+    src: AVATAR_GUEST,
+    alt: '未登录访客卡通大头贴',
     fade: {delay: 0.25, x: -80, y: 0, duration: 0.9}
   },
   {
     className: 'about-asset about-asset-lego',
-    src: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png',
-    alt: '3D lego icon',
+    src: AVATAR_MALE,
+    alt: '男性账号卡通大头贴',
     fade: {delay: 0.15, x: 80, y: 0, duration: 0.9}
   },
   {
     className: 'about-asset about-asset-group',
-    src: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png',
-    alt: '3D creative group',
+    src: AVATAR_FEMALE,
+    alt: '女性账号卡通大头贴',
     fade: {delay: 0.3, x: 80, y: 0, duration: 0.9}
   }
 ];
@@ -105,66 +116,62 @@ const ABOUT_IMAGES = [
 const SERVICES = [
   {
     number: '01',
-    name: '3D Modeling',
-    description: 'Creation of detailed objects, characters, or environments tailored to specific client needs, ideal for games, products, and visualizations.'
+    name: '工作日常',
+    description: '记录每天的开发推进，并延伸成周报、月报和年报，让项目进度不再只停留在聊天和脑子里。',
+    image: MODULE_WORK_DAILY
   },
   {
     number: '02',
-    name: 'Rendering',
-    description: 'High-quality, photorealistic renders that showcase designs with custom lighting, textures, and materials to bring concepts to life.'
+    name: '开发文档',
+    description: '沉淀项目资料、模板文档和分类内容，把零散信息整理成后续能继续接力的知识库。',
+    image: MODULE_WORK_DOC
   },
   {
     number: '03',
-    name: 'Motion Design',
-    description: 'Dynamic animations and motion graphics that add energy and storytelling to brands, products, and digital experiences.'
+    name: '平台来源',
+    description: '统一管理不同项目和平台来源，给日志、文档、内容管理都提供清楚的归属。',
+    image: MODULE_WORK_PLATFORM
   },
   {
     number: '04',
-    name: 'Branding',
-    description: 'Crafting cohesive visual identities -- from logos to full brand systems -- that communicate a clear and memorable presence.'
+    name: '路径转换',
+    description: '集中维护项目编码、网址和服务器地址，减少本地、远端和线上环境之间切换时的查找成本。',
+    image: MODULE_CONVERT_PATH
   },
   {
     number: '05',
-    name: 'Web Design',
-    description: 'Designing clean, modern, and conversion-focused websites with attention to layout, typography, and user experience.'
+    name: '模型初始化',
+    description: '管理框架模板和初始化配置，把重复搭建动作收束成可复用的开发流程。',
+    image: MODULE_INIT_MODEL
   }
 ];
 
 const PROJECTS = [
   {
     number: '01',
-    category: 'Client',
-    name: 'Nextlevel Studio',
-    images: [
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85',
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055431_11d841fd-8b41-46a5-82e4-b04f2407a7d8.png&w=1280&q=85',
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85'
-    ]
+    category: 'Vue2 Admin',
+    name: 'Blog UI',
+    href: '/dashboard/workplace',
+    images: [PROJECT_UI, MODULE_WORK_DAILY, MODULE_WORK_DOC]
   },
   {
     number: '02',
-    category: 'Personal',
-    name: 'Aura Brand Identity',
-    images: [
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055654_911201c5-36d9-4bc6-bac7-331adfce159f.png&w=1280&q=85',
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85',
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055753_adc5dcbd-a8e6-49c0-b43a-9b030d835cea.png&w=1280&q=85'
-    ]
+    category: 'Laravel API',
+    name: 'Blog Backend',
+    href: '/develop/work-doc',
+    images: [PROJECT_BACKEND, MODULE_API, MODULE_WORK_PLATFORM]
   },
   {
     number: '03',
-    category: 'Client',
-    name: 'Solaris Digital',
-    images: [
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055759_963cfb0b-4bd1-4b0f-9d0a-09bd6cf95b2f.png&w=1280&q=85',
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_060108_438f781a-9846-4dcc-89ab-c4e6cb830f5b.png&w=1280&q=85',
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85'
-    ]
+    category: 'Docker Remote',
+    name: 'Runtime Verify',
+    href: '/develop/work-platform',
+    images: [PROJECT_DEPLOY, MODULE_REMOTE, MODULE_INIT_MODEL]
   }
 ];
 
-function repeatImages(images) {
-  return images.concat(images, images);
+function repeatItems(items) {
+  return items.concat(items, items);
 }
 
 function clamp(value, min, max) {
@@ -312,24 +319,30 @@ const Magnet = {
 const ContactButton = {
   name: 'ContactButton',
   render(h) {
-    return h('a', {
+    return h('router-link', {
       class: 'contact-button',
-      attrs: {
-        href: '#contact'
+      props: {
+        to: '/login'
       }
-    }, 'Contact Me');
+    }, '进入后台');
   }
 };
 
 const LiveProjectButton = {
   name: 'LiveProjectButton',
+  props: {
+    to: {
+      type: String,
+      default: '/login'
+    }
+  },
   render(h) {
-    return h('a', {
+    return h('router-link', {
       class: 'live-project-button',
-      attrs: {
-        href: '#projects'
+      props: {
+        to: this.to
       }
-    }, 'Live Project');
+    }, '进入模块');
   }
 };
 
@@ -391,8 +404,8 @@ const MarqueeSection = {
   data() {
     return {
       offset: 0,
-      rowOne: repeatImages(MARQUEE_IMAGES.slice(0, 11)),
-      rowTwo: repeatImages(MARQUEE_IMAGES.slice(11))
+      rowOne: repeatItems(MARQUEE_ITEMS.slice(0, 6)),
+      rowTwo: repeatItems(MARQUEE_ITEMS.slice(6))
     };
   },
   mounted() {
@@ -425,15 +438,24 @@ const MarqueeSection = {
           ? `translate3d(${this.offset - 200}px, 0, 0)`
           : `translate3d(${-(this.offset - 200)}px, 0, 0)`
       }
-    }, images.map((src, index) => h('img', {
+    }, images.map((item, index) => h('article', {
       class: 'marquee-tile',
-      attrs: {
-        src,
-        alt: `3D portfolio preview ${index + 1}`,
-        loading: 'lazy'
-      },
-      key: `${direction}-${index}`
-    })));
+      key: `${direction}-${item.title}-${index}`
+    }, [
+      h('img', {
+        attrs: {
+          src: item.image,
+          alt: item.title,
+          loading: 'lazy'
+        }
+      }),
+      h('div', {
+        class: 'marquee-tile-copy'
+      }, [
+        h('span', item.title),
+        h('small', item.desc)
+      ])
+    ])));
 
     return h('section', {
       class: 'marquee-section'
@@ -449,7 +471,7 @@ const AboutSection = {
   data() {
     return {
       aboutImages: ABOUT_IMAGES,
-      text: 'With more than five years of experience in design, i focus on branding, web design, and user experience, i truly enjoy working with businesses that aim to stand out and present their best image. Let\'s build something incredible together!'
+      text: '这个 blog 项目不是单纯的展示页，它更像一个私人开发中枢：工作日常记录推进过程，工作文档沉淀资料，平台来源绑定项目上下文，路径转换和模型初始化负责把重复配置收束起来。'
     };
   },
   render(h) {
@@ -489,7 +511,7 @@ const AboutSection = {
         }, [
           h('h2', {
             class: 'hero-heading section-heading'
-          }, 'About me')
+          }, 'About blog')
         ]),
         h(AnimatedText, {
           props: {
@@ -519,10 +541,10 @@ const ServicesSection = {
       attrs: {
         id: 'price'
       }
-    }, [
-      h('h2', {
-        class: 'section-heading services-heading'
-      }, 'Services'),
+      }, [
+        h('h2', {
+          class: 'section-heading services-heading'
+      }, 'Modules'),
       h('div', {
         class: 'service-list'
       }, this.services.map((service, index) => h(FadeIn, {
@@ -541,7 +563,15 @@ const ServicesSection = {
         }, [
           h('h3', service.name),
           h('p', service.description)
-        ])
+        ]),
+        h('img', {
+          class: 'service-image',
+          attrs: {
+            src: service.image,
+            alt: `${service.name}模块插画`,
+            loading: 'lazy'
+          }
+        })
       ])))
     ]);
   }
@@ -626,7 +656,11 @@ const ProjectsSection = {
               h('span', project.category),
               h('h3', project.name)
             ]),
-            h(LiveProjectButton)
+            h(LiveProjectButton, {
+              props: {
+                to: project.href
+              }
+            })
           ]),
           h('div', {
             class: 'project-image-grid'
@@ -665,7 +699,7 @@ const ProjectsSection = {
 };
 
 export default {
-  name: 'CreatorLanding',
+  name: 'BlogLanding',
   components: {
     AboutSection,
     ContactButton,
@@ -677,22 +711,75 @@ export default {
   },
   data() {
     return {
+      landingUserLoadError: '',
       navLinks: [
-        {label: 'About', href: '#about'},
-        {label: 'Price', href: '#price'},
-        {label: 'Projects', href: '#projects'},
-        {label: 'Contact', href: '#contact'}
+        {label: '概览', href: '#about'},
+        {label: '模块', href: '#price'},
+        {label: '项目', href: '#projects'},
+        {label: '登录', href: '/login'}
       ]
     };
   },
+  computed: {
+    loginUser() {
+      return this.$store.state.user.user || {};
+    },
+    landingGender() {
+      if (!setting.takeToken()) {
+        return 0;
+      }
+      return this.resolveGender(this.loginUser);
+    },
+    currentAvatar() {
+      if (this.landingGender === 2) {
+        return AVATAR_FEMALE;
+      }
+      if (this.landingGender === 1) {
+        return AVATAR_MALE;
+      }
+      return AVATAR_GUEST;
+    },
+    currentAvatarAlt() {
+      if (this.landingGender === 2) {
+        return '女性账号卡通大头贴';
+      }
+      if (this.landingGender === 1) {
+        return '男性账号卡通大头贴';
+      }
+      return '未登录访客卡通大头贴';
+    }
+  },
   mounted() {
-    document.title = 'Jack -- 3D Creator';
+    document.title = '个人博客 -- 开发与知识工作台';
     document.documentElement.classList.add('creator-landing-html');
     document.body.classList.add('creator-landing-body');
+    this.loadLandingUser();
   },
   beforeDestroy() {
     document.documentElement.classList.remove('creator-landing-html');
     document.body.classList.remove('creator-landing-body');
+  },
+  methods: {
+    resolveGender(user) {
+      const member = user && user.member ? user.member : {};
+      const value = member.gender || user.gender || member.sex || user.sex;
+      return Number(value || 0);
+    },
+    loadLandingUser() {
+      if (!setting.takeToken() || this.resolveGender(this.loginUser)) {
+        return;
+      }
+      this.$http.get(setting.userUrl, {params: {include: ['member']}}).then((res) => {
+        const result = setting.parseUser ? setting.parseUser(res.data) : res.data;
+        if (result.code !== 0) {
+          throw new Error(result.msg || '获取用户信息失败');
+        }
+        this.$store.dispatch('user/setUser', result.data || {});
+      }).catch((e) => {
+        this.landingUserLoadError = e.message || '获取用户信息失败';
+        console.error(e);
+      });
+    }
   }
 };
 </script>
@@ -813,7 +900,7 @@ export default {
 
 .creator-heading-wrap {
   position: relative;
-  z-index: 5;
+  z-index: 24;
   width: 100%;
   margin-top: 24px;
   overflow: hidden;
@@ -832,10 +919,10 @@ export default {
 .creator-portrait {
   position: absolute;
   left: 50%;
-  top: 50%;
-  z-index: 10;
-  width: 280px;
-  aspect-ratio: 145 / 157;
+  top: 56%;
+  z-index: 12;
+  width: clamp(180px, 48vw, 250px);
+  aspect-ratio: 1 / 1;
   translate: -50% -50%;
 }
 
@@ -849,7 +936,15 @@ export default {
 .creator-portrait img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  border: 1px solid rgba(215, 226, 234, 0.22);
+  border-radius: 999px;
+  object-fit: cover;
+  object-position: center;
+  background: #0c0c0c;
+  box-shadow:
+    0 0 0 10px rgba(12, 12, 12, 0.72),
+    0 28px 80px rgba(182, 0, 168, 0.24),
+    0 18px 64px rgba(76, 211, 255, 0.18);
   user-select: none;
   pointer-events: none;
 }
@@ -934,11 +1029,57 @@ export default {
 }
 
 .marquee-tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
   width: 420px;
   height: 270px;
   flex: 0 0 auto;
+  overflow: hidden;
   border-radius: 16px;
+  background: #111820;
+}
+
+.marquee-tile::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(180deg, rgba(12, 12, 12, 0.02) 0%, rgba(12, 12, 12, 0.66) 100%);
+}
+
+.marquee-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  opacity: 0.92;
+  filter: saturate(1.08) contrast(1.04);
+}
+
+.marquee-tile-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+}
+
+.marquee-tile-copy span {
+  color: #f4f8fb;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.marquee-tile-copy small {
+  color: rgba(215, 226, 234, 0.72);
+  font-size: 0.92rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
 }
 
 .about-section {
@@ -999,6 +1140,21 @@ export default {
 
 .about-asset img {
   width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(215, 226, 234, 0.2);
+  border-radius: 999px;
+  object-fit: cover;
+  background: #0c0c0c;
+  box-shadow:
+    0 0 0 8px rgba(12, 12, 12, 0.72),
+    0 18px 58px rgba(0, 0, 0, 0.36),
+    0 16px 52px rgba(182, 0, 168, 0.18),
+    0 12px 44px rgba(76, 211, 255, 0.12);
+}
+
+.about-asset-moon img {
+  object-fit: contain;
+  padding: 7%;
 }
 
 .about-asset-moon {
@@ -1066,6 +1222,8 @@ export default {
 
 .service-copy {
   display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
   flex-direction: column;
   gap: 12px;
 }
@@ -1084,6 +1242,16 @@ export default {
   font-size: clamp(0.85rem, 1.6vw, 1.25rem);
   font-weight: 300;
   line-height: 1.7;
+}
+
+.service-image {
+  width: clamp(96px, 16vw, 190px);
+  aspect-ratio: 1.26 / 1;
+  flex: 0 0 auto;
+  border: 1px solid rgba(12, 12, 12, 0.1);
+  border-radius: 24px;
+  object-fit: cover;
+  box-shadow: 0 24px 60px rgba(12, 12, 12, 0.12);
 }
 
 .projects-section {
@@ -1189,6 +1357,7 @@ export default {
 .project-image-grid img {
   width: 100%;
   border-radius: 40px;
+  background: #111820;
   object-fit: cover;
 }
 
@@ -1227,10 +1396,9 @@ export default {
   }
 
   .creator-portrait {
-    top: auto;
-    bottom: 0;
-    width: 360px;
-    translate: -50% 0;
+    top: 56%;
+    width: clamp(230px, 30vw, 330px);
+    translate: -50% -50%;
   }
 
   .creator-hero-bottom {
@@ -1334,7 +1502,8 @@ export default {
   }
 
   .creator-portrait {
-    width: 440px;
+    top: 55%;
+    width: clamp(260px, 28vw, 360px);
   }
 
   .creator-hero-bottom {
@@ -1436,7 +1605,7 @@ export default {
   }
 
   .creator-portrait {
-    width: 520px;
+    width: clamp(290px, 27vw, 380px);
   }
 }
 
@@ -1444,6 +1613,21 @@ export default {
   .creator-hero-bottom {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .service-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .service-copy {
+    flex: 1 1 calc(100% - 96px);
+  }
+
+  .service-image {
+    width: 100%;
+    border-radius: 20px;
   }
 
   .project-card-shell {
