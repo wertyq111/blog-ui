@@ -14,6 +14,11 @@ Vue.use(VueRouter);
 // 静态路由
 const routes = [
   {
+    path: '/',
+    component: () => import('@/views/landing/creator'),
+    meta: {title: 'Jack -- 3D Creator'}
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/login'),
     meta: {title: '登录'}
@@ -38,6 +43,10 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   NProgress.start();
   updateTitle(to);
+  if (setting.whiteList.includes(to.path) && to.path !== '/login') {
+    next();
+    return;
+  }
   // 判断是否登录
   if (setting.takeToken()) {
     // 判断是否已经注册动态路由

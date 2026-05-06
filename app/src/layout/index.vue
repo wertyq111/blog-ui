@@ -189,7 +189,7 @@ export default {
     /* logo点击事件 */
     onLogoClick(isHome) {
       if (!isHome) {
-        this.$router.push('/');
+        this.$router.push(this.getAdminHomePath());
       }
     },
     /* 更新collapse */
@@ -234,16 +234,20 @@ export default {
     tabRemove(obj) {
       removePageTab(obj.name).then(({lastPath}) => {
         if (obj.active === obj.name) {
-          this.$router.push(lastPath || '/');
+          this.$router.push(lastPath || this.getAdminHomePath());
         }
       });
     },
     /* 移除全部tab */
     tabRemoveAll(active) {
       removeAllPageTab();
-      if (active !== '/') {
-        this.$router.push('/');
+      const homePath = this.getAdminHomePath();
+      if (active !== homePath) {
+        this.$router.push(homePath);
       }
+    },
+    getAdminHomePath() {
+      return setting.homePath || '/dashboard/workplace';
     },
     /* 移除左边tab */
     tabRemoveLeft(value) {
