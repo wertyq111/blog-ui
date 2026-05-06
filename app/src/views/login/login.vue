@@ -345,7 +345,7 @@ export default {
     /* 跳转到首页 */
     goHome() {
       const query = this.$route.query;
-      const path = query && query.from ? query.from : '/';
+      const path = query && query.from ? query.from : '/dashboard/workplace';
       this.$router.push(path).catch(() => {
       });
     },

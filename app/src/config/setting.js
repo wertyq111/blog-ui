@@ -9,7 +9,7 @@ export default {
   // 页签可重复打开的路由
   repeatableTabs: ['/system/user/info'],
   // 不需要登录的路由
-  whiteList: ['/login', '/forget'],
+  whiteList: ['/', '/login', '/forget'],
   // 菜单数据接口
   menuUrl: '/index/getMenuList',
   // 自定义解析菜单接口数据
