@@ -16,16 +16,23 @@
         :delay="0.6"
         :y="30">
         <Magnet
-          :padding="150"
-          :strength="3"
+          :padding="320"
+          :strength="2.2"
           active-transition="transform 0.3s ease-out"
           inactive-transition="transform 0.6s ease-in-out">
-          <img
-            :src="currentAvatar"
-            :alt="currentAvatarAlt"
-            width="1024"
-            height="1536"
-            fetchpriority="high">
+          <div class="creator-avatar-card">
+            <div class="creator-avatar-frame">
+              <img
+                :src="currentAvatar"
+                :alt="currentAvatarAlt"
+                width="1024"
+                height="1536"
+                fetchpriority="high">
+            </div>
+            <div v-if="isLoggedIn" class="creator-avatar-name">
+              {{ currentNickname }}
+            </div>
+          </div>
         </Magnet>
       </FadeIn>
 
@@ -34,7 +41,7 @@
           记录开发日常、沉淀项目文档、管理平台来源与工具配置
         </FadeIn>
         <FadeIn class="creator-actions" :delay="0.5" :y="20">
-          <router-link class="creator-login-entry" to="/login">
+          <router-link v-if="!isLoggedIn" class="creator-login-entry" to="/login">
             <i class="el-icon-user"></i>
             登录
           </router-link>
@@ -724,8 +731,16 @@ export default {
     loginUser() {
       return this.$store.state.user.user || {};
     },
+    isLoggedIn() {
+      return Boolean(setting.takeToken());
+    },
+    currentNickname() {
+      const user = this.loginUser || {};
+      const member = user.member || {};
+      return member.nickname || user.nickname || member.realname || user.realname || user.username || '我的账号';
+    },
     landingGender() {
-      if (!setting.takeToken()) {
+      if (!this.isLoggedIn) {
         return 0;
       }
       return this.resolveGender(this.loginUser);
@@ -922,31 +937,60 @@ export default {
   top: 56%;
   z-index: 12;
   width: clamp(180px, 48vw, 250px);
-  aspect-ratio: 1 / 1;
   translate: -50% -50%;
 }
 
 .magnet-shell,
 .magnet-content {
   width: 100%;
-  height: 100%;
   will-change: transform;
 }
 
-.creator-portrait img {
+.creator-avatar-card {
   width: 100%;
-  height: 100%;
-  border: 1px solid rgba(215, 226, 234, 0.22);
+  text-align: center;
+}
+
+.creator-avatar-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
   border-radius: 999px;
-  object-fit: cover;
-  object-position: center;
   background: #0c0c0c;
   box-shadow:
     0 0 0 10px rgba(12, 12, 12, 0.72),
     0 28px 80px rgba(182, 0, 168, 0.24),
     0 18px 64px rgba(76, 211, 255, 0.18);
+}
+
+.creator-avatar-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1);
   user-select: none;
   pointer-events: none;
+}
+
+.creator-avatar-name {
+  display: inline-flex;
+  max-width: min(100%, 320px);
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  border: 1px solid rgba(215, 226, 234, 0.16);
+  border-radius: 999px;
+  padding: 7px 16px;
+  color: #d7e2ea;
+  font-size: clamp(0.82rem, 1.4vw, 1.05rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(12, 12, 12, 0.5);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
 }
 
 .creator-hero-bottom {
