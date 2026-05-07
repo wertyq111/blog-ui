@@ -49,11 +49,19 @@
               <el-form-item label="各平台内容:" prop="platformContents">
                 <div v-for="pid in form.platformIds" :key="pid" class="daily-edit-platform-card">
                   <div class="daily-edit-platform-card__title">{{ findPlatformName(pid) || pid }}</div>
-                  <mavon-editor v-model="form.platformContents[pid]" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
+                  <work-daily-markdown-editor
+                    v-model="form.platformContents[pid]"
+                    :externalLink="mavonExternalLink"
+                    :toolbarsFlag="true"
+                    :subfield="true" />
                 </div>
                 <div v-if="allowCustom && form.customPlatformName" class="daily-edit-platform-card daily-edit-platform-card--custom">
                   <div class="daily-edit-platform-card__title">{{ form.customPlatformName }}</div>
-                  <mavon-editor v-model="form.customPlatformContent" :externalLink="mavonExternalLink" :toolbarsFlag="true" :subfield="true" />
+                  <work-daily-markdown-editor
+                    v-model="form.customPlatformContent"
+                    :externalLink="mavonExternalLink"
+                    :toolbarsFlag="true"
+                    :subfield="true" />
                 </div>
               </el-form-item>
             </el-col>
@@ -69,13 +77,12 @@
 </template>
 
 <script>
-import {mavonEditor} from 'mavon-editor';
-import 'mavon-editor/dist/css/index.css';
 import mavonLocalAssets from '@/utils/mavon-local-assets';
+import WorkDailyMarkdownEditor from './components/work-daily-markdown-editor.vue';
 
 export default {
   name: 'WorkDailyEdit',
-  components: {mavonEditor},
+  components: {WorkDailyMarkdownEditor},
   props: {
     visible: Boolean,
     data: Object,
