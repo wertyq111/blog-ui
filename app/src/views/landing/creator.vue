@@ -8,7 +8,7 @@
       </FadeIn>
 
       <FadeIn class="creator-heading-wrap" :delay="0.15" :y="40">
-        <h1 class="hero-heading">Blog hub</h1>
+        <h1 class="hero-heading">BLOG HUB</h1>
       </FadeIn>
 
       <FadeIn
@@ -927,6 +927,7 @@ export default {
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
+  text-align: center;
   text-transform: uppercase;
   white-space: nowrap;
 }
