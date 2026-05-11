@@ -914,15 +914,11 @@ export default {
 }
 
 .creator-heading-wrap {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 24;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
+  margin-top: 24px;
   overflow: hidden;
-  pointer-events: none;
 }
 
 .creator-heading-wrap h1 {
@@ -1540,6 +1536,10 @@ export default {
 @media (min-width: 768px) {
   .creator-navbar {
     padding-top: 32px;
+  }
+
+  .creator-heading-wrap {
+    margin-top: -20px;
   }
 
   .creator-heading-wrap h1 {
