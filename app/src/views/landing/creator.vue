@@ -8,7 +8,7 @@
       </FadeIn>
 
       <FadeIn class="creator-heading-wrap" :delay="0.15" :y="40">
-        <h1 class="hero-heading">Blog hub</h1>
+        <h1 class="hero-heading">BLOG HUB</h1>
       </FadeIn>
 
       <FadeIn
@@ -914,11 +914,15 @@ export default {
 }
 
 .creator-heading-wrap {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-top: 24px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .creator-heading-wrap h1 {
@@ -927,6 +931,7 @@ export default {
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
+  text-align: center;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -1535,10 +1540,6 @@ export default {
 @media (min-width: 768px) {
   .creator-navbar {
     padding-top: 32px;
-  }
-
-  .creator-heading-wrap {
-    margin-top: -20px;
   }
 
   .creator-heading-wrap h1 {
