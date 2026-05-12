@@ -1,6 +1,6 @@
 <template>
   <div class="ele-body develop-page admin-workspace-page admin-workspace-page--todo develop-page--todo todo-page">
-    <el-card shadow="never" class="todo-page-card admin-workspace-shell">
+    <el-card shadow="never" class="develop-shell todo-page-card admin-workspace-shell">
       <section class="develop-hero">
         <div class="develop-hero__copy">
           <div class="develop-hero__eyebrow">Develop Workspace</div>
@@ -28,7 +28,7 @@
       </section>
 
       <div class="todo-toolbar-grid">
-        <section class="daily-panel">
+        <section class="develop-panel daily-panel">
           <div class="daily-panel__head">
             <div>
               <div class="daily-panel__title">筛选待办</div>
@@ -37,7 +37,7 @@
           </div>
           <el-form
             :model="where"
-            class="ele-form-search daily-form daily-form--inline daily-form--filter"
+            class="ele-form-search develop-form daily-form daily-form--inline daily-form--filter"
             label-width="77px"
             @keyup.enter.native="reload"
             @submit.native.prevent>
@@ -89,7 +89,7 @@
       </div>
 
       <!-- 数据表格 -->
-      <section class="daily-table-shell">
+      <section class="develop-table-shell daily-table-shell">
         <ele-pro-table
           ref="table"
           :columns="columns"
@@ -282,7 +282,7 @@ export default {
         {
           columnKey: "action",
           label: "操作",
-          width: 220,
+          width: 260,
           align: "center",
           resizable: false,
           slot: "action",
@@ -490,17 +490,11 @@ export default {
 .daily-panel {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(104, 186, 255, 0.22);
-  border-radius: 24px;
+  border: 1px solid rgba(31, 35, 41, .08);
+  border-radius: 14px;
   padding: 22px 22px 10px;
-  background:
-    radial-gradient(circle at top right, rgba(52, 157, 255, 0.16), transparent 32%),
-    linear-gradient(180deg, rgba(16, 27, 41, 0.92) 0%, rgba(11, 20, 32, 0.9) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 38px rgba(2, 9, 19, 0.34),
-    0 0 0 1px rgba(55, 168, 255, 0.04),
-    0 0 28px rgba(29, 148, 255, 0.18);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  box-shadow: 0 6px 18px rgba(36, 50, 74, .06);
 }
 
 .daily-panel__head {
@@ -508,14 +502,14 @@ export default {
 }
 
 .daily-panel__title {
-  color: #eef7ff;
+  color: #24324a;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 
 .daily-panel__desc {
-  color: rgba(185, 212, 239, 0.76);
+  color: #728197;
   font-size: 12px;
   line-height: 1.6;
   margin-top: 4px;
@@ -565,45 +559,27 @@ export default {
 }
 
 .daily-form ::v-deep .el-form-item__label {
-  color: rgba(226, 240, 255, 0.88);
+  color: #24324a;
   font-weight: 600;
 }
 
 .daily-form ::v-deep .el-input__inner,
 .daily-form ::v-deep .el-range-editor.el-input__inner,
 .daily-form ::v-deep .el-date-editor.el-input__inner {
-  border-radius: 14px;
+  border-radius: 10px;
   min-height: 42px;
-  background: rgba(8, 15, 26, 0.7);
-  border: 1px solid rgba(97, 160, 224, 0.2);
-  color: #eef6ff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .daily-form ::v-deep .el-button {
-  border-radius: 14px;
-}
-
-.daily-form ::v-deep .el-input__inner::placeholder {
-  color: rgba(152, 181, 214, 0.56);
-}
-
-.daily-form ::v-deep .el-range-editor .el-range-input,
-.daily-form ::v-deep .el-date-editor .el-range-separator,
-.daily-form ::v-deep .el-input__icon,
-.daily-form ::v-deep .el-range__icon,
-.daily-form ::v-deep .el-range__close-icon {
-  color: rgba(178, 210, 240, 0.7);
+  border-radius: 10px;
 }
 
 .todo-page-card {
-  border: 1px solid rgba(87, 157, 219, 0.2);
-  border-radius: 28px;
+  border: 1px solid rgba(31, 35, 41, .08);
+  border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(10, 18, 30, 0.8) 0%, rgba(8, 14, 24, 0.82) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 26px 48px rgba(3, 8, 19, 0.3);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  box-shadow: 0 8px 24px rgba(36, 50, 74, .06);
 }
 
 .todo-page-card ::v-deep .el-card__body {
@@ -613,17 +589,11 @@ export default {
 .daily-table-shell {
   position: relative;
   margin-top: 6px;
-  border: 1px solid rgba(87, 175, 255, 0.32);
-  border-radius: 28px;
+  border: 1px solid rgba(31, 35, 41, .08);
+  border-radius: 14px;
   padding: 18px;
-  background:
-    radial-gradient(circle at top right, rgba(44, 152, 255, 0.2), transparent 28%),
-    linear-gradient(180deg, rgba(16, 28, 42, 0.94) 0%, rgba(11, 20, 32, 0.96) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(66, 181, 255, 0.05),
-    0 0 32px rgba(28, 146, 255, 0.28),
-    0 24px 44px rgba(2, 9, 19, 0.28);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  box-shadow: 0 6px 18px rgba(36, 50, 74, .06);
 }
 
 .daily-table-toolbar {
@@ -645,72 +615,16 @@ export default {
   width: 34px;
   height: 34px;
   padding: 0;
-  border: 1px solid rgba(102, 164, 226, 0.2);
-  background: rgba(10, 18, 29, 0.72);
-  color: rgba(214, 232, 249, 0.92);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(31, 35, 41, .08);
+  background: #fff;
+  color: #5f6b7a;
+  box-shadow: 0 2px 6px rgba(36, 50, 74, .06);
 }
 
-.daily-table {
-  background: transparent;
-}
-
-.daily-table ::v-deep .ele-pro-table {
-  background: transparent;
-}
-
-.daily-table ::v-deep .ele-pro-table-main {
-  background: transparent;
-}
-
-.daily-table ::v-deep .el-table,
-.daily-table ::v-deep .el-table__expanded-cell,
-.daily-table ::v-deep .el-table tr,
-.daily-table ::v-deep .el-table th,
-.daily-table ::v-deep .el-table td {
-  background: transparent;
-}
-
-.daily-table ::v-deep .el-table::before {
-  display: none;
-}
-
-.daily-table ::v-deep .el-table th.is-leaf,
-.daily-table ::v-deep .el-table td {
-  border-bottom: 1px solid rgba(82, 132, 188, 0.12);
-}
-
-.daily-table ::v-deep .el-table th > .cell {
-  color: rgba(232, 244, 255, 0.92);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.daily-table ::v-deep .el-table thead tr {
-  background: rgba(21, 33, 48, 0.9);
-}
-
-.daily-table ::v-deep .el-table thead th {
-  height: 44px;
-  background: rgba(21, 33, 48, 0.86);
-}
-
-.daily-table ::v-deep .el-table tbody tr {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.daily-table ::v-deep .el-table tbody tr:hover > td {
-  background: rgba(30, 54, 79, 0.68) !important;
-}
-
-.daily-table ::v-deep .el-table tbody tr.current-row > td,
-.daily-table ::v-deep .el-table tbody tr:first-child > td {
-  background: rgba(42, 74, 110, 0.58);
-  box-shadow: inset 0 1px 0 rgba(113, 196, 255, 0.18), inset 0 -1px 0 rgba(113, 196, 255, 0.18);
-}
-
-.daily-table ::v-deep .el-table .cell {
-  color: rgba(229, 241, 255, 0.88);
+.daily-table-toolbar__icon:hover {
+  background: #eef4ff;
+  border-color: rgba(52, 120, 246, .26);
+  color: #3478f6;
 }
 
 .daily-action-group {
@@ -721,45 +635,17 @@ export default {
 }
 
 .daily-btn {
-  border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .daily-btn.is-mini {
   min-width: 56px;
 }
 
-.daily-btn--primary {
-  background: linear-gradient(135deg, #0ea5ff 0%, #1468ff 100%);
-  box-shadow:
-    0 10px 22px rgba(12, 124, 255, 0.26),
-    0 0 18px rgba(13, 158, 255, 0.22);
-}
-
-.daily-btn--danger {
-  background: linear-gradient(135deg, rgba(255, 120, 146, 0.28) 0%, rgba(170, 38, 76, 0.42) 100%);
-  color: #ffd7df;
-  box-shadow: 0 8px 18px rgba(180, 46, 84, 0.18);
-}
-
-.daily-table ::v-deep .el-pagination {
-  color: rgba(221, 237, 252, 0.82);
-}
-
-.daily-table ::v-deep .btn-prev,
-.daily-table ::v-deep .btn-next,
-.daily-table ::v-deep .el-pager li {
-  border-radius: 10px;
-  background: rgba(11, 20, 32, 0.78);
-  color: rgba(215, 233, 251, 0.8);
-}
-
-.daily-table ::v-deep .el-pager li.active {
-  background: linear-gradient(135deg, #0ea5ff 0%, #1468ff 100%);
-  color: #ffffff;
+.daily-form ::v-deep .el-range-editor .el-range-input {
+  background: transparent;
 }
 
 @media (max-width: 991px) {
