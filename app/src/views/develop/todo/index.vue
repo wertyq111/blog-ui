@@ -123,35 +123,71 @@
           </template>
           <!-- 状态列 -->
           <template slot="status" slot-scope="{ row }">
-            <el-tag :type="statusTagType(row.status)" size="small" effect="dark" class="todo-status-tag">
+            <el-dropdown v-if="canOperate" trigger="click" size="small" @command="(cmd) => quickStatus(row, cmd)">
+              <el-tag :type="statusTagType(row.status)" size="small" effect="dark" class="todo-status-tag todo-inline-trigger">
+                {{ statusLabel(row.status) }}
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </el-tag>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item v-for="item in statusOptions" :key="item.value" :command="item.value" :disabled="row.status === item.value">
+                  {{ item.label }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <el-tag v-else :type="statusTagType(row.status)" size="small" effect="dark" class="todo-status-tag">
               {{ statusLabel(row.status) }}
             </el-tag>
           </template>
           <!-- 优先级列 -->
           <template slot="priority" slot-scope="{ row }">
-            <el-tag :type="priorityTagType(row.priority)" size="small" effect="dark" class="todo-priority-tag">
+            <el-dropdown v-if="canOperate" trigger="click" size="small" @command="(cmd) => quickPriority(row, cmd)">
+              <el-tag :type="priorityTagType(row.priority)" size="small" effect="dark" class="todo-priority-tag todo-inline-trigger">
+                {{ priorityLabel(row.priority) }}
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </el-tag>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item v-for="item in priorityOptions" :key="item.value" :command="item.value" :disabled="row.priority === item.value">
+                  {{ item.label }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <el-tag v-else :type="priorityTagType(row.priority)" size="small" effect="dark" class="todo-priority-tag">
               {{ priorityLabel(row.priority) }}
             </el-tag>
           </template>
           <!-- 截止日期列 -->
           <template slot="dueDate" slot-scope="{ row }">
-            <span :class="{'todo-overdue': isOverdue(row)}">{{ row.dueDate || '-' }}</span>
+            <el-date-picker
+              v-if="canOperate"
+              :class="{'todo-overdue-picker': isOverdue(row)}"
+              :value="row.dueDate || ''"
+              clearable
+              size="mini"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期"
+              class="todo-inline-date"
+              @change="(value) => quickField(row, { due_date: value || null }, '截止日期已更新')" />
+            <span v-else :class="{'todo-overdue': isOverdue(row)}">{{ row.dueDate || '-' }}</span>
           </template>
           <!-- 平台列 -->
           <template slot="platform" slot-scope="{ row }">
-            <span>{{ row.platform ? row.platform.name : '-' }}</span>
+            <el-select
+              v-if="canOperate"
+              :value="rowPlatformId(row)"
+              clearable
+              filterable
+              size="mini"
+              placeholder="选择平台"
+              class="todo-inline-platform"
+              @change="(value) => quickField(row, { platform_id: value || null }, '平台已更新')">
+              <el-option v-for="item in platforms" :key="item.id" :label="item.name" :value="item.id" />
+            </el-select>
+            <span v-else>{{ row.platform ? row.platform.name : '-' }}</span>
           </template>
           <!-- 操作列 -->
           <template slot="action" slot-scope="{row}">
             <div class="daily-action-group">
-              <el-dropdown v-if="canOperate" trigger="click" size="small" @command="(cmd) => quickStatus(row, cmd)">
-                <el-button icon="el-icon-switch-button" size="mini" type="primary">状态</el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item v-for="item in statusOptions" :key="item.value" :command="item.value" :disabled="row.status === item.value">
-                    {{ item.label }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
               <el-button
                 v-if="canOperate"
                 icon="el-icon-edit"
@@ -224,28 +260,28 @@ export default {
         {
           prop: "status",
           label: "状态",
-          width: 100,
+          width: 120,
           align: "center",
           slot: "status",
         },
         {
           prop: "priority",
           label: "优先级",
-          width: 90,
+          width: 110,
           align: "center",
           slot: "priority",
         },
         {
           prop: "dueDate",
           label: "截止日期",
-          width: 120,
+          width: 150,
           align: "center",
           slot: "dueDate",
         },
         {
           prop: "platform",
           label: "平台",
-          width: 120,
+          width: 160,
           align: "center",
           slot: "platform",
         },
@@ -262,7 +298,7 @@ export default {
         {
           columnKey: "action",
           label: "操作",
-          width: 260,
+          width: 170,
           align: "center",
           resizable: false,
           slot: "action",
@@ -367,6 +403,27 @@ export default {
           this.$message.error(e.message);
         });
     },
+    quickPriority(row, priority) {
+      this.quickField(row, { priority }, "优先级已更新");
+    },
+    quickField(row, payload, message) {
+      const loading = this.$loading({ lock: true });
+      this.$http
+        .post(`/todo/${row.id}`, payload)
+        .then((res) => {
+          loading.close();
+          if (res.data.code === 0) {
+            this.$message.success(message);
+            this.reload();
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch((e) => {
+          loading.close();
+          this.$message.error(e.message);
+        });
+    },
     fetchPlatforms() {
       this.$http
         .get("/work-platform/list", { params: { status: 1 } })
@@ -406,6 +463,10 @@ export default {
     priorityTagType(val) {
       const map = { 0: "", 1: "info", 2: "warning", 3: "danger" };
       return map[val] || "";
+    },
+    rowPlatformId(row) {
+      const id = row.platformId ?? row.platform_id ?? (row.platform ? row.platform.id : null);
+      return id ? Number(id) : null;
     },
     isOverdue(row) {
       if (!row.dueDate || row.status === 2 || row.status === 3) return false;
@@ -462,7 +523,39 @@ export default {
   text-align: center;
 }
 
+.todo-inline-trigger {
+  cursor: pointer;
+  user-select: none;
+}
+
+.todo-inline-date,
+.todo-inline-platform {
+  width: 128px;
+}
+
+.todo-inline-date ::v-deep .el-input__inner,
+.todo-inline-platform ::v-deep .el-input__inner {
+  height: 28px;
+  line-height: 28px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.todo-inline-date ::v-deep .el-input__icon,
+.todo-inline-platform ::v-deep .el-input__icon {
+  line-height: 28px;
+}
+
+.todo-inline-platform {
+  width: 138px;
+}
+
 .todo-overdue {
+  color: #f56c6c;
+  font-weight: 600;
+}
+
+.todo-overdue-picker ::v-deep .el-input__inner {
   color: #f56c6c;
   font-weight: 600;
 }
