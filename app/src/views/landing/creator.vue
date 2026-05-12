@@ -16,8 +16,8 @@
         :delay="0.6"
         :y="30">
         <Magnet
-          :padding="320"
-          :strength="2.2"
+          :padding="500"
+          :strength="1.2"
           active-transition="transform 0.3s ease-out"
           inactive-transition="transform 0.6s ease-in-out">
           <div class="creator-avatar-card">
