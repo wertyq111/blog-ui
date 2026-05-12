@@ -171,24 +171,6 @@
                   @click="openEdit(null)">添加
                 </el-button>
               </div>
-              <div class="daily-table-toolbar__right">
-                <el-tooltip content="刷新列表" placement="top">
-                  <el-button
-                    circle
-                    class="daily-table-toolbar__icon"
-                    icon="el-icon-refresh"
-                    size="mini"
-                    @click="reload" />
-                </el-tooltip>
-                <el-tooltip content="重置筛选" placement="top">
-                  <el-button
-                    circle
-                    class="daily-table-toolbar__icon"
-                    icon="el-icon-delete"
-                    size="mini"
-                    @click="reset" />
-                </el-tooltip>
-              </div>
             </div>
           </template>
           <!-- 内容列 -->

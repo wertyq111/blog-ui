@@ -110,24 +110,6 @@
                   @click="openEdit(null)">添加
                 </el-button>
               </div>
-              <div class="daily-table-toolbar__right">
-                <el-tooltip content="刷新列表" placement="top">
-                  <el-button
-                    circle
-                    class="daily-table-toolbar__icon"
-                    icon="el-icon-refresh"
-                    size="mini"
-                    @click="reload" />
-                </el-tooltip>
-                <el-tooltip content="重置筛选" placement="top">
-                  <el-button
-                    circle
-                    class="daily-table-toolbar__icon"
-                    icon="el-icon-delete"
-                    size="mini"
-                    @click="reset" />
-                </el-tooltip>
-              </div>
             </div>
           </template>
           <!-- 标题列 -->
@@ -584,16 +566,8 @@ export default {
 .daily-table-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   width: 100%;
-}
-
-.daily-table-toolbar__left,
-.daily-table-toolbar__right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .daily-action-group {
@@ -620,15 +594,6 @@ export default {
     padding: 14px;
   }
 
-  .daily-table-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .daily-table-toolbar__left,
-  .daily-table-toolbar__right {
-    justify-content: space-between;
-  }
 }
 
 @media (max-width: 1366px) {
