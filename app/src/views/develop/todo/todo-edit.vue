@@ -302,7 +302,7 @@ export default {
 
 .develop-dialog-card ::v-deep .content-input-wrapper textarea,
 .develop-dialog-card ::v-deep .auto-textarea-wrapper.content-input textarea,
-.develop-dialog-card ::v/deep .v-show-content,
+.develop-dialog-card ::v-deep .v-show-content,
 .develop-dialog-card ::v-deep .v-show-content p,
 .develop-dialog-card ::v-deep .v-show-content li,
 .develop-dialog-card ::v-deep .v-show-content span,
