@@ -28,7 +28,7 @@
       </section>
 
       <div class="todo-toolbar-grid">
-        <section class="develop-panel daily-panel">
+        <section class="develop-panel develop-panel--filter daily-panel">
           <div class="daily-panel__head">
             <div>
               <div class="daily-panel__title">筛选待办</div>
@@ -103,7 +103,7 @@
               <div class="daily-table-toolbar__left">
                 <el-button
                   v-if="canOperate"
-                  class="ele-btn-icon daily-btn daily-btn--primary"
+                  class="ele-btn-icon"
                   icon="el-icon-plus"
                   size="small"
                   type="primary"
@@ -163,7 +163,7 @@
           <template slot="action" slot-scope="{row}">
             <div class="daily-action-group">
               <el-dropdown v-if="canOperate" trigger="click" size="small" @command="(cmd) => quickStatus(row, cmd)">
-                <el-button class="daily-btn daily-btn--primary is-mini" icon="el-icon-switch-button" size="mini" type="primary">状态</el-button>
+                <el-button icon="el-icon-switch-button" size="mini" type="primary">状态</el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item v-for="item in statusOptions" :key="item.value" :command="item.value" :disabled="row.status === item.value">
                     {{ item.label }}
@@ -172,7 +172,6 @@
               </el-dropdown>
               <el-button
                 v-if="canOperate"
-                class="daily-btn daily-btn--primary is-mini"
                 icon="el-icon-edit"
                 size="mini"
                 type="warning"
@@ -185,7 +184,6 @@
                 <el-button
                   v-if="canOperate"
                   slot="reference"
-                  class="daily-btn daily-btn--danger is-mini"
                   icon="el-icon-delete"
                   size="mini"
                   type="danger">删除
@@ -490,11 +488,7 @@ export default {
 .daily-panel {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(31, 35, 41, .08);
-  border-radius: 14px;
   padding: 22px 22px 10px;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-  box-shadow: 0 6px 18px rgba(36, 50, 74, .06);
 }
 
 .daily-panel__head {
@@ -575,11 +569,7 @@ export default {
 }
 
 .todo-page-card {
-  border: 1px solid rgba(31, 35, 41, .08);
-  border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-  box-shadow: 0 8px 24px rgba(36, 50, 74, .06);
 }
 
 .todo-page-card ::v-deep .el-card__body {
@@ -589,11 +579,6 @@ export default {
 .daily-table-shell {
   position: relative;
   margin-top: 6px;
-  border: 1px solid rgba(31, 35, 41, .08);
-  border-radius: 14px;
-  padding: 18px;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-  box-shadow: 0 6px 18px rgba(36, 50, 74, .06);
 }
 
 .daily-table-toolbar {
@@ -611,37 +596,11 @@ export default {
   gap: 10px;
 }
 
-.daily-table-toolbar__icon {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 1px solid rgba(31, 35, 41, .08);
-  background: #fff;
-  color: #5f6b7a;
-  box-shadow: 0 2px 6px rgba(36, 50, 74, .06);
-}
-
-.daily-table-toolbar__icon:hover {
-  background: #eef4ff;
-  border-color: rgba(52, 120, 246, .26);
-  color: #3478f6;
-}
-
 .daily-action-group {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-.daily-btn {
-  border-radius: 10px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-
-.daily-btn.is-mini {
-  min-width: 56px;
 }
 
 .daily-form ::v-deep .el-range-editor .el-range-input {
