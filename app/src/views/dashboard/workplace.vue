@@ -1,25 +1,19 @@
 <template>
-  <div class="ele-body develop-page develop-page--control">
-    <el-card shadow="never" class="develop-shell workplace-shell">
-      <section class="develop-hero workplace-hero">
-        <div class="develop-hero__copy workplace-hero__copy">
-          <div class="develop-hero__eyebrow">Develop Workspace</div>
-          <div class="workplace-hero__title-row">
-            <div>
-              <div class="develop-hero__title">
-                {{ helloPrev }}，{{ displayName }}
-              </div>
-              <div class="develop-hero__desc">
-                这里集中查看开发日志、文档、平台来源与配置工具，优先处理今天要推进的开发工作。
-              </div>
-              <div class="workplace-hero__weather">
-                <i :class="weatherIcon"></i>
-                <span>{{ weatherText }}</span>
-              </div>
-            </div>
+  <div class="ele-body develop-page develop-page--control wp-page">
+    <div class="wp-shell">
+      <section class="wp-hero">
+        <div class="wp-hero__copy">
+          <div class="wp-hero__eyebrow">DEVELOP WORKSPACE</div>
+          <h1 class="wp-hero__title">{{ helloPrev }}，{{ displayName }}</h1>
+          <p class="wp-hero__desc">
+            {{ todayText }}
+          </p>
+          <div class="wp-hero__weather">
+            <i :class="weatherIcon"></i>
+            <span>{{ weatherText }}</span>
           </div>
         </div>
-        <div class="workplace-hero__actions">
+        <div class="wp-hero__actions">
           <el-button
             class="ele-btn-icon"
             icon="el-icon-edit-outline"
@@ -42,219 +36,256 @@
         </div>
       </section>
 
-      <section class="develop-panel workplace-overview">
-        <div
-          v-for="item in overviewCards"
-          :key="item.key"
-          class="workplace-overview__item">
-          <div class="workplace-overview__label">
-            <i :class="item.icon"></i>
-            <span>{{ item.label }}</span>
-          </div>
-          <div class="workplace-overview__value">{{ item.value }}</div>
-          <div class="workplace-overview__hint">{{ item.hint }}</div>
-        </div>
+      <wp-control-bar
+        :value="control"
+        @change="handleControlChange" />
+
+      <section v-if="statsError" class="wp-feedback wp-feedback--error">
+        <span>{{ statsError }}</span>
+        <el-button size="mini" type="primary" plain @click="loadStats">重试</el-button>
       </section>
 
-      <section class="workplace-layout">
-        <div class="workplace-main">
-          <section class="develop-panel workplace-panel">
-            <div class="workplace-panel__header">
-              <div>
-                <div class="workplace-panel__title">最近工作日志</div>
-                <div class="workplace-panel__desc">追踪最近的开发记录、所属平台与摘要内容。</div>
+      <template v-else-if="statsLoading">
+        <section class="wp-skeleton-grid">
+          <div v-for="item in 8" :key="item" class="wp-skeleton wp-skeleton--tile"></div>
+        </section>
+        <section class="wp-skeleton-board">
+          <div class="wp-skeleton wp-skeleton--panel"></div>
+          <div class="wp-skeleton wp-skeleton--panel"></div>
+        </section>
+      </template>
+
+      <template v-else>
+        <section v-if="control.view === 'overview'" class="wp-overview">
+          <div class="wp-metric-grid">
+            <button
+              v-for="item in metricCards"
+              :key="item.key"
+              :class="['wp-metric', { 'wp-metric--accent': item.accent, 'wp-metric--interactive': item.action }]"
+              type="button"
+              @click="item.action && item.action()">
+              <div class="wp-metric__label">{{ item.label }}</div>
+              <div class="wp-metric__value">
+                <span>{{ item.value }}</span>
+                <small v-if="item.unit">{{ item.unit }}</small>
               </div>
+              <div class="wp-metric__meta">{{ item.meta }}</div>
+            </button>
+          </div>
+
+          <section class="wp-overview-main">
+            <wp-activity-heatmap
+              :cells="heatmapCells"
+              :buckets="heatmapBuckets"
+              :range="control.range"
+              @select-date="openDailyByDate" />
+            <div class="wp-overview-side">
+              <wp-trend-line :data="trend30d" />
+              <section class="wp-quip">
+                <div class="wp-quip__eyebrow">今日小结</div>
+                <div class="wp-quip__text">{{ insightQuip }}</div>
+              </section>
+            </div>
+          </section>
+        </section>
+
+        <section v-else class="wp-platform-view">
+          <section class="wp-rank">
+            <div class="wp-section-head">
+              <div>
+                <div class="wp-section-head__eyebrow">平台贡献排行</div>
+                <div class="wp-section-head__desc">按当前范围内的累计字数排序。</div>
+              </div>
+            </div>
+            <div v-if="!platformRank.length" class="wp-empty-card">
+              还没有平台贡献数据。
+            </div>
+            <div v-else class="wp-rank-list">
+              <button
+                v-for="item in platformRank"
+                :key="item.platform_id || item.name"
+                class="wp-rank-item"
+                type="button"
+                @click="goTo('/develop/work-daily')">
+                <div class="wp-rank-item__head">
+                  <div class="wp-rank-item__title">
+                    <span class="wp-rank-item__badge">{{ item.rank }}</span>
+                    <span>{{ item.name || '未绑定平台' }}</span>
+                  </div>
+                  <div class="wp-rank-item__value">{{ formatNumber(item.words) }} 字</div>
+                </div>
+                <div class="wp-rank-item__bar">
+                  <span
+                    class="wp-rank-item__fill"
+                    :style="{ width: `${Math.max(item.percent || 0, 4)}%` }"></span>
+                </div>
+                <div class="wp-rank-item__meta">
+                  <span>{{ formatNumber(item.logs) }} 条日志</span>
+                  <span>{{ formatPercent(item.percent) }}</span>
+                </div>
+              </button>
+            </div>
+          </section>
+
+          <wp-platform-matrix :matrix="platformMatrix" />
+        </section>
+      </template>
+
+      <section class="wp-quick">
+        <div class="wp-section-head">
+          <div>
+            <div class="wp-section-head__eyebrow">快速入口</div>
+            <div class="wp-section-head__desc">最近日志、文档、平台和配置摘要都保留在这里。</div>
+          </div>
+        </div>
+        <div class="wp-quick-grid">
+          <section class="wp-quick-card">
+            <div class="wp-quick-card__head">
+              <span>最近日志</span>
               <el-link :underline="false" type="primary" @click="goTo('/develop/work-daily')">查看全部</el-link>
             </div>
-            <div v-if="errorMap.logs" class="workplace-state workplace-state--error">
-              <span>{{ errorMap.logs }}</span>
-              <el-button size="mini" type="primary" plain @click="goTo('/develop/work-daily')">进入工作日常</el-button>
-            </div>
-            <div v-else-if="loadingMap.logs" class="workplace-state">日志加载中...</div>
-            <div v-else-if="!recentLogs.length" class="workplace-state">
-              <span>还没有工作日志，先记录今天的推进内容。</span>
-              <el-button size="mini" type="primary" plain @click="goTo('/develop/work-daily')">去写日志</el-button>
-            </div>
-            <div v-else class="workplace-log-list">
-              <article
+            <div v-if="errorMap.logs" class="wp-mini-state">{{ errorMap.logs }}</div>
+            <div v-else-if="loadingMap.logs" class="wp-mini-state">日志加载中...</div>
+            <div v-else-if="!recentLogs.length" class="wp-mini-state">还没有工作日志。</div>
+            <div v-else class="wp-mini-list">
+              <button
                 v-for="item in recentLogs"
                 :key="item.id || item.logDate || item.createTime"
-                class="workplace-log-item">
-                <div class="workplace-log-item__head">
-                  <div class="workplace-log-item__date">{{ formatDateLabel(item.logDate || item.createTime) }}</div>
-                  <div class="workplace-log-item__platforms">
-                    <span
-                      v-for="(name, index) in getLogPlatformNames(item)"
-                      :key="name + index"
-                      class="workplace-chip">
-                      {{ name }}
-                    </span>
-                  </div>
-                </div>
-                <div class="workplace-log-item__content">{{ getLogPreview(item) }}</div>
-              </article>
+                class="wp-mini-list__item"
+                type="button"
+                @click="goTo('/develop/work-daily')">
+                <div class="wp-mini-list__title">{{ formatDateLabel(item.logDate || item.createTime) }}</div>
+                <div class="wp-mini-list__meta">{{ getLogPreview(item) }}</div>
+              </button>
             </div>
           </section>
 
-          <section class="develop-panel workplace-panel">
-            <div class="workplace-panel__header">
-              <div>
-                <div class="workplace-panel__title">最近更新文档</div>
-                <div class="workplace-panel__desc">快速进入最近维护的开发文档、模板和项目来源。</div>
-              </div>
+          <section class="wp-quick-card">
+            <div class="wp-quick-card__head">
+              <span>最近文档</span>
               <el-link :underline="false" type="primary" @click="goTo('/develop/work-doc')">查看全部</el-link>
             </div>
-            <div v-if="errorMap.docs" class="workplace-state workplace-state--error">
-              <span>{{ errorMap.docs }}</span>
-              <el-button size="mini" type="primary" plain @click="goTo('/develop/work-doc')">进入工作文档</el-button>
-            </div>
-            <div v-else-if="loadingMap.docs" class="workplace-state">文档加载中...</div>
-            <div v-else-if="!recentDocs.length" class="workplace-state">
-              <span>还没有文档内容，先沉淀一份开发资料。</span>
-              <el-button size="mini" type="primary" plain @click="goTo('/develop/work-doc')">去写文档</el-button>
-            </div>
-            <div v-else class="workplace-doc-list">
-              <article
+            <div v-if="errorMap.docs" class="wp-mini-state">{{ errorMap.docs }}</div>
+            <div v-else-if="loadingMap.docs" class="wp-mini-state">文档加载中...</div>
+            <div v-else-if="!recentDocs.length" class="wp-mini-state">还没有开发文档。</div>
+            <div v-else class="wp-mini-list">
+              <button
                 v-for="item in recentDocs"
                 :key="item.id || item.title"
-                class="workplace-doc-item">
-                <div class="workplace-doc-item__title">{{ item.title || '未命名文档' }}</div>
-                <div class="workplace-doc-item__meta">
-                  <span>{{ item.category && item.category.name ? item.category.name : '未分类' }}</span>
-                  <span>{{ item.source || '未设置项目来源' }}</span>
-                  <span>{{ formatDateLabel(item.updated_at || item.updateTime || item.createTime) }}</span>
+                class="wp-mini-list__item"
+                type="button"
+                @click="goTo('/develop/work-doc')">
+                <div class="wp-mini-list__title">{{ item.title || '未命名文档' }}</div>
+                <div class="wp-mini-list__meta">
+                  {{ item.source || '未设置来源' }} · {{ formatDateLabel(item.updated_at || item.updateTime || item.createTime) }}
                 </div>
-              </article>
+              </button>
             </div>
           </section>
-        </div>
 
-        <div class="workplace-side">
-          <section class="develop-panel workplace-panel">
-            <div class="workplace-panel__header">
-              <div>
-                <div class="workplace-panel__title">项目来源 / 平台概览</div>
-                <div class="workplace-panel__desc">已启用的平台会直接影响日志归属、文档来源与工作范围。</div>
-              </div>
+          <section class="wp-quick-card">
+            <div class="wp-quick-card__head">
+              <span>启用平台</span>
               <el-link :underline="false" type="primary" @click="goTo('/develop/work-platform')">平台管理</el-link>
             </div>
-            <div v-if="errorMap.platforms" class="workplace-state workplace-state--error">
-              <span>{{ errorMap.platforms }}</span>
-              <el-button size="mini" type="primary" plain @click="goTo('/develop/work-platform')">进入工作平台</el-button>
-            </div>
-            <div v-else-if="loadingMap.platforms" class="workplace-state">平台加载中...</div>
-            <div v-else-if="!platforms.length" class="workplace-state">
-              <span>当前没有启用的平台来源。</span>
-              <el-button size="mini" type="primary" plain @click="goTo('/develop/work-platform')">添加平台</el-button>
-            </div>
+            <div v-if="errorMap.platforms" class="wp-mini-state">{{ errorMap.platforms }}</div>
+            <div v-else-if="loadingMap.platforms" class="wp-mini-state">平台加载中...</div>
+            <div v-else-if="!platforms.length" class="wp-mini-state">当前没有启用的平台。</div>
             <div v-else>
-              <div class="workplace-platform-summary">
-                <div class="workplace-platform-summary__count">{{ platforms.length }}</div>
-                <div class="workplace-platform-summary__text">个启用平台正在为日志与文档提供项目来源。</div>
-              </div>
-              <div class="workplace-platform-list">
+              <div class="wp-platform-summary">{{ platforms.length }} 个启用平台</div>
+              <div class="wp-chip-list">
                 <span
                   v-for="item in platforms"
                   :key="item.id || item.name"
-                  class="workplace-chip workplace-chip--strong">
+                  class="wp-chip">
                   {{ item.name }}
                 </span>
               </div>
             </div>
           </section>
 
-          <section class="develop-panel workplace-panel">
-            <div class="workplace-panel__header">
-              <div>
-                <div class="workplace-panel__title">开发工具箱</div>
-                <div class="workplace-panel__desc">日常开发、知识沉淀、配置维护与转换工具统一从这里进入。</div>
-              </div>
+          <section class="wp-quick-card">
+            <div class="wp-quick-card__head">
+              <span>路径与模型</span>
+              <el-link :underline="false" type="primary" @click="goTo('/develop/convert-path')">进入工具</el-link>
             </div>
-            <div class="workplace-tool-list">
-              <router-link
-                v-for="item in tools"
-                :key="item.path"
-                :to="item.path"
-                class="workplace-tool-item">
-                <div class="workplace-tool-item__icon">
-                  <i :class="item.icon"></i>
-                </div>
-                <div class="workplace-tool-item__body">
-                  <div class="workplace-tool-item__title">{{ item.title }}</div>
-                  <div class="workplace-tool-item__desc">{{ item.desc }}</div>
-                </div>
-              </router-link>
-            </div>
-          </section>
-
-          <section class="develop-panel workplace-panel">
-            <div class="workplace-panel__header">
-              <div>
-                <div class="workplace-panel__title">配置与转换摘要</div>
-                <div class="workplace-panel__desc">聚合查看最近维护的路径转换项目与模型初始化配置。</div>
-              </div>
-            </div>
-            <div class="workplace-summary-grid">
-              <div class="workplace-summary-card">
-                <div class="workplace-summary-card__head">
-                  <span>路径转换</span>
-                  <el-link :underline="false" type="primary" @click="goTo('/develop/convert-path')">全部</el-link>
-                </div>
-                <div v-if="errorMap.paths" class="workplace-state workplace-state--error">
-                  <span>{{ errorMap.paths }}</span>
-                </div>
-                <div v-else-if="loadingMap.paths" class="workplace-state">路径项目加载中...</div>
-                <div v-else-if="!recentPaths.length" class="workplace-state">暂无路径转换项目。</div>
-                <div v-else class="workplace-mini-list">
-                  <div
+            <div class="wp-combo">
+              <div class="wp-combo__block">
+                <div class="wp-combo__label">路径转换</div>
+                <div v-if="errorMap.paths" class="wp-mini-state">{{ errorMap.paths }}</div>
+                <div v-else-if="loadingMap.paths" class="wp-mini-state">路径项目加载中...</div>
+                <div v-else-if="!recentPaths.length" class="wp-mini-state">暂无路径项目。</div>
+                <div v-else class="wp-mini-list">
+                  <button
                     v-for="item in recentPaths"
                     :key="item.id || item.code"
-                    class="workplace-mini-list__item">
-                    <div class="workplace-mini-list__title">{{ item.name || item.code }}</div>
-                    <div class="workplace-mini-list__meta">{{ item.code || '未配置编码' }}</div>
-                  </div>
+                    class="wp-mini-list__item"
+                    type="button"
+                    @click="goTo('/develop/convert-path')">
+                    <div class="wp-mini-list__title">{{ item.name || item.code }}</div>
+                    <div class="wp-mini-list__meta">{{ item.code || '未配置编码' }}</div>
+                  </button>
                 </div>
               </div>
-
-              <div class="workplace-summary-card">
-                <div class="workplace-summary-card__head">
-                  <span>模型初始化</span>
-                  <el-link :underline="false" type="primary" @click="goTo('/develop/init-model')">全部</el-link>
-                </div>
-                <div v-if="errorMap.models" class="workplace-state workplace-state--error">
-                  <span>{{ errorMap.models }}</span>
-                </div>
-                <div v-else-if="loadingMap.models" class="workplace-state">模型配置加载中...</div>
-                <div v-else-if="!recentModels.length" class="workplace-state">暂无模型初始化配置。</div>
-                <div v-else class="workplace-mini-list">
-                  <div
+              <div class="wp-combo__block">
+                <div class="wp-combo__label">模型初始化</div>
+                <div v-if="errorMap.models" class="wp-mini-state">{{ errorMap.models }}</div>
+                <div v-else-if="loadingMap.models" class="wp-mini-state">模型配置加载中...</div>
+                <div v-else-if="!recentModels.length" class="wp-mini-state">暂无模型配置。</div>
+                <div v-else class="wp-mini-list">
+                  <button
                     v-for="item in recentModels"
                     :key="item.id || item.code"
-                    class="workplace-mini-list__item">
-                    <div class="workplace-mini-list__title">{{ item.name || item.code }}</div>
-                    <div class="workplace-mini-list__meta">{{ item.code || '未配置编码' }}</div>
-                  </div>
+                    class="wp-mini-list__item"
+                    type="button"
+                    @click="goTo('/develop/init-model')">
+                    <div class="wp-mini-list__title">{{ item.name || item.code }}</div>
+                    <div class="wp-mini-list__meta">{{ item.code || '未配置编码' }}</div>
+                  </button>
                 </div>
               </div>
             </div>
           </section>
         </div>
       </section>
-    </el-card>
+    </div>
   </div>
 </template>
 
 <script>
+import WpActivityHeatmap from "./components/WpActivityHeatmap.vue";
+import WpControlBar from "./components/WpControlBar.vue";
+import WpPlatformMatrix from "./components/WpPlatformMatrix.vue";
+import WpTrendLine from "./components/WpTrendLine.vue";
+
+const BOOK_POOL = [
+  { name: "《小王子》", words: 21000 },
+  { name: "《老人与海》", words: 27000 },
+  { name: "《动物农场》", words: 30000 },
+  { name: "《哈利波特 1》", words: 77000 },
+  { name: "《三体 1》", words: 210000 },
+  { name: "《围城》", words: 220000 },
+  { name: "《红楼梦》", words: 730000 },
+];
+
 export default {
   name: "DashboardWorkplace",
+  components: {
+    WpActivityHeatmap,
+    WpControlBar,
+    WpPlatformMatrix,
+    WpTrendLine,
+  },
   data() {
     return {
-      overview: {
-        platformCount: 0,
-        logCount: 0,
-        docCount: 0,
-        toolCount: 5,
+      control: {
+        view: "overview",
+        range: "all",
       },
+      statsLoading: true,
+      statsError: "",
+      overviewData: {},
+      platformData: {},
       recentLogs: [],
       recentDocs: [],
       platforms: [],
@@ -276,38 +307,6 @@ export default {
       },
       weatherText: "正在整理今天天气提醒...",
       weatherIcon: "el-icon-sunny",
-      tools: [
-        {
-          title: "工作日常",
-          desc: "记录日报并生成周报、月报与年报。",
-          icon: "el-icon-date",
-          path: "/develop/work-daily",
-        },
-        {
-          title: "工作文档",
-          desc: "维护分类、模板文档与项目来源。",
-          icon: "el-icon-document-copy",
-          path: "/develop/work-doc",
-        },
-        {
-          title: "工作平台",
-          desc: "统一管理项目来源与启用状态。",
-          icon: "el-icon-s-grid",
-          path: "/develop/work-platform",
-        },
-        {
-          title: "路径转换",
-          desc: "集中维护项目编码、网址与服务器地址。",
-          icon: "el-icon-_surveying",
-          path: "/develop/convert-path",
-        },
-        {
-          title: "模型初始化",
-          desc: "统一管理框架模板与初始化配置。",
-          icon: "el-icon-s-operation",
-          path: "/develop/init-model",
-        },
-      ],
     };
   },
   computed: {
@@ -336,52 +335,176 @@ export default {
 
       return content;
     },
-    overviewCards() {
+    todayText() {
+      const now = new Date();
+      const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+      return `今天是 ${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${weekdays[now.getDay()]}，先看清楚这段时间的产出，再决定今天要把力气花在哪。`;
+    },
+    metrics() {
+      return this.overviewData.metrics || {};
+    },
+    heatmapBuckets() {
+      return (this.overviewData.heatmap && this.overviewData.heatmap.buckets) || [0, 200, 800, 2000];
+    },
+    heatmapCells() {
+      return (this.overviewData.heatmap && this.overviewData.heatmap.cells) || [];
+    },
+    trend30d() {
+      return this.overviewData.trend_30d || [];
+    },
+    platformRank() {
+      return this.platformData.rank || [];
+    },
+    platformMatrix() {
+      return this.platformData.matrix || { months: [], rows: [], buckets: [0, 500, 2000, 5000] };
+    },
+    metricCards() {
+      const favorite = this.metrics.favorite_platform || {};
+      const longest = this.metrics.longest_streak || {};
+      const peakHour = this.metrics.peak_hour || {};
+
       return [
         {
-          key: "platformCount",
-          label: "启用平台数",
-          value: this.overview.platformCount,
-          hint: "当前参与开发记录的平台来源",
-          icon: "el-icon-s-grid",
+          key: "total_words",
+          label: "累计字数",
+          value: this.formatNumber(this.metrics.total_words && this.metrics.total_words.value),
+          unit: "字",
+          meta: this.buildDeltaText(this.metrics.total_words && this.metrics.total_words.delta_7d, "本周"),
         },
         {
-          key: "logCount",
-          label: "最近日志数",
-          value: this.overview.logCount,
-          hint: "工作日常列表中的累计记录",
-          icon: "el-icon-date",
+          key: "total_logs",
+          label: "总日志数",
+          value: this.formatNumber(this.metrics.total_logs && this.metrics.total_logs.value),
+          unit: "条",
+          meta: this.buildDeltaText(this.metrics.total_logs && this.metrics.total_logs.delta_7d, "本周"),
         },
         {
-          key: "docCount",
-          label: "文档总数",
-          value: this.overview.docCount,
-          hint: "开发文档与模板沉淀总量",
-          icon: "el-icon-document",
+          key: "total_docs",
+          label: "总文档数",
+          value: this.formatNumber(this.metrics.total_docs && this.metrics.total_docs.value),
+          unit: "篇",
+          meta: this.buildDeltaText(this.metrics.total_docs && this.metrics.total_docs.delta_7d, "本周"),
         },
         {
-          key: "toolCount",
-          label: "开发工具数",
-          value: this.overview.toolCount,
-          hint: "可直接进入的 develop 工作模块",
-          icon: "el-icon-s-tools",
+          key: "active_days",
+          label: "活跃天数",
+          value: this.formatNumber(this.metrics.active_days && this.metrics.active_days.value),
+          unit: "天",
+          meta: this.buildDeltaText(this.metrics.active_days && this.metrics.active_days.delta_7d, "近 7 天"),
+        },
+        {
+          key: "current_streak",
+          label: "当前连续",
+          value: this.formatNumber(this.metrics.current_streak && this.metrics.current_streak.value),
+          unit: "天",
+          meta: (this.metrics.current_streak && this.metrics.current_streak.hint) || "等你写下第一条",
+        },
+        {
+          key: "longest_streak",
+          label: "最长连续",
+          value: this.formatNumber(longest.value),
+          unit: "天",
+          meta: longest.start ? `${longest.start} 至 ${longest.end}` : "还没攒出连续记录",
+        },
+        {
+          key: "peak_hour",
+          label: "高产时段",
+          value: peakHour.hour === null || peakHour.hour === undefined ? "—" : `${peakHour.hour}时`,
+          unit: peakHour.label || "",
+          meta: peakHour.label ? `${peakHour.label}最有产出` : "还没攒出节奏",
+        },
+        {
+          key: "favorite_platform",
+          label: "主力平台",
+          value: favorite.name || "—",
+          unit: "",
+          meta: favorite.words ? `${this.formatNumber(favorite.words)} 字 · ${this.formatPercent(favorite.percent)}` : "还没有平台贡献数据",
+          accent: !!favorite.words,
+          action: favorite.words ? this.openPlatformView : null,
         },
       ];
     },
+    insightQuip() {
+      const totalWords = Number(this.metrics.total_words && this.metrics.total_words.value);
+      if (!totalWords) {
+        return "你的写作旅程还没开始，今天这第一笔就很关键。";
+      }
+      if (totalWords < BOOK_POOL[0].words) {
+        return `你已经写下约 ${Math.round((totalWords / BOOK_POOL[0].words) * 100)}% 一本${BOOK_POOL[0].name}。`;
+      }
+      const candidates = BOOK_POOL.filter((item) => {
+        const ratio = totalWords / item.words;
+        return ratio >= 1 && ratio <= 50;
+      });
+      const target = candidates.length ? candidates[totalWords % candidates.length] : BOOK_POOL[BOOK_POOL.length - 1];
+      const times = (totalWords / target.words).toFixed(totalWords / target.words >= 10 ? 0 : 1);
+      return `按现在的累计字数，你已经写了约 ${times} 本${target.name}。`;
+    },
   },
   created() {
+    this.syncControlFromRoute();
     this.loadDashboard();
     this.getWeatherInfo();
+  },
+  watch: {
+    "$route.query"() {
+      const changed = this.syncControlFromRoute();
+      if (changed) {
+        this.loadStats();
+      }
+    },
   },
   methods: {
     async loadDashboard() {
       await Promise.all([
+        this.loadStats(),
         this.loadPlatforms(),
         this.loadLogs(),
         this.loadDocs(),
         this.loadPaths(),
         this.loadModels(),
       ]);
+    },
+    syncControlFromRoute() {
+      const view = this.$route.query.view === "platform" ? "platform" : "overview";
+      const range = ["all", "30d", "7d"].includes(this.$route.query.range) ? this.$route.query.range : "all";
+      const next = { view, range };
+      const changed = next.view !== this.control.view || next.range !== this.control.range;
+      this.control = next;
+      return changed;
+    },
+    handleControlChange(next) {
+      if (!next || (next.view === this.control.view && next.range === this.control.range)) {
+        return;
+      }
+      this.$router.replace({
+        path: this.$route.path,
+        query: Object.assign({}, this.$route.query, next),
+      });
+    },
+    async loadStats() {
+      this.statsLoading = true;
+      this.statsError = "";
+      try {
+        const res = await this.$http.get("/dashboard/stats", {
+          params: {
+            view: this.control.view,
+            range: this.control.range,
+          },
+        });
+        if (!res.data || res.data.code !== 0) {
+          throw new Error((res.data && res.data.msg) || "工作台统计加载失败");
+        }
+        if (this.control.view === "overview") {
+          this.overviewData = res.data.data || {};
+        } else {
+          this.platformData = res.data.data || {};
+        }
+      } catch (error) {
+        this.statsError = this.resolveErrorMessage(error, "工作台统计加载失败");
+      } finally {
+        this.statsLoading = false;
+      }
     },
     async loadPlatforms() {
       this.setLoading("platforms", true);
@@ -390,12 +513,9 @@ export default {
         const res = await this.$http.get("/work-platform/list", {
           params: { status: 1 },
         });
-        const items = this.extractCollection(res);
-        this.platforms = items;
-        this.overview.platformCount = items.length;
+        this.platforms = this.extractCollection(res);
       } catch (error) {
         this.platforms = [];
-        this.overview.platformCount = 0;
         this.setError("platforms", this.resolveErrorMessage(error, "平台概览加载失败"));
       } finally {
         this.setLoading("platforms", false);
@@ -406,13 +526,11 @@ export default {
       this.setError("logs", "");
       try {
         const res = await this.$http.get("/work-daily/index", {
-          params: { page: 1, limit: 6 },
+          params: { page: 1, limit: 5 },
         });
-        this.recentLogs = this.extractCollection(res).slice(0, 6);
-        this.overview.logCount = this.extractTotal(res, this.recentLogs.length);
+        this.recentLogs = this.extractCollection(res).slice(0, 5);
       } catch (error) {
         this.recentLogs = [];
-        this.overview.logCount = 0;
         this.setError("logs", this.resolveErrorMessage(error, "工作日志加载失败"));
       } finally {
         this.setLoading("logs", false);
@@ -423,13 +541,11 @@ export default {
       this.setError("docs", "");
       try {
         const res = await this.$http.get("/work-doc/index", {
-          params: { page: 1, limit: 6 },
+          params: { page: 1, limit: 5 },
         });
-        this.recentDocs = this.extractCollection(res).slice(0, 6);
-        this.overview.docCount = this.extractTotal(res, this.recentDocs.length);
+        this.recentDocs = this.extractCollection(res).slice(0, 5);
       } catch (error) {
         this.recentDocs = [];
-        this.overview.docCount = 0;
         this.setError("docs", this.resolveErrorMessage(error, "开发文档加载失败"));
       } finally {
         this.setLoading("docs", false);
@@ -440,9 +556,9 @@ export default {
       this.setError("paths", "");
       try {
         const res = await this.$http.get("/server-path/index", {
-          params: { page: 1, limit: 4 },
+          params: { page: 1, limit: 3 },
         });
-        this.recentPaths = this.extractCollection(res).slice(0, 4);
+        this.recentPaths = this.extractCollection(res).slice(0, 3);
       } catch (error) {
         this.recentPaths = [];
         this.setError("paths", this.resolveErrorMessage(error, "路径转换摘要加载失败"));
@@ -455,9 +571,9 @@ export default {
       this.setError("models", "");
       try {
         const res = await this.$http.get("/init-model/index", {
-          params: { page: 1, limit: 4 },
+          params: { page: 1, limit: 3 },
         });
-        this.recentModels = this.extractCollection(res).slice(0, 4);
+        this.recentModels = this.extractCollection(res).slice(0, 3);
       } catch (error) {
         this.recentModels = [];
         this.setError("models", this.resolveErrorMessage(error, "模型配置摘要加载失败"));
@@ -491,17 +607,6 @@ export default {
       }
       return [];
     },
-    extractTotal(res, fallback) {
-      const body = res && res.data ? res.data : {};
-      const payload = body.data;
-      if (payload && typeof payload.total === "number") {
-        return payload.total;
-      }
-      if (payload && payload.data && typeof payload.data.total === "number") {
-        return payload.data.total;
-      }
-      return fallback;
-    },
     resolveErrorMessage(error, fallback) {
       return (error && error.message) || fallback;
     },
@@ -513,6 +618,18 @@ export default {
     },
     goTo(path) {
       this.$router.push(path);
+    },
+    openDailyByDate(date) {
+      this.$router.push({
+        path: "/develop/work-daily",
+        query: { date },
+      });
+    },
+    openPlatformView() {
+      this.handleControlChange({
+        view: "platform",
+        range: this.control.range,
+      });
     },
     normalizePlatforms(content) {
       let resolved = content;
@@ -531,38 +648,14 @@ export default {
       }
       return [];
     },
-    getLogPlatformNames(item) {
-      const platforms = this.normalizePlatforms(item ? item.content : null);
-      const names = platforms
-        .map((platform) => {
-          if (platform.platformName) {
-            return platform.platformName;
-          }
-          if (platform.platform_name) {
-            return platform.platform_name;
-          }
-          if (platform.platformId || platform.platform_id) {
-            return this.findPlatformName(platform.platformId || platform.platform_id);
-          }
-          return "";
-        })
-        .filter(Boolean);
-
-      return names.length ? names.slice(0, 3) : ["未绑定平台"];
-    },
     getLogPreview(item) {
       const platforms = this.normalizePlatforms(item ? item.content : null);
       const preview = platforms
-        .map((platform) => this.truncateText(platform.content || "", 72))
+        .map((platform) => this.truncateText(platform.content || "", 54))
         .filter(Boolean)
         .join(" / ");
 
       return preview || "暂无日志摘要";
-    },
-    findPlatformName(id) {
-      const targetId = Number(id);
-      const match = (this.platforms || []).find((item) => Number(item.id) === targetId);
-      return match ? match.name : "";
     },
     truncateText(value, limit) {
       const plain = (value || "")
@@ -585,7 +678,22 @@ export default {
       if (this.$util && typeof this.$util.toDateString === "function") {
         return this.$util.toDateString(value, "MM-dd");
       }
-      return String(value);
+      return String(value).slice(5, 10);
+    },
+    formatNumber(value) {
+      const target = Number(value || 0);
+      return target.toLocaleString();
+    },
+    formatPercent(value) {
+      const target = Number(value || 0);
+      return `${target.toFixed(target >= 10 ? 0 : 1)}%`;
+    },
+    buildDeltaText(value, suffix) {
+      const target = Number(value || 0);
+      if (!target) {
+        return `+0 ${suffix}`;
+      }
+      return `+${this.formatNumber(target)} ${suffix}`;
     },
     getWeatherType(name) {
       switch (name) {
@@ -676,460 +784,449 @@ export default {
 };
 </script>
 
-<style scoped>
-.workplace-shell {
-  padding: 0;
+<style lang="scss" scoped>
+.wp-page {
+  min-height: 100%;
+  padding-bottom: 32px;
+  background:
+    radial-gradient(circle at top left, rgba(240, 246, 236, 0.95), rgba(247, 250, 245, 0.92) 36%, rgba(248, 250, 247, 0.96) 100%);
 }
 
-.workplace-hero {
+.wp-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.wp-hero,
+.wp-feedback,
+.wp-quip,
+.wp-rank,
+.wp-quick-card {
+  border: 1px solid rgba(214, 225, 208, 0.9);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 24px 40px -30px rgba(84, 106, 74, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(150%);
+}
+
+.wp-hero {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  padding: 8px 8px 28px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 28px;
+  border-radius: 30px;
 }
 
-.workplace-hero__copy {
+.wp-hero__copy {
   flex: 1;
   min-width: 0;
 }
 
-.workplace-hero__title-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+.wp-hero__eyebrow {
+  color: #7a8574;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.1em;
 }
 
-.workplace-hero__weather {
+.wp-hero__title {
+  margin: 12px 0 0;
+  color: #1f2a1a;
+  font-size: 40px;
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.wp-hero__desc {
+  max-width: 720px;
+  margin: 14px 0 0;
+  color: #5c6b57;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.wp-hero__weather {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
-  padding: 8px 12px;
+  margin-top: 16px;
+  padding: 10px 14px;
   border-radius: 999px;
-  background: #f8fafc;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  color: #475569;
+  background: rgba(240, 246, 236, 0.92);
+  color: #586753;
   font-size: 12px;
   line-height: 1.6;
 }
 
-.workplace-hero__weather i {
-  color: #2563eb;
-  font-size: 14px;
-}
-
-.workplace-hero__actions {
+.wp-hero__actions {
   display: flex;
-  align-items: center;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
   justify-content: flex-end;
 }
 
-.workplace-overview {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 22px;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.workplace-overview__item {
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: #fff;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  min-height: 120px;
-}
-
-.workplace-overview__label {
+.wp-feedback {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #64748b;
-  font-size: 13px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 22px;
 }
 
-.workplace-overview__label i {
-  font-size: 15px;
-  color: #2563eb;
+.wp-feedback--error {
+  color: #b44e34;
 }
 
-.workplace-overview__value {
-  margin-top: 14px;
-  color: #0f172a;
+.wp-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wp-skeleton-board {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 16px;
+}
+
+.wp-skeleton {
+  border-radius: 24px;
+  background: linear-gradient(90deg, rgba(234, 243, 226, 0.95), rgba(246, 249, 243, 0.98), rgba(234, 243, 226, 0.95));
+  background-size: 240px 100%;
+  animation: wp-skeleton 1.8s linear infinite;
+}
+
+.wp-skeleton--tile {
+  height: 144px;
+}
+
+.wp-skeleton--panel {
+  height: 280px;
+}
+
+.wp-overview,
+.wp-platform-view,
+.wp-quick {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wp-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wp-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 148px;
+  padding: 22px;
+  border: 1px solid rgba(214, 225, 208, 0.9);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 24px 40px -30px rgba(84, 106, 74, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(150%);
+  text-align: left;
+  cursor: default;
+}
+
+.wp-metric--accent {
+  background: linear-gradient(180deg, rgba(245, 225, 213, 0.88), rgba(255, 255, 255, 0.76));
+}
+
+.wp-metric--interactive {
+  cursor: pointer;
+}
+
+.wp-metric__label {
+  color: #7a8574;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+.wp-metric__value {
+  color: #1f2a1a;
   font-size: 34px;
   line-height: 1;
   font-weight: 700;
 }
 
-.workplace-overview__hint {
-  margin-top: 12px;
-  color: #94a3b8;
+.wp-metric__value small {
+  margin-left: 6px;
+  color: #6e7a69;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.wp-metric__meta {
+  color: #5c6b57;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.wp-overview-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 16px;
+}
+
+.wp-overview-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wp-quip {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.wp-quip__eyebrow,
+.wp-section-head__eyebrow {
+  color: #6e7a69;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wp-quip__text,
+.wp-section-head__desc {
+  margin-top: 8px;
+  color: #5c6b57;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.wp-rank {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.wp-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.wp-rank-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.wp-rank-item {
+  padding: 16px;
+  border: 1px solid rgba(224, 233, 219, 0.88);
+  border-radius: 18px;
+  background: rgba(248, 250, 247, 0.95);
+  text-align: left;
+  cursor: pointer;
+}
+
+.wp-rank-item__head,
+.wp-rank-item__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.wp-rank-item__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #24311f;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.wp-rank-item__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #f5e1d5;
+  color: #d17b5c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wp-rank-item__value,
+.wp-rank-item__meta {
+  color: #6d7968;
+  font-size: 12px;
+}
+
+.wp-rank-item__bar {
+  height: 10px;
+  margin: 14px 0 10px;
+  border-radius: 999px;
+  background: rgba(224, 233, 219, 0.9);
+  overflow: hidden;
+}
+
+.wp-rank-item__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d17b5c 0%, #7bb069 100%);
+}
+
+.wp-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wp-quick-card {
+  min-height: 280px;
+  padding: 20px;
+  border-radius: 24px;
+}
+
+.wp-quick-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: #24311f;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.wp-mini-list {
+  display: grid;
+  gap: 10px;
+}
+
+.wp-mini-list__item {
+  padding: 12px 14px;
+  border: 1px solid rgba(224, 233, 219, 0.88);
+  border-radius: 16px;
+  background: rgba(248, 250, 247, 0.95);
+  text-align: left;
+  cursor: pointer;
+}
+
+.wp-mini-list__title {
+  color: #24311f;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wp-mini-list__meta,
+.wp-mini-state,
+.wp-platform-summary,
+.wp-combo__label {
+  color: #6d7968;
   font-size: 12px;
   line-height: 1.6;
 }
 
-.workplace-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
-  gap: 18px;
-  margin-top: 18px;
+.wp-platform-summary {
+  margin-bottom: 12px;
 }
 
-.workplace-main,
-.workplace-side {
+.wp-chip-list {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.workplace-panel {
-  padding: 18px 20px;
-  background: #fff;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 18px;
-}
-
-.workplace-panel__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.workplace-panel__title {
-  color: #0f172a;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.workplace-panel__desc {
-  margin-top: 6px;
-  color: #64748b;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.workplace-log-list,
-.workplace-doc-list,
-.workplace-tool-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.workplace-log-item,
-.workplace-doc-item,
-.workplace-mini-list__item {
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f8fafc;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-}
-
-.workplace-log-item__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.workplace-log-item__date {
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.workplace-log-item__platforms {
-  display: flex;
-  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.workplace-log-item__content {
-  margin-top: 10px;
-  color: #475569;
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-.workplace-chip {
+.wp-chip {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0 10px;
-  min-height: 26px;
+  padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.08);
-  color: #1d4ed8;
+  background: rgba(234, 243, 226, 0.96);
+  color: #486540;
   font-size: 12px;
 }
 
-.workplace-chip--strong {
-  background: #eff6ff;
-}
-
-.workplace-doc-item__title,
-.workplace-mini-list__title {
-  color: #0f172a;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.workplace-doc-item__meta,
-.workplace-mini-list__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
-  color: #64748b;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.workplace-platform-summary {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.workplace-platform-summary__count {
-  color: #0f172a;
-  font-size: 38px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.workplace-platform-summary__text {
-  color: #475569;
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-.workplace-platform-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.workplace-tool-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 0;
-  color: inherit;
-  text-decoration: none;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.workplace-tool-item:first-child {
-  padding-top: 0;
-  border-top: none;
-}
-
-.workplace-tool-item__icon {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #2563eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.workplace-tool-item__body {
-  min-width: 0;
-}
-
-.workplace-tool-item__title {
-  color: #0f172a;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.workplace-tool-item__desc {
-  margin-top: 6px;
-  color: #64748b;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.workplace-summary-grid {
+.wp-combo {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
-.workplace-summary-card {
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f8fafc;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-}
-
-.workplace-summary-card__head {
+.wp-empty-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.workplace-state {
-  min-height: 116px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   justify-content: center;
-  gap: 12px;
-  color: #64748b;
-  font-size: 13px;
-  line-height: 1.7;
+  min-height: 180px;
+  margin-top: 18px;
+  border-radius: 18px;
+  background: rgba(240, 246, 236, 0.92);
+  color: #7e8a79;
+  font-size: 14px;
+  text-align: center;
 }
 
-.workplace-state--error {
-  color: #b91c1c;
+@keyframes wp-skeleton {
+  0% {
+    background-position: -240px 0;
+  }
+  100% {
+    background-position: calc(100% + 240px) 0;
+  }
 }
 
-@media (max-width: 1200px) {
-  .workplace-overview {
+@media (max-width: 1100px) {
+  .wp-skeleton-grid,
+  .wp-metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .workplace-layout {
+  .wp-overview-main,
+  .wp-skeleton-board,
+  .wp-quick-grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) {
-  .workplace-hero,
-  .workplace-panel__header,
-  .workplace-log-item__head {
+@media (max-width: 767px) {
+  .wp-shell {
+    gap: 16px;
+  }
+
+  .wp-hero {
     flex-direction: column;
+    padding: 22px 18px;
   }
 
-  .workplace-hero {
-    padding-bottom: 22px;
+  .wp-hero__title {
+    font-size: 32px;
   }
 
-  .workplace-hero__title-row {
-    flex-direction: column;
-  }
-
-  .workplace-hero__actions,
-  .workplace-log-item__platforms {
+  .wp-hero__actions {
     width: 100%;
     justify-content: flex-start;
   }
 
-  .workplace-overview {
+  .wp-metric-grid {
     grid-template-columns: 1fr;
   }
 
-  .workplace-summary-grid {
-    grid-template-columns: 1fr;
+  .wp-quick-card,
+  .wp-rank {
+    padding: 18px;
   }
-
-  .workplace-panel,
-  .workplace-overview__item {
-    padding: 16px;
-  }
-}
-</style>
-
-<style>
-body.cyber-theme-dark .develop-page--control .workplace-hero {
-  border-bottom-color: var(--page-border-soft);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-hero__weather {
-  background: var(--page-surface-float);
-  border-color: var(--page-border-soft);
-  color: var(--page-text-secondary);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    var(--page-accent-glow);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-hero__weather i,
-body.cyber-theme-dark .develop-page--control .workplace-overview__label i,
-body.cyber-theme-dark .develop-page--control .workplace-tool-item__icon {
-  color: #69b6ff;
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-overview__item,
-body.cyber-theme-dark .develop-page--control .workplace-panel,
-body.cyber-theme-dark .develop-page--control .workplace-summary-card {
-  border-color: var(--page-border-soft);
-  background: var(--page-surface-card);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 20px 36px rgba(2, 10, 23, 0.24);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-log-item,
-body.cyber-theme-dark .develop-page--control .workplace-doc-item,
-body.cyber-theme-dark .develop-page--control .workplace-mini-list__item {
-  background: var(--page-surface-card-soft);
-  border-color: var(--page-border-soft);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-overview__label,
-body.cyber-theme-dark .develop-page--control .workplace-panel__desc,
-body.cyber-theme-dark .develop-page--control .workplace-doc-item__meta,
-body.cyber-theme-dark .develop-page--control .workplace-mini-list__meta,
-body.cyber-theme-dark .develop-page--control .workplace-log-item__content,
-body.cyber-theme-dark .develop-page--control .workplace-platform-summary__text,
-body.cyber-theme-dark .develop-page--control .workplace-tool-item__desc,
-body.cyber-theme-dark .develop-page--control .workplace-state {
-  color: var(--page-text-muted);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-overview__value,
-body.cyber-theme-dark .develop-page--control .workplace-panel__title,
-body.cyber-theme-dark .develop-page--control .workplace-doc-item__title,
-body.cyber-theme-dark .develop-page--control .workplace-mini-list__title,
-body.cyber-theme-dark .develop-page--control .workplace-log-item__date,
-body.cyber-theme-dark .develop-page--control .workplace-platform-summary__count,
-body.cyber-theme-dark .develop-page--control .workplace-tool-item__title,
-body.cyber-theme-dark .develop-page--control .workplace-summary-card__head {
-  color: var(--page-text-primary);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-chip {
-  background: var(--page-accent-soft);
-  color: #8dc7ff;
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-chip--strong,
-body.cyber-theme-dark .develop-page--control .workplace-tool-item__icon {
-  background: rgba(52, 120, 246, 0.18);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-tool-item {
-  border-top-color: rgba(93, 153, 214, 0.12);
-}
-
-body.cyber-theme-dark .develop-page--control .workplace-state--error {
-  color: #ffb4c0;
 }
 </style>
