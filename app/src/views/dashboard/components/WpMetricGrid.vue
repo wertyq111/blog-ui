@@ -5,6 +5,7 @@
       :key="item.key"
       :label="item.label"
       :value="item.value"
+      :numeric-value="item.numericValue"
       :unit="item.unit"
       :meta="item.meta"
       :accent="!!item.accent"

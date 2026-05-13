@@ -1,15 +1,63 @@
+// 工作台仪表盘 V2 设计令牌。来源：docs/superpowers/specs/2026-05-13-workplace-dashboard-design.md §3
+// 仅在 V2 子组件内生效；不要在全站全局色板里复用，避免污染既有 Element UI 主题。
 :root {
+  // ---- 底色 / 玻璃 ----
   --wp-bg-base: #f7faf5;
   --wp-bg-mesh-1: #f0f6ec;
   --wp-bg-mesh-2: #f8faf7;
+
+  --wp-glass-fill: rgba(255, 255, 255, 0.72);
+  --wp-glass-fill-hover: rgba(255, 255, 255, 0.86);
+  --wp-glass-border: rgba(214, 225, 208, 0.9);
+  --wp-glass-shadow: 0 24px 40px -30px rgba(84, 106, 74, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --wp-glass-shadow-hover: 0 32px 56px -28px rgba(84, 106, 74, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  // ---- 墨色 ----
   --wp-ink-1: #1f2a1a;
   --wp-ink-2: #5c6b57;
   --wp-ink-3: #94a189;
+  --wp-ink-4: #c7cfc0;
+
+  // ---- 薄荷九阶 ----
   --wp-mint-50: #f4f9ee;
   --wp-mint-100: #eaf3e2;
   --wp-mint-200: #c8e0b5;
   --wp-mint-400: #9ccc80;
   --wp-mint-500: #7bb069;
   --wp-mint-600: #4a8f2e;
+  --wp-mint-700: #2e5a1b;
+
+  // ---- 对比强调 ----
   --wp-clay: #d17b5c;
+  --wp-clay-soft: #f5e1d5;
+  --wp-ink-warm: #2e4d8a;
+
+  // ---- 字体 ----
+  --wp-font-display: "Fraunces", "Source Han Serif SC", "Songti SC", serif;
+  --wp-font-body: "Hanken Grotesk", "PingFang SC", system-ui, sans-serif;
+  --wp-font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+  // ---- 间距 ----
+  --wp-space-1: 4px;
+  --wp-space-2: 8px;
+  --wp-space-3: 12px;
+  --wp-space-4: 16px;
+  --wp-space-5: 24px;
+  --wp-space-6: 32px;
+  --wp-space-7: 48px;
+  --wp-space-8: 64px;
+
+  // ---- 圆角 ----
+  --wp-radius-sm: 8px;
+  --wp-radius-md: 16px;
+  --wp-radius-lg: 22px;
+  --wp-radius-xl: 30px;
+  --wp-radius-pill: 999px;
+
+  // ---- 动效 ----
+  --wp-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --wp-dur-fast: 180ms;
+  --wp-dur-base: 320ms;
+  --wp-dur-slow: 600ms;
+  --wp-dur-breath: 14s;
 }

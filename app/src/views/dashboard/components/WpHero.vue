@@ -55,12 +55,49 @@ export default {
 
 <style lang="scss" scoped>
 .wp-hero {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
   padding: 28px;
   border-radius: 30px;
+  overflow: hidden;
+}
+
+// 候选 1：浅色慢呼吸渐变。纯 CSS 14s 周期；prefers-reduced-motion 关掉。
+.wp-hero::before {
+  content: "";
+  position: absolute;
+  inset: -28% -18% -18% -28%;
+  background:
+    radial-gradient(closest-side at 22% 32%, rgba(200, 224, 181, 0.55), transparent 70%),
+    radial-gradient(closest-side at 78% 28%, rgba(245, 225, 213, 0.42), transparent 70%);
+  animation: wp-hero-breath var(--wp-dur-breath, 14s) ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.wp-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes wp-hero-breath {
+  0%, 100% {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translate3d(2%, 2%, 0) scale(1.06);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-hero::before {
+    animation: none;
+  }
 }
 
 .wp-hero__copy {
@@ -73,6 +110,8 @@ export default {
   font-size: 12px;
   line-height: 1.4;
   letter-spacing: 0.1em;
+  font-family: var(--wp-font-mono, "JetBrains Mono", "SF Mono", ui-monospace, monospace);
+  text-transform: uppercase;
 }
 
 .wp-hero__title {
@@ -81,6 +120,7 @@ export default {
   font-size: 40px;
   line-height: 1.05;
   font-weight: 700;
+  font-family: var(--wp-font-display, "Fraunces", "Source Han Serif SC", "Songti SC", serif);
 }
 
 .wp-hero__desc {

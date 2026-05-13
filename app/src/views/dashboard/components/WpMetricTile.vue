@@ -5,7 +5,7 @@
     @click="handleClick">
     <div class="wp-metric__label">{{ label }}</div>
     <div class="wp-metric__value">
-      <span>{{ value }}</span>
+      <span>{{ displayValue }}</span>
       <small v-if="unit">{{ unit }}</small>
     </div>
     <div class="wp-metric__meta">{{ meta }}</div>
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import { countUp } from "../utils/wp-count-up";
+
 export default {
   name: "WpMetricTile",
   props: {
@@ -20,9 +22,15 @@ export default {
       type: String,
       default: "",
     },
+    // 已格式化的字符串（fallback 显示，比如 "458,500" 或 "下午"）
     value: {
       type: [String, Number],
       default: "0",
+    },
+    // 原始数字；提供时启用 CountUp 动画，结束后用 toLocaleString 格式化
+    numericValue: {
+      type: Number,
+      default: null,
     },
     unit: {
       type: String,
@@ -41,7 +49,64 @@ export default {
       default: null,
     },
   },
+  data() {
+    return {
+      currentNum: 0,
+      stopAnimation: null,
+    };
+  },
+  computed: {
+    isNumeric() {
+      return typeof this.numericValue === "number" && Number.isFinite(this.numericValue);
+    },
+    displayValue() {
+      if (this.isNumeric) {
+        return Math.round(this.currentNum).toLocaleString();
+      }
+      return this.value;
+    },
+  },
+  watch: {
+    numericValue: {
+      immediate: false,
+      handler(next, prev) {
+        if (typeof next !== "number") return;
+        this.animateTo(typeof prev === "number" ? prev : 0, next);
+      },
+    },
+  },
+  mounted() {
+    if (this.isNumeric) {
+      this.animateTo(0, this.numericValue);
+    }
+  },
+  beforeDestroy() {
+    if (this.stopAnimation) {
+      this.stopAnimation();
+      this.stopAnimation = null;
+    }
+  },
   methods: {
+    animateTo(from, to) {
+      if (this.stopAnimation) {
+        this.stopAnimation();
+        this.stopAnimation = null;
+      }
+      // 数字为 0 时直接落地，不必动画
+      if (to === 0) {
+        this.currentNum = 0;
+        return;
+      }
+      this.currentNum = from;
+      this.stopAnimation = countUp({
+        from,
+        to,
+        duration: 1200,
+        onUpdate: (v) => {
+          this.currentNum = v;
+        },
+      });
+    },
     handleClick() {
       if (this.action) {
         this.action();
@@ -62,6 +127,7 @@ export default {
   border-radius: 24px;
   text-align: left;
   cursor: default;
+  font-variant-numeric: tabular-nums;
 }
 
 .wp-metric--accent {
@@ -77,6 +143,8 @@ export default {
   font-size: 12px;
   line-height: 1.4;
   letter-spacing: 0.08em;
+  font-family: var(--wp-font-mono, "JetBrains Mono", "SF Mono", ui-monospace, monospace);
+  text-transform: uppercase;
 }
 
 .wp-metric__value {
@@ -84,6 +152,7 @@ export default {
   font-size: 34px;
   line-height: 1;
   font-weight: 700;
+  font-family: var(--wp-font-display, "Fraunces", "Source Han Serif SC", "Songti SC", serif);
 }
 
 .wp-metric__value small {
@@ -91,11 +160,13 @@ export default {
   color: #6e7a69;
   font-size: 14px;
   font-weight: 500;
+  font-family: var(--wp-font-body, "Hanken Grotesk", "PingFang SC", system-ui, sans-serif);
 }
 
 .wp-metric__meta {
   color: #5c6b57;
   font-size: 13px;
   line-height: 1.6;
+  font-family: var(--wp-font-mono, "JetBrains Mono", "SF Mono", ui-monospace, monospace);
 }
 </style>
