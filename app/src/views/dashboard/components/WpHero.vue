@@ -65,17 +65,19 @@ export default {
   overflow: hidden;
 }
 
-// 候选 1：浅色慢呼吸渐变。纯 CSS 14s 周期；prefers-reduced-motion 关掉。
+// 候选 1：浅色慢呼吸渐变。10s 周期，幅度足够肉眼察觉 —— 是持续循环动效，不是 fade-in
 .wp-hero::before {
   content: "";
   position: absolute;
-  inset: -28% -18% -18% -28%;
+  inset: -40% -25% -25% -40%;
   background:
-    radial-gradient(closest-side at 22% 32%, rgba(200, 224, 181, 0.55), transparent 70%),
-    radial-gradient(closest-side at 78% 28%, rgba(245, 225, 213, 0.42), transparent 70%);
-  animation: wp-hero-breath var(--wp-dur-breath, 14s) ease-in-out infinite;
+    radial-gradient(closest-side at 20% 30%, rgba(156, 204, 128, 0.62), transparent 68%),
+    radial-gradient(closest-side at 78% 26%, rgba(245, 225, 213, 0.58), transparent 68%),
+    radial-gradient(closest-side at 50% 90%, rgba(200, 224, 181, 0.4), transparent 65%);
+  animation: wp-hero-breath 10s ease-in-out infinite;
   z-index: 0;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .wp-hero > * {
@@ -85,11 +87,11 @@ export default {
 
 @keyframes wp-hero-breath {
   0%, 100% {
-    transform: translate3d(-3%, -2%, 0) scale(1);
-    opacity: 0.92;
+    transform: translate3d(-6%, -4%, 0) scale(1);
+    opacity: 0.85;
   }
   50% {
-    transform: translate3d(2%, 2%, 0) scale(1.06);
+    transform: translate3d(5%, 4%, 0) scale(1.12);
     opacity: 1;
   }
 }

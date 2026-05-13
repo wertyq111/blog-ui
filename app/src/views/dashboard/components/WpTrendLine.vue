@@ -82,7 +82,8 @@ export default {
       }
       const labels = this.data.map((item) => this.formatDate(item.date));
       const values = this.data.map((item) => Number(item.words || 0));
-      const labelInterval = labels.length > 8 ? Math.ceil(labels.length / 5) : 0;
+      // 期望最多 5~6 个 label 不挤；30 个数据时取 6 表示"每 7 个显示 1 个"
+      const labelInterval = labels.length > 8 ? Math.max(1, Math.ceil(labels.length / 6)) : 0;
 
       this.chart.setOption(
         {
@@ -120,11 +121,13 @@ export default {
             axisLabel: {
               color: "#94a189",
               fontSize: 11,
+              margin: 12,
+              hideOverlap: true,
+              // ECharts 文档约定：函数返回 true=显示 / false=隐藏。
+              // 之前是反的，导致 30 个 label 几乎全部叠在一起。
               interval(index) {
-                if (labelInterval === 0) {
-                  return false;
-                }
-                return index % labelInterval !== 0 && index !== labels.length - 1;
+                if (labelInterval === 0) return true;
+                return index % labelInterval === 0 || index === labels.length - 1;
               },
             },
           },
