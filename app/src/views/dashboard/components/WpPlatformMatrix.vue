@@ -106,6 +106,11 @@ export default {
         });
       });
       const maxValue = values.reduce((max, item) => Math.max(max, item[2]), 0) || 1;
+      const buckets = Array.isArray(this.matrix.buckets) ? this.matrix.buckets.map((item) => Number(item || 0)) : [0, 500, 2000, 5000];
+      const b1 = buckets[1] || 200;
+      const b2 = buckets[2] || 800;
+      const b3 = buckets[3] || 2000;
+      const top = Math.max(maxValue, b3);
 
       this.chart.setOption(
         {
@@ -159,13 +164,16 @@ export default {
             },
           },
           visualMap: {
-            min: 0,
-            max: maxValue,
+            type: "piecewise",
             show: false,
             calculable: false,
-            inRange: {
-              color: ["#eaf3e2", "#c8e0b5", "#9ccc80", "#7bb069", "#4a8f2e"],
-            },
+            pieces: [
+              { lte: 0, color: "#eaf3e2" },
+              { gt: 0, lte: b1, color: "#c8e0b5" },
+              { gt: b1, lte: b2, color: "#9ccc80" },
+              { gt: b2, lte: b3, color: "#7bb069" },
+              { gt: b3, lte: top, color: "#4a8f2e" },
+            ],
           },
           series: [
             {
