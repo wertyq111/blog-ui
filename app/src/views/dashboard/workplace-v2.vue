@@ -13,7 +13,7 @@
 
       <section v-if="statsError" class="wp-feedback wp-feedback--error wp-glass-card">
         <span>{{ statsError }}</span>
-        <el-button size="mini" type="primary" plain @click="loadStats">重试</el-button>
+        <el-button size="mini" type="primary" plain @click="loadStats({ force: true })">重试</el-button>
       </section>
 
       <template v-else-if="statsLoading">
@@ -108,6 +108,8 @@ export default {
       statsError: "",
       overviewData: {},
       platformData: {},
+      // 5 分钟前端软缓存（避免切 Tab/Range 来回点反复打接口；后端 cache_hit 仍是兜底）
+      statsCache: Object.create(null),
       recentLogs: [],
       recentDocs: [],
       platforms: [],
@@ -179,40 +181,46 @@ export default {
       const favorite = this.metrics.favorite_platform || {};
       const longest = this.metrics.longest_streak || {};
       const peakHour = this.metrics.peak_hour || {};
+      const numeric = (m) => (m && typeof m.value === "number" ? m.value : 0);
 
       return [
         {
           key: "total_words",
           label: "累计字数",
-          value: this.formatNumber(this.metrics.total_words && this.metrics.total_words.value),
+          value: this.formatNumber(numeric(this.metrics.total_words)),
+          numericValue: numeric(this.metrics.total_words),
           unit: "字",
           meta: this.buildDeltaText(this.metrics.total_words && this.metrics.total_words.delta_7d, "本周"),
         },
         {
           key: "total_logs",
           label: "总日志数",
-          value: this.formatNumber(this.metrics.total_logs && this.metrics.total_logs.value),
+          value: this.formatNumber(numeric(this.metrics.total_logs)),
+          numericValue: numeric(this.metrics.total_logs),
           unit: "条",
           meta: this.buildDeltaText(this.metrics.total_logs && this.metrics.total_logs.delta_7d, "本周"),
         },
         {
           key: "total_docs",
           label: "总文档数",
-          value: this.formatNumber(this.metrics.total_docs && this.metrics.total_docs.value),
+          value: this.formatNumber(numeric(this.metrics.total_docs)),
+          numericValue: numeric(this.metrics.total_docs),
           unit: "篇",
           meta: this.buildDeltaText(this.metrics.total_docs && this.metrics.total_docs.delta_7d, "本周"),
         },
         {
           key: "active_days",
           label: "活跃天数",
-          value: this.formatNumber(this.metrics.active_days && this.metrics.active_days.value),
+          value: this.formatNumber(numeric(this.metrics.active_days)),
+          numericValue: numeric(this.metrics.active_days),
           unit: "天",
           meta: this.buildDeltaText(this.metrics.active_days && this.metrics.active_days.delta_7d, "近 7 天"),
         },
         {
           key: "current_streak",
           label: "当前连续",
-          value: this.formatNumber(this.metrics.current_streak && this.metrics.current_streak.value),
+          value: this.formatNumber(numeric(this.metrics.current_streak)),
+          numericValue: numeric(this.metrics.current_streak),
           unit: "天",
           meta: (this.metrics.current_streak && this.metrics.current_streak.hint) || "等你写下第一条",
         },
@@ -220,6 +228,7 @@ export default {
           key: "longest_streak",
           label: "最长连续",
           value: this.formatNumber(longest.value),
+          numericValue: typeof longest.value === "number" ? longest.value : 0,
           unit: "天",
           meta: longest.start ? `${longest.start} 至 ${longest.end}` : "还没攒出连续记录",
         },
@@ -292,23 +301,43 @@ export default {
         query: Object.assign({}, this.$route.query, next),
       });
     },
-    async loadStats() {
+    async loadStats({ force = false } = {}) {
+      const view = this.control.view;
+      const range = this.control.range;
+      const cacheKey = `${view}:${range}`;
+      const FIVE_MIN = 5 * 60 * 1000;
+      const cached = this.statsCache[cacheKey];
+
+      // 命中本地软缓存：直接还原数据，跳过 HTTP（spec §5.5）
+      if (!force && cached && Date.now() - cached.loadedAt < FIVE_MIN) {
+        if (view === "overview") {
+          this.overviewData = cached.data;
+        } else {
+          this.platformData = cached.data;
+        }
+        this.statsLoading = false;
+        this.statsError = "";
+        return;
+      }
+
       this.statsLoading = true;
       this.statsError = "";
       try {
         const res = await this.$http.get("/dashboard/stats", {
-          params: {
-            view: this.control.view,
-            range: this.control.range,
-          },
+          params: { view, range },
         });
         if (!res.data || res.data.code !== 0) {
           throw new Error((res.data && res.data.msg) || "工作台统计加载失败");
         }
-        if (this.control.view === "overview") {
-          this.overviewData = res.data.data || {};
+        const payload = res.data.data || {};
+        if (view === "overview") {
+          this.overviewData = payload;
         } else {
-          this.platformData = res.data.data || {};
+          this.platformData = payload;
+        }
+        // 注意：只缓存与当前 view/range 一致的数据，避免后端 race 把过期 response 写入
+        if (payload.view === view && payload.range === range) {
+          this.$set(this.statsCache, cacheKey, { data: payload, loadedAt: Date.now() });
         }
       } catch (error) {
         this.statsError = this.resolveErrorMessage(error, "工作台统计加载失败");
