@@ -184,7 +184,7 @@ export default {
 .wp-trend {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  //min-height: 100%;
   padding: 22px;
   border-radius: 24px;
   border: 1px solid rgba(214, 225, 208, 0.9);
