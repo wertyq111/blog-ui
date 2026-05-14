@@ -182,6 +182,8 @@ export default {
 
 <style lang="scss" scoped>
 .wp-trend {
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
   padding: 22px;
   border-radius: 24px;
@@ -193,6 +195,7 @@ export default {
   backdrop-filter: blur(20px) saturate(150%);
 
   &__eyebrow {
+    flex-shrink: 0;
     margin-bottom: 14px;
     color: #6e7a69;
     font-size: 12px;
@@ -201,12 +204,14 @@ export default {
     text-transform: uppercase;
   }
 
-  &__chart,
-  &__empty {
-    height: 180px;
+  &__chart {
+    flex: 1;
+    min-height: 180px;
   }
 
   &__empty {
+    flex: 1;
+    min-height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;

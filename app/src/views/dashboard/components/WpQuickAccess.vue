@@ -1,10 +1,6 @@
 <template>
   <section class="wp-quick">
     <div class="wp-section-head">
-      <div>
-        <div class="wp-section-head__eyebrow">快速入口</div>
-        <div class="wp-section-head__desc">保留原有能力，收进第二屏，随时跳转。</div>
-      </div>
     </div>
     <div class="wp-quick-grid">
       <wp-quick-card title="最近日志" link-text="查看全部" link-target="/develop/work-daily" @navigate="$emit('navigate', $event)">

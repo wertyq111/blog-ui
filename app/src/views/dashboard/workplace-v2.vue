@@ -30,16 +30,19 @@
         <section v-if="control.view === 'overview'" class="wp-overview">
           <wp-metric-grid :items="metricCards" />
 
+          <wp-activity-heatmap
+            :cells="heatmapCells"
+            :buckets="heatmapBuckets"
+            :range="control.range"
+            @select-date="openDailyByDate" />
+
           <section class="wp-overview-main">
-            <wp-activity-heatmap
-              :cells="heatmapCells"
-              :buckets="heatmapBuckets"
-              :range="control.range"
-              @select-date="openDailyByDate" />
-            <div class="wp-overview-side">
+            <div class="wp-charts-col">
               <wp-trend-line :data="trend30d" />
-              <wp-insight-quip :text="insightQuip" />
+              <wp-hour-chart :hour-dist="hourDist" />
+              <wp-platform-donut :platform-dist="platformDist" />
             </div>
+            <wp-streak-panel :metrics="metrics" />
           </section>
         </section>
 
@@ -68,11 +71,14 @@
 import WpActivityHeatmap from "./components/WpActivityHeatmap.vue";
 import WpControlBar from "./components/WpControlBar.vue";
 import WpHero from "./components/WpHero.vue";
+import WpHourChart from "./components/WpHourChart.vue";
 import WpInsightQuip from "./components/WpInsightQuip.vue";
 import WpMetricGrid from "./components/WpMetricGrid.vue";
+import WpPlatformDonut from "./components/WpPlatformDonut.vue";
 import WpPlatformMatrix from "./components/WpPlatformMatrix.vue";
 import WpPlatformRank from "./components/WpPlatformRank.vue";
 import WpQuickAccess from "./components/WpQuickAccess.vue";
+import WpStreakPanel from "./components/WpStreakPanel.vue";
 import WpTrendLine from "./components/WpTrendLine.vue";
 
 const BOOK_POOL = [
@@ -91,11 +97,14 @@ export default {
     WpActivityHeatmap,
     WpControlBar,
     WpHero,
+    WpHourChart,
     WpInsightQuip,
     WpMetricGrid,
+    WpPlatformDonut,
     WpPlatformMatrix,
     WpPlatformRank,
     WpQuickAccess,
+    WpStreakPanel,
     WpTrendLine,
   },
   data() {
@@ -170,6 +179,12 @@ export default {
     },
     trend30d() {
       return this.overviewData.trend_30d || [];
+    },
+    hourDist() {
+      return (this.overviewData.metrics && this.overviewData.metrics.hour_dist) || [];
+    },
+    platformDist() {
+      return this.overviewData.platform_dist || [];
     },
     platformRank() {
       return this.platformData.rank || [];
