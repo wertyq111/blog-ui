@@ -96,12 +96,13 @@ export default {
       const values = [];
       rows.forEach((row, rowIndex) => {
         const cells = Array.isArray(row.cells) ? row.cells : [];
-        cells.forEach((cell, monthIndex) => {
+        const logCells = Array.isArray(row.log_cells) ? row.log_cells : [];
+        cells.forEach((words, monthIndex) => {
           values.push([
             monthIndex,
             rowIndex,
-            Number(cell && cell.words ? cell.words : 0),
-            Number(cell && cell.logs ? cell.logs : 0),
+            Number(words || 0),
+            Number(logCells[monthIndex] || 0),
           ]);
         });
       });
