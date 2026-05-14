@@ -127,7 +127,7 @@ export default {
 .wp-hour-chart {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  //min-height: 100%;
   padding: 22px;
   border-radius: 24px;
 
