@@ -32,10 +32,25 @@
             </el-col>
           </el-row>
           <el-row :gutter="15">
-            <el-col :sm="24">
+            <el-col :sm="12">
               <el-form-item label="临时平台:" prop="customPlatformName">
                 <el-input v-if="allowCustom" v-model="form.customPlatformName" class="daily-edit-custom-name" placeholder="新增临时平台名（可选）"/>
                 <div v-else class="field-desc">当前未开启临时平台补充。</div>
+              </el-form-item>
+            </el-col>
+            <el-col :sm="12">
+              <el-form-item label="标签:">
+                <el-select
+                  v-model="form.tagIds"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  placeholder="选择或输入新标签"
+                  style="width: 100%"
+                  @change="handleTagChange">
+                  <el-option v-for="t in tagList" :key="t.id" :label="t.name" :value="t.id" />
+                </el-select>
               </el-form-item>
             </el-col>
           </el-row>
@@ -97,6 +112,10 @@ export default {
     mavonExternalLink: {
       type: Object,
       default: () => mavonLocalAssets
+    },
+    tagList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -135,6 +154,7 @@ export default {
         const init = Object.assign({}, this.data);
         init.platformIds = [];
         init.platformContents = {};
+        init.tagIds = (init.tags || []).map(t => t.id);
         if (init.content && init.content.platforms) {
           init.content.platforms.forEach(p => {
             if (p.platformId) {
@@ -149,7 +169,7 @@ export default {
         this.form = init;
         this.isUpdate = true;
       } else {
-        this.form = {logDate: '', platformIds: [], platformContents: {}, customPlatformName: '', customPlatformContent: ''};
+        this.form = {logDate: '', platformIds: [], platformContents: {}, customPlatformName: '', customPlatformContent: '', tagIds: []};
         this.isUpdate = false;
       }
     },
@@ -184,7 +204,8 @@ export default {
 
           const payload = {
             log_date: this.formatDate(this.form.logDate),
-            platforms: platforms
+            platforms: platforms,
+            tag_ids: (this.form.tagIds || []).filter(id => typeof id === 'number')
           };
 
           this.$http.post(url, payload).then(res => {
@@ -192,7 +213,7 @@ export default {
             if (res.data.code === 0) {
               this.$message({type: 'success', message: res.data.msg || '保存成功'});
               if (!this.isUpdate) {
-                this.form = {logDate: '', platformIds: [], platformContents: {}, customPlatformName: '', customPlatformContent: ''};
+                this.form = {logDate: '', platformIds: [], platformContents: {}, customPlatformName: '', customPlatformContent: '', tagIds: []};
               }
               this.updateVisible(false);
               this.$emit('done');
@@ -208,6 +229,35 @@ export default {
     },
     updateVisible(value) {
       this.$emit('update:visible', value);
+    },
+    handleTagChange(val) {
+      const resolved = [];
+      const pending = [];
+      (val || []).forEach(item => {
+        if (typeof item === 'string') {
+          pending.push(item);
+        } else {
+          resolved.push(item);
+        }
+      });
+      if (!pending.length) return;
+      // 逐个创建新标签
+      const createNext = (index) => {
+        if (index >= pending.length) {
+          this.form.tagIds = resolved;
+          return;
+        }
+        this.$http.post('/work-daily-tag/add', { name: pending[index] }).then(res => {
+          if (res.data.code === 0 && res.data.data) {
+            resolved.push(res.data.data.id);
+            this.$emit('tag-created', res.data.data);
+          }
+          createNext(index + 1);
+        }).catch(() => {
+          createNext(index + 1);
+        });
+      };
+      createNext(0);
     },
     formatDate(date) {
       if (!date) return '';

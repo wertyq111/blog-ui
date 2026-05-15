@@ -235,6 +235,8 @@
       :platforms="platforms"
       :findPlatformName="findPlatformName"
       :mavon-external-link="mavonExternalLink"
+      :tag-list="tagList"
+      @tag-created="onTagCreated"
       @done="reload" />
   </div>
 </template>
@@ -334,11 +336,13 @@ export default {
       reportRange: [],
       reportYear: null,
       importYear: new Date(),
+      tagList: [],
     };
   },
   created() {
     this.fetchPlatforms();
     this.fetchReportModels();
+    this.fetchTags();
   },
   methods: {
     reload() {
@@ -412,6 +416,20 @@ export default {
           this.reportModelOptions = [];
           this.reportModel = "";
         });
+    },
+    fetchTags() {
+      this.$http.get('/work-daily-tag/list').then(res => {
+        if (res.data.code === 0) {
+          this.tagList = res.data.data || [];
+        }
+      }).catch(() => {
+        this.tagList = [];
+      });
+    },
+    onTagCreated(tag) {
+      if (tag && tag.id && !this.tagList.some(t => t.id === tag.id)) {
+        this.tagList.push(tag);
+      }
     },
     findPlatformName(id) {
       const targetId = Number(id);

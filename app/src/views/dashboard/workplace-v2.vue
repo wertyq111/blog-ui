@@ -210,7 +210,10 @@ export default {
       return (this.overviewData.metrics && this.overviewData.metrics.week_dist) || [];
     },
     tags() {
-      return [];
+      if (this.control.view === 'tag' && this.overviewData.tags) {
+        return this.overviewData.tags;
+      }
+      return (this.overviewData && this.overviewData.tag_ranking) || [];
     },
     lastUpdatedTime() {
       return this.overviewData.generated_at || null;
@@ -354,7 +357,7 @@ export default {
 
       // 命中本地软缓存：直接还原数据，跳过 HTTP（spec §5.5）
       if (!force && cached && Date.now() - cached.loadedAt < FIVE_MIN) {
-        if (view === "overview") {
+        if (view === "overview" || view === "tag") {
           this.overviewData = cached.data;
         } else {
           this.platformData = cached.data;
@@ -374,7 +377,7 @@ export default {
           throw new Error((res.data && res.data.msg) || "工作台统计加载失败");
         }
         const payload = res.data.data || {};
-        if (view === "overview") {
+        if (view === "overview" || view === "tag") {
           this.overviewData = payload;
         } else {
           this.platformData = payload;
