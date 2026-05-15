@@ -111,8 +111,8 @@ export default {
   display: flex;
   flex-direction: column;
   //min-height: 100%;
-  padding: 22px;
-  border-radius: 24px;
+  padding: 18px 20px;
+  border-radius: var(--wp-radius-card, 16px);
 
   &__eyebrow {
     flex-shrink: 0;

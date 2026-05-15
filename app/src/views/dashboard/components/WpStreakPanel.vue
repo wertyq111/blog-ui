@@ -83,8 +83,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px;
-  border-radius: 24px;
+  padding: 18px 20px;
+  border-radius: var(--wp-radius-card, 16px);
   height: 100%;
   box-sizing: border-box;
 

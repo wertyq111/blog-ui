@@ -1,8 +1,15 @@
 <template>
   <section class="wp-hour-chart wp-glass-card">
-    <div class="wp-hour-chart__eyebrow">24h 写作分布</div>
+    <div class="wp-hour-chart__head">
+      <div>
+        <div class="wp-hour-chart__title">24 小时时段分布</div>
+        <div class="wp-hour-chart__sub">{{ subtitle }}</div>
+      </div>
+    </div>
     <div v-if="!hasData" class="wp-hour-chart__empty">还没有写作时段数据。</div>
-    <div v-else ref="chart" class="wp-hour-chart__chart"></div>
+    <div v-else class="wp-hour-chart__body">
+      <div ref="chart" class="wp-hour-chart__chart"></div>
+    </div>
   </section>
 </template>
 
@@ -27,6 +34,23 @@ export default {
   computed: {
     hasData() {
       return Array.isArray(this.hourDist) && this.hourDist.some((v) => v > 0);
+    },
+    peakHour() {
+      if (!this.hasData) return { hour: 0, value: 0 };
+      let maxVal = 0;
+      let maxH = 0;
+      this.hourDist.forEach((v, i) => {
+        if (v > maxVal) {
+          maxVal = v;
+          maxH = i;
+        }
+      });
+      return { hour: maxH, value: maxVal };
+    },
+    subtitle() {
+      if (!this.hasData) return "";
+      const avg = Math.round(this.hourDist.reduce((s, v) => s + v, 0) / 24);
+      return `高产时段 ${String(this.peakHour.hour).padStart(2, "0")}:00 · 平均 ${avg} 字/时`;
     },
   },
   mounted() {
@@ -69,55 +93,108 @@ export default {
       if (!this.chart) return;
       const dist = this.hourDist;
       const max = Math.max(...dist, 1);
-      const hours = Array.from({ length: 24 }, (_, i) => `${i}h`);
+      const peak = this.peakHour;
+      const hours = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`);
+      const periodLabel = this.resolvePeriodLabel(peak.hour);
 
       this.chart.setOption(
         {
-          animationDuration: 300,
-          grid: { left: 0, right: 4, top: 8, bottom: 22, containLabel: true },
-          tooltip: {
-            trigger: "axis",
-            confine: true,
-            formatter(params) {
-              const p = params && params[0] ? params[0] : null;
-              if (!p) return "";
-              return `${p.axisValue}<br/>${Number(p.data || 0).toLocaleString()} 字`;
-            },
+          animationDuration: 600,
+          polar: {
+            radius: ["43%", "86%"],
           },
-          xAxis: {
+          angleAxis: {
             type: "category",
             data: hours,
+            startAngle: 90,
+            clockwise: true,
             axisTick: { show: false },
-            axisLine: { lineStyle: { color: "#d7dfd1" } },
-            axisLabel: { color: "#94a189", fontSize: 10, interval: 5 },
+            axisLine: { show: false },
+            axisLabel: {
+              fontSize: 9,
+              color: "#94a189",
+              interval: 5,
+              formatter(val) {
+                return val.replace(":00", "");
+              },
+            },
+            splitLine: { show: false },
           },
-          yAxis: {
+          radiusAxis: {
             type: "value",
             show: false,
+            max: max,
+          },
+          tooltip: {
+            trigger: "item",
+            confine: true,
+            formatter(params) {
+              if (!params || params.value === undefined) return "";
+              return `${params.name}<br/>${Number(params.value || 0).toLocaleString()} 字`;
+            },
           },
           series: [
             {
               type: "bar",
-              data: dist.map((v) => ({
+              coordinateSystem: "polar",
+              data: dist.map((v, i) => ({
                 value: v,
                 itemStyle: {
-                  color: {
-                    type: "linear",
-                    x: 0, y: 0, x2: 0, y2: 1,
-                    colorStops: [
-                      { offset: 0, color: v / max > 0.5 ? "#7bb069" : "#b5d9a8" },
-                      { offset: 1, color: "rgba(123,176,105,0.2)" },
-                    ],
-                  },
-                  borderRadius: [3, 3, 0, 0],
+                  color: i === peak.hour ? "#2e7d4c" : (i >= 14 && i <= 16) ? "#5fa979" : "#a9cdb3",
+                  opacity: v === 0 ? 0.25 : 1,
                 },
               })),
-              barMaxWidth: 12,
+              barWidth: 6,
+              roundCap: true,
+            },
+          ],
+          graphic: [
+            {
+              type: "text",
+              left: "center",
+              top: "42%",
+              style: {
+                text: String(peak.hour),
+                fontSize: 28,
+                fontWeight: 700,
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fill: "#1f2a1a",
+                textAlign: "center",
+              },
+            },
+            {
+              type: "text",
+              left: "center",
+              top: "52%",
+              style: {
+                text: "时",
+                fontSize: 12,
+                fill: "#5c6b57",
+                textAlign: "center",
+              },
+            },
+            {
+              type: "text",
+              left: "center",
+              top: "58%",
+              style: {
+                text: `${periodLabel}最有产出`,
+                fontSize: 10.5,
+                fill: "#94a189",
+                textAlign: "center",
+              },
             },
           ],
         },
         true
       );
+    },
+    resolvePeriodLabel(hour) {
+      if (hour > 5 && hour <= 11) return "早晨";
+      if (hour > 11 && hour <= 13) return "中午";
+      if (hour > 13 && hour <= 18) return "下午";
+      if (hour > 18 && hour <= 22) return "晚上";
+      return "深夜";
     },
   },
 };
@@ -127,23 +204,39 @@ export default {
 .wp-hour-chart {
   display: flex;
   flex-direction: column;
-  //min-height: 100%;
-  padding: 22px;
-  border-radius: 24px;
+  padding: 18px 20px;
+  border-radius: var(--wp-radius-card, 16px);
 
-  &__eyebrow {
-    flex-shrink: 0;
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     margin-bottom: 14px;
-    color: #6e7a69;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--wp-ink-1, #1f2a1a);
+  }
+
+  &__sub {
     font-size: 12px;
-    line-height: 1.4;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    color: var(--wp-ink-3, #94a189);
+    margin-top: 2px;
+  }
+
+  &__body {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 10px 0;
   }
 
   &__chart {
-    flex: 1;
-    min-height: 160px;
+    width: 100%;
+    min-height: 260px;
   }
 
   &__empty {
