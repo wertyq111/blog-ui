@@ -15,10 +15,10 @@
         v-for="(log, i) in recentLogs"
         :key="log.id || i"
         class="wp-logs__row"
-        @click="$emit('navigate', '/develop/work-daily?date=' + log.log_date)">
+        @click="$emit('navigate', '/develop/work-daily?date=' + resolveDate(log))">
         <div class="wp-logs__date">
-          <div class="wp-logs__date-md">{{ formatMD(log.log_date) }}</div>
-          <div class="wp-logs__date-y">{{ formatYear(log.log_date) }}</div>
+          <div class="wp-logs__date-md">{{ formatMD(resolveDate(log)) }}</div>
+          <div class="wp-logs__date-y">{{ formatYear(resolveDate(log)) }}</div>
         </div>
         <div class="wp-logs__body">
           <div class="wp-logs__row-title">{{ logTitle(log) }}</div>
@@ -71,6 +71,10 @@ export default {
     },
   },
   methods: {
+    resolveDate(log) {
+      if (!log) return null;
+      return log.log_date || (log.created_at && log.created_at.slice(0, 10)) || (log.create_time && log.create_time.slice(0, 10)) || null;
+    },
     formatMD(date) {
       if (!date) return "--";
       return String(date).slice(5, 10);
@@ -81,8 +85,9 @@ export default {
     },
     logTitle(log) {
       if (!log) return "无标题";
+      const date = this.resolveDate(log);
       const content = log.content;
-      if (!content) return `${this.formatMD(log.log_date)} 工作日志`;
+      if (!content) return `${this.formatMD(date)} 工作日志`;
       let platforms = [];
       if (typeof content === "object" && Array.isArray(content.platforms)) {
         platforms = content.platforms;
@@ -94,10 +99,10 @@ export default {
           .map((p) => p.platform_name || p.platformName)
           .filter(Boolean);
         if (names.length > 0) {
-          return `工作日报（${this.formatMD(log.log_date)}）`;
+          return `工作日报（${this.formatMD(date)}）`;
         }
       }
-      return `${this.formatMD(log.log_date)} 工作日志`;
+      return `${this.formatMD(date)} 工作日志`;
     },
     logWords(log) {
       if (!log || !log.content) return 0;

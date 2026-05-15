@@ -34,6 +34,25 @@
         type="button"
         @click="$emit('select-date', cell.date)"></button>
     </div>
+
+    <div v-if="decoratedCells.length" class="wp-heat__foot">
+      <div class="wp-heat__foot-item">
+        <div class="wp-heat__foot-label">最高单日</div>
+        <div class="wp-heat__foot-value">{{ maxDayWords.toLocaleString() }}<span>字</span></div>
+      </div>
+      <div class="wp-heat__foot-item">
+        <div class="wp-heat__foot-label">活跃天</div>
+        <div class="wp-heat__foot-value">{{ activeDays }}<span>/{{ decoratedCells.length }}</span></div>
+      </div>
+      <div class="wp-heat__foot-item">
+        <div class="wp-heat__foot-label">空白天</div>
+        <div class="wp-heat__foot-value">{{ blankDays }}<span>天</span></div>
+      </div>
+      <div class="wp-heat__foot-item">
+        <div class="wp-heat__foot-label">日均</div>
+        <div class="wp-heat__foot-value">{{ avgWords }}<span>字</span></div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -76,6 +95,21 @@ export default {
         return "最近 7 天保持高亮，其余日期保留全年底稿。";
       }
       return "点击任意一天，可直接跳到对应日期的工作日常。";
+    },
+    maxDayWords() {
+      if (!this.decoratedCells.length) return 0;
+      return Math.max(...this.decoratedCells.map((c) => c.words));
+    },
+    activeDays() {
+      return this.decoratedCells.filter((c) => c.words > 0).length;
+    },
+    blankDays() {
+      return this.decoratedCells.filter((c) => c.words === 0).length;
+    },
+    avgWords() {
+      if (!this.decoratedCells.length) return 0;
+      const total = this.decoratedCells.reduce((s, c) => s + c.words, 0);
+      return Math.round(total / this.decoratedCells.length);
     },
     decoratedCells() {
       const visibleDays = RANGE_DAYS[this.range] || 0;
@@ -192,25 +226,25 @@ export default {
   }
 
   &__legend-cell {
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
-    background: #eef4e8;
+    width: 11px;
+    height: 11px;
+    border-radius: 2.5px;
+    background: #eef4ee;
 
     &.lvl-1 {
-      background: #c8e0b5;
+      background: #d8ecdb;
     }
 
     &.lvl-2 {
-      background: #9ccc80;
+      background: #9dd3a9;
     }
 
     &.lvl-3 {
-      background: #7bb069;
+      background: #5fa979;
     }
 
     &.lvl-4 {
-      background: #4a8f2e;
+      background: #2e7d4c;
     }
   }
 
@@ -228,8 +262,8 @@ export default {
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(var(--cols), 11px);
-    grid-template-rows: repeat(7, 11px);
+    grid-template-columns: repeat(var(--cols), 13px);
+    grid-template-rows: repeat(7, 13px);
     grid-auto-flow: column;
     gap: 3px;
     justify-content: flex-start;
@@ -238,12 +272,12 @@ export default {
   }
 
   &__cell {
-    width: 11px;
-    height: 11px;
+    width: 13px;
+    height: 13px;
     padding: 0;
     border: none;
-    border-radius: 3px;
-    background: #eaf3e2;
+    border-radius: 2.5px;
+    background: #eef4ee;
     cursor: pointer;
     transition:
       transform 0.18s ease,
@@ -252,28 +286,56 @@ export default {
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 0 0 1px rgba(74, 143, 46, 0.55);
+      box-shadow: 0 0 0 1.5px #2e7d4c;
     }
 
     &.lvl-1 {
-      background: #c8e0b5;
+      background: #d8ecdb;
     }
 
     &.lvl-2 {
-      background: #9ccc80;
+      background: #9dd3a9;
     }
 
     &.lvl-3 {
-      background: #7bb069;
+      background: #5fa979;
     }
 
     &.lvl-4 {
-      background: #4a8f2e;
+      background: #2e7d4c;
     }
   }
 
   &__cell--muted {
     opacity: 0.3;
+  }
+
+  &__foot {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(214, 225, 208, 0.9);
+  }
+
+  &__foot-label {
+    font-size: 11px;
+    color: var(--wp-ink-3, #94a189);
+  }
+
+  &__foot-value {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 2px;
+    color: var(--wp-ink-1, #1f2a1a);
+
+    span {
+      font-size: 11px;
+      color: var(--wp-ink-3, #94a189);
+      margin-left: 4px;
+      font-weight: 400;
+    }
   }
 }
 
