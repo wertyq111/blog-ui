@@ -9,7 +9,10 @@
         :weather-text="weatherText"
         @go="goTo" />
 
-      <wp-control-bar :value="control" @change="handleControlChange" />
+      <wp-control-bar
+        :value="control"
+        :last-updated="lastUpdatedTime"
+        @change="handleControlChange" />
 
       <section v-if="statsError" class="wp-feedback wp-feedback--error wp-glass-card">
         <span>{{ statsError }}</span>
@@ -30,30 +33,51 @@
         <section v-if="control.view === 'overview'" class="wp-overview">
           <wp-metric-grid :items="metricCards" />
 
-          <wp-activity-heatmap
-            :cells="heatmapCells"
-            :buckets="heatmapBuckets"
-            :range="control.range"
-            @select-date="openDailyByDate" />
-
-          <section class="wp-overview-main">
-            <div class="wp-charts-col">
-              <wp-trend-line :data="trend30d" />
-              <wp-hour-chart :hour-dist="hourDist" />
-              <wp-platform-donut :platform-dist="platformDist" />
-            </div>
+          <section class="wp-heatmap-row">
+            <wp-activity-heatmap
+              :cells="heatmapCells"
+              :buckets="heatmapBuckets"
+              :range="control.range"
+              @select-date="openDailyByDate" />
             <wp-streak-panel :metrics="metrics" />
           </section>
+
+          <section class="wp-charts-row">
+            <wp-trend-line :data="trend30d" />
+            <wp-hour-chart :hour-dist="hourDist" />
+            <wp-platform-donut :platform-dist="platformDist" />
+          </section>
+
+          <section class="wp-bottom-row">
+            <wp-weekday-bar :week-dist="weekDist" />
+            <wp-tag-block :tags="tags" />
+          </section>
+
+          <wp-recent-logs
+            :recent-logs="recentLogs"
+            :total-logs="totalLogsValue"
+            :week-delta="totalLogsWeekDelta"
+            :format-date-label="formatDateLabel"
+            :get-log-preview="getLogPreview"
+            @navigate="goTo" />
         </section>
 
-        <section v-else class="wp-platform-view">
+        <section v-else-if="control.view === 'platform'" class="wp-platform-view">
           <wp-platform-rank :rank="platformRank" @open-daily="goTo('/develop/work-daily')" />
           <wp-platform-matrix :matrix="platformMatrix" />
+        </section>
+
+        <section v-else-if="control.view === 'hour'" class="wp-overview">
+          <wp-hour-chart :hour-dist="hourViewDist" />
+          <wp-weekday-bar :week-dist="weekViewDist" />
+        </section>
+
+        <section v-else class="wp-overview">
+          <wp-tag-block :tags="tags" />
         </section>
       </template>
 
       <wp-quick-access
-        :recent-logs="recentLogs"
         :recent-docs="recentDocs"
         :platforms="platforms"
         :recent-paths="recentPaths"
@@ -61,8 +85,9 @@
         :loading-map="loadingMap"
         :error-map="errorMap"
         :format-date-label="formatDateLabel"
-        :get-log-preview="getLogPreview"
         @navigate="goTo" />
+
+      <div class="wp-footer-note">保留原有能力，收进第二屏，随时跳转。</div>
     </div>
   </div>
 </template>
@@ -72,24 +97,16 @@ import WpActivityHeatmap from "./components/WpActivityHeatmap.vue";
 import WpControlBar from "./components/WpControlBar.vue";
 import WpHero from "./components/WpHero.vue";
 import WpHourChart from "./components/WpHourChart.vue";
-import WpInsightQuip from "./components/WpInsightQuip.vue";
 import WpMetricGrid from "./components/WpMetricGrid.vue";
 import WpPlatformDonut from "./components/WpPlatformDonut.vue";
 import WpPlatformMatrix from "./components/WpPlatformMatrix.vue";
 import WpPlatformRank from "./components/WpPlatformRank.vue";
 import WpQuickAccess from "./components/WpQuickAccess.vue";
+import WpRecentLogs from "./components/WpRecentLogs.vue";
 import WpStreakPanel from "./components/WpStreakPanel.vue";
+import WpTagBlock from "./components/WpTagBlock.vue";
 import WpTrendLine from "./components/WpTrendLine.vue";
-
-const BOOK_POOL = [
-  { name: "《小王子》", words: 21000 },
-  { name: "《老人与海》", words: 27000 },
-  { name: "《动物农场》", words: 30000 },
-  { name: "《哈利波特 1》", words: 77000 },
-  { name: "《三体 1》", words: 210000 },
-  { name: "《围城》", words: 220000 },
-  { name: "《红楼梦》", words: 730000 },
-];
+import WpWeekdayBar from "./components/WpWeekdayBar.vue";
 
 export default {
   name: "DashboardWorkplaceV2",
@@ -98,14 +115,16 @@ export default {
     WpControlBar,
     WpHero,
     WpHourChart,
-    WpInsightQuip,
     WpMetricGrid,
     WpPlatformDonut,
     WpPlatformMatrix,
     WpPlatformRank,
     WpQuickAccess,
+    WpRecentLogs,
     WpStreakPanel,
+    WpTagBlock,
     WpTrendLine,
+    WpWeekdayBar,
   },
   data() {
     return {
@@ -186,6 +205,29 @@ export default {
     platformDist() {
       return this.overviewData.platform_dist || [];
     },
+    weekDist() {
+      return (this.overviewData.metrics && this.overviewData.metrics.week_dist) || [];
+    },
+    tags() {
+      return [];
+    },
+    lastUpdatedTime() {
+      return this.overviewData.generated_at || null;
+    },
+    totalLogsValue() {
+      return this.metrics.total_logs && this.metrics.total_logs.value;
+    },
+    totalLogsWeekDelta() {
+      return this.metrics.total_logs && this.metrics.total_logs.delta_7d;
+    },
+    hourViewDist() {
+      const hourData = this.overviewData.hour_dist || this.hourDist;
+      return hourData;
+    },
+    weekViewDist() {
+      const weekData = this.overviewData.week_dist || this.weekDist;
+      return weekData;
+    },
     platformRank() {
       return this.platformData.rank || [];
     },
@@ -265,22 +307,6 @@ export default {
         },
       ];
     },
-    insightQuip() {
-      const totalWords = Number(this.metrics.total_words && this.metrics.total_words.value);
-      if (!totalWords) {
-        return "你的写作旅程还没开始，今天这第一笔就很关键。";
-      }
-      if (totalWords < BOOK_POOL[0].words) {
-        return `你已经写下约 ${Math.round((totalWords / BOOK_POOL[0].words) * 100)}% 一本${BOOK_POOL[0].name}。`;
-      }
-      const candidates = BOOK_POOL.filter((item) => {
-        const ratio = totalWords / item.words;
-        return ratio >= 1 && ratio <= 50;
-      });
-      const target = candidates.length ? candidates[totalWords % candidates.length] : BOOK_POOL[BOOK_POOL.length - 1];
-      const times = (totalWords / target.words).toFixed(totalWords / target.words >= 10 ? 0 : 1);
-      return `按现在的累计字数，你已经写了约 ${times} 本${target.name}。`;
-    },
   },
   created() {
     this.syncControlFromRoute();
@@ -300,8 +326,10 @@ export default {
       await Promise.all([this.loadStats(), this.loadPlatforms(), this.loadLogs(), this.loadDocs(), this.loadPaths(), this.loadModels()]);
     },
     syncControlFromRoute() {
-      const view = this.$route.query.view === "platform" ? "platform" : "overview";
-      const range = ["all", "30d", "7d"].includes(this.$route.query.range) ? this.$route.query.range : "all";
+      const validViews = ["overview", "platform", "hour", "tag"];
+      const view = validViews.includes(this.$route.query.view) ? this.$route.query.view : "overview";
+      const validRanges = ["all", "30d", "7d", "today"];
+      const range = validRanges.includes(this.$route.query.range) ? this.$route.query.range : "all";
       const next = { view, range };
       const changed = next.view !== this.control.view || next.range !== this.control.range;
       this.control = next;

@@ -185,8 +185,8 @@ export default {
   display: flex;
   flex-direction: column;
   //min-height: 100%;
-  padding: 22px;
-  border-radius: 24px;
+  padding: 18px 20px;
+  border-radius: var(--wp-radius-card, 16px);
   border: 1px solid rgba(214, 225, 208, 0.9);
   background: rgba(255, 255, 255, 0.72);
   box-shadow:

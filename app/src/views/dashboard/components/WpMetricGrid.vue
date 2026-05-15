@@ -35,8 +35,14 @@ export default {
 <style lang="scss" scoped>
 .wp-metric-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 1500px) {
+  .wp-metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1100px) {

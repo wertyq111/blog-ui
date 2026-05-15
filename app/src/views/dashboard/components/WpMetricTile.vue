@@ -121,17 +121,24 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
-  min-height: 148px;
-  padding: 22px;
-  border-radius: 24px;
+  gap: 6px;
+  min-height: 100px;
+  padding: 14px 16px;
+  border-radius: 14px;
   text-align: left;
   cursor: default;
   font-variant-numeric: tabular-nums;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px rgba(95, 169, 121, 0.12);
+  }
 }
 
 .wp-metric--accent {
-  background: linear-gradient(180deg, rgba(245, 225, 213, 0.88), rgba(255, 255, 255, 0.76));
+  background: linear-gradient(135deg, #fbeed8 0%, #f8e6c8 50%, #f4e0e3 100%) !important;
+  border-color: #f0d8a8 !important;
 }
 
 .wp-metric--interactive {
@@ -149,10 +156,11 @@ export default {
 
 .wp-metric__value {
   color: #1f2a1a;
-  font-size: 34px;
+  font-size: 30px;
   line-height: 1;
   font-weight: 700;
-  font-family: var(--wp-font-display, "Fraunces", "Source Han Serif SC", "Songti SC", serif);
+  letter-spacing: -1px;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
 }
 
 .wp-metric__value small {

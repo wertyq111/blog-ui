@@ -3,23 +3,6 @@
     <div class="wp-section-head">
     </div>
     <div class="wp-quick-grid">
-      <wp-quick-card title="最近日志" link-text="查看全部" link-target="/develop/work-daily" @navigate="$emit('navigate', $event)">
-        <div v-if="errorMap.logs" class="wp-mini-state">{{ errorMap.logs }}</div>
-        <div v-else-if="loadingMap.logs" class="wp-mini-state">日志加载中...</div>
-        <div v-else-if="!recentLogs.length" class="wp-mini-state">还没有工作日志。</div>
-        <div v-else class="wp-mini-list">
-          <button
-            v-for="item in recentLogs"
-            :key="item.id || item.logDate || item.createTime"
-            class="wp-mini-list__item"
-            type="button"
-            @click="$emit('navigate', '/develop/work-daily')">
-            <div class="wp-mini-list__title">{{ formatDateLabel(item.logDate || item.createTime) }}</div>
-            <div class="wp-mini-list__meta">{{ getLogPreview(item) }}</div>
-          </button>
-        </div>
-      </wp-quick-card>
-
       <wp-quick-card title="最近文档" link-text="查看全部" link-target="/develop/work-doc" @navigate="$emit('navigate', $event)">
         <div v-if="errorMap.docs" class="wp-mini-state">{{ errorMap.docs }}</div>
         <div v-else-if="loadingMap.docs" class="wp-mini-state">文档加载中...</div>
@@ -100,12 +83,6 @@ export default {
     WpQuickCard,
   },
   props: {
-    recentLogs: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
     recentDocs: {
       type: Array,
       default() {
@@ -146,10 +123,6 @@ export default {
       type: Function,
       required: true,
     },
-    getLogPreview: {
-      type: Function,
-      required: true,
-    },
   },
 };
 </script>
@@ -163,8 +136,8 @@ export default {
 
 .wp-quick-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .wp-mini-state {
@@ -232,7 +205,10 @@ export default {
 }
 
 @media (max-width: 1100px) {
-  .wp-quick-grid,
+  .wp-quick-grid {
+    grid-template-columns: 1fr;
+  }
+
   .wp-combo {
     grid-template-columns: 1fr;
   }

@@ -11,6 +11,10 @@
         {{ item.label }}
       </button>
     </div>
+    <div class="wp-control__spacer" />
+    <div v-if="lastUpdatedLabel" class="wp-control__group">
+      <span class="wp-control__label">最后更新 {{ lastUpdatedLabel }}</span>
+    </div>
     <div class="wp-control__group wp-control__group--range">
       <span class="wp-control__label">范围</span>
       <button
@@ -29,12 +33,15 @@
 const TABS = [
   { label: "总览", value: "overview" },
   { label: "平台", value: "platform" },
+  { label: "时段", value: "hour" },
+  { label: "标签", value: "tag" },
 ];
 
 const RANGES = [
   { label: "全部", value: "all" },
   { label: "30d", value: "30d" },
   { label: "7d", value: "7d" },
+  { label: "今日", value: "today" },
 ];
 
 export default {
@@ -49,12 +56,31 @@ export default {
         };
       },
     },
+    lastUpdated: {
+      type: [Number, String],
+      default: null,
+    },
   },
   data() {
     return {
       tabs: TABS,
       ranges: RANGES,
     };
+  },
+  computed: {
+    lastUpdatedLabel() {
+      if (!this.lastUpdated) {
+        return "";
+      }
+      const ts = typeof this.lastUpdated === "string" ? parseInt(this.lastUpdated, 10) : this.lastUpdated;
+      if (!ts || isNaN(ts)) {
+        return "";
+      }
+      const d = new Date(ts * 1000);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      return `${hh}:${mm}`;
+    },
   },
   methods: {
     update(key, nextValue) {
@@ -87,6 +113,10 @@ export default {
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+  }
+
+  &__spacer {
+    flex: 1;
   }
 
   &__group--range {
