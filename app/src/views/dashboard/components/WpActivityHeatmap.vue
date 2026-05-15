@@ -226,6 +226,13 @@ export default {
   border-radius: var(--wp-radius-card, 16px);
   height: 100%;
   box-sizing: border-box;
+  border: 1px solid rgba(214, 225, 208, 0.9);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 28px 48px -28px rgba(84, 106, 74, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 
   &__header {
     display: flex;
