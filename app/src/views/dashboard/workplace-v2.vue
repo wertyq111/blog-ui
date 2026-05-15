@@ -80,6 +80,7 @@
       <wp-quick-access
         :recent-docs="recentDocs"
         :platforms="platforms"
+        :platform-dist="platformDist"
         :recent-paths="recentPaths"
         :recent-models="recentModels"
         :loading-map="loadingMap"

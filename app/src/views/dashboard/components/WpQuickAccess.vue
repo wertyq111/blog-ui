@@ -24,10 +24,13 @@
         <div v-if="errorMap.platforms" class="wp-mini-state">{{ errorMap.platforms }}</div>
         <div v-else-if="loadingMap.platforms" class="wp-mini-state">平台加载中...</div>
         <div v-else-if="!platforms.length" class="wp-mini-state">当前没有启用的平台。</div>
-        <div v-else>
-          <div class="wp-platform-summary">{{ platforms.length }} 个启用平台</div>
-          <div class="wp-chip-list">
-            <span v-for="item in platforms" :key="item.id || item.name" class="wp-chip">{{ item.name }}</span>
+        <div v-else class="wp-platform-visual">
+          <div ref="platformChart" class="wp-platform-chart"></div>
+          <div class="wp-platform-legend">
+            <div v-for="item in pieData" :key="item.name" class="wp-platform-legend__item">
+              <span class="wp-platform-legend__dot" :style="{ background: item.color }"></span>
+              <span class="wp-platform-legend__name">{{ item.name }}</span>
+            </div>
           </div>
         </div>
       </wp-quick-card>
@@ -76,6 +79,9 @@
 
 <script>
 import WpQuickCard from "./WpQuickCard.vue";
+import echarts from "../utils/echarts";
+
+const PIE_COLORS = ["#5fa979", "#7bb069", "#9ccc80", "#c8e0b5", "#d8ecdb", "#eef4ee", "#d49b4a", "#e8c98a", "#b8d4a8"];
 
 export default {
   name: "WpQuickAccess",
@@ -90,6 +96,12 @@ export default {
       },
     },
     platforms: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    platformDist: {
       type: Array,
       default() {
         return [];
@@ -122,6 +134,69 @@ export default {
     formatDateLabel: {
       type: Function,
       required: true,
+    },
+  },
+  computed: {
+    pieData() {
+      if (this.platformDist && this.platformDist.length) {
+        return this.platformDist.map((p, i) => ({
+          name: p.name || p.platform,
+          value: p.words || p.value || 1,
+          color: PIE_COLORS[i % PIE_COLORS.length],
+        }));
+      }
+      return this.platforms.map((p, i) => ({
+        name: p.name || p,
+        value: 1,
+        color: PIE_COLORS[i % PIE_COLORS.length],
+      }));
+    },
+  },
+  watch: {
+    pieData() {
+      this.$nextTick(() => this.renderChart());
+    },
+  },
+  mounted() {
+    this.$nextTick(() => this.renderChart());
+  },
+  beforeDestroy() {
+    if (this._chart) {
+      this._chart.dispose();
+      this._chart = null;
+    }
+  },
+  methods: {
+    renderChart() {
+      const el = this.$refs.platformChart;
+      if (!el || !this.pieData.length) return;
+      if (!this._chart) {
+        this._chart = echarts.init(el);
+      }
+      this._chart.setOption({
+        tooltip: {
+          trigger: "item",
+          formatter: "{b}: {d}%",
+        },
+        series: [
+          {
+            type: "pie",
+            radius: ["40%", "75%"],
+            center: ["50%", "50%"],
+            data: this.pieData.map((d) => ({
+              name: d.name,
+              value: d.value,
+              itemStyle: { color: d.color },
+            })),
+            label: { show: false },
+            emphasis: {
+              scale: true,
+              scaleSize: 4,
+            },
+          },
+        ],
+      });
+      this._chart.resize();
     },
   },
 };
@@ -172,24 +247,46 @@ export default {
   line-height: 1.5;
 }
 
-.wp-chip-list {
+.wp-platform-visual {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 14px;
+  min-height: 130px;
 }
 
-.wp-chip {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(234, 243, 226, 0.9);
-  color: #4f5f4a;
+.wp-platform-chart {
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+}
+
+.wp-platform-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.wp-platform-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
+  color: #2f3f2a;
 }
 
-.wp-platform-summary {
-  margin-bottom: 10px;
-  color: #5f6f5a;
-  font-size: 13px;
+.wp-platform-legend__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wp-platform-legend__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .wp-combo {
