@@ -2,7 +2,7 @@
   <section class="wp-logs wp-glass-card">
     <div class="wp-logs__head">
       <div>
-        <div class="wp-logs__title">最近日志</div>
+        <div class="wp-logs__title">工作日常</div>
         <div class="wp-logs__sub">
           共 {{ totalLogs || 0 }} 条<span v-if="weekDelta"> · 本周 +{{ weekDelta }}</span>
         </div>
@@ -122,7 +122,13 @@ export default {
       return total;
     },
     logTags(log) {
-      if (!log || !log.content) return [];
+      if (!log) return [];
+      // 优先使用后端返回的真实标签
+      if (Array.isArray(log.tags) && log.tags.length) {
+        return log.tags.slice(0, 3);
+      }
+      // fallback: 从 content 中提取平台名
+      if (!log.content) return [];
       let platforms = [];
       const content = log.content;
       if (typeof content === "object" && Array.isArray(content.platforms)) {

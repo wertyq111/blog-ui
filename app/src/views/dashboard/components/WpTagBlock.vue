@@ -7,7 +7,7 @@
       </div>
     </div>
     <div v-if="!tags.length" class="wp-tag-block__empty">
-      标签系统建设中，敬请期待。
+      暂无标签数据，在工作日常中添加标签后此处会显示 Top 10。
     </div>
     <div v-else class="wp-tag-block__list">
       <div v-for="(t, i) in tags" :key="t.name" class="wp-tag-block__row">
