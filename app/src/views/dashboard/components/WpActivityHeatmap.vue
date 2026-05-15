@@ -2,37 +2,55 @@
   <section class="wp-heat">
     <div class="wp-heat__header">
       <div>
-        <div class="wp-heat__eyebrow">365 天活跃热力图</div>
+        <div class="wp-heat__title">365 天活跃热力图</div>
         <div class="wp-heat__sub">{{ subText }}</div>
       </div>
       <div class="wp-heat__legend">
-        <span>少</span>
-        <span
-          v-for="level in 5"
-          :key="level"
-          :class="['wp-heat__legend-cell', 'lvl-' + (level - 1)]"></span>
-        <span>多</span>
+        <span class="wp-heat__legend-label">少</span>
+        <span v-for="l in 5" :key="l" class="wp-heat__legend-cell" :class="'lvl-' + (l - 1)"></span>
+        <span class="wp-heat__legend-label">多</span>
       </div>
     </div>
 
     <div v-if="!decoratedCells.length" class="wp-heat__empty">
       还没有写作活跃数据，先去写今天第一条日志。
     </div>
-    <div
-      v-else
-      class="wp-heat__grid"
-      :style="{ '--cols': cols }">
-      <button
-        v-for="cell in decoratedCells"
-        :key="cell.date"
-        :class="[
-          'wp-heat__cell',
-          'lvl-' + cell.level,
-          { 'wp-heat__cell--muted': cell.muted },
-        ]"
-        :title="cell.title"
-        type="button"
-        @click="$emit('select-date', cell.date)"></button>
+    <div v-else class="wp-heat__body">
+      <svg :width="svgWidth" :height="svgHeight" class="wp-heat__svg">
+        <!-- month labels -->
+        <text
+          v-for="m in monthLabels"
+          :key="'m' + m.wi"
+          :x="m.wi * (cellSize + cellGap)"
+          y="10"
+          class="wp-heat__month">{{ m.label }}</text>
+        <g transform="translate(0, 16)">
+          <rect
+            v-for="cell in svgCells"
+            :key="cell.date"
+            :x="cell.x"
+            :y="cell.y"
+            :width="cellSize"
+            :height="cellSize"
+            :rx="2.5"
+            :fill="levelFill(cell.level)"
+            :stroke="hoverDate === cell.date ? '#2e7d4c' : 'transparent'"
+            :stroke-width="hoverDate === cell.date ? 1.5 : 0"
+            :opacity="cell.muted ? 0.3 : 1"
+            style="cursor: pointer"
+            @mouseenter="onCellEnter(cell)"
+            @mouseleave="hoverDate = null"
+            @click="$emit('select-date', cell.date)" />
+        </g>
+      </svg>
+      <!-- hover tooltip -->
+      <div
+        v-if="hoverCell"
+        class="wp-heat__tip"
+        :style="{ left: hoverCell.tipX + 'px', top: hoverCell.tipY + 'px' }">
+        <div class="wp-heat__tip-date">{{ hoverCell.date }}</div>
+        <div class="wp-heat__tip-val">{{ hoverCell.words > 0 ? hoverCell.words.toLocaleString() + ' 字' : '没写' }}</div>
+      </div>
     </div>
 
     <div v-if="decoratedCells.length" class="wp-heat__foot">
@@ -57,44 +75,99 @@
 </template>
 
 <script>
-const RANGE_DAYS = {
-  all: 0,
-  "30d": 30,
-  "7d": 7,
-};
+const RANGE_DAYS = { all: 0, "30d": 30, "7d": 7 };
+const LEVEL_FILLS = ["#eef4ee", "#d8ecdb", "#9dd3a9", "#5fa979", "#2e7d4c"];
 
 export default {
   name: "WpActivityHeatmap",
   props: {
-    cells: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    buckets: {
-      type: Array,
-      default() {
-        return [0, 200, 800, 2000];
-      },
-    },
-    range: {
-      type: String,
-      default: "all",
-    },
+    cells: { type: Array, default: () => [] },
+    buckets: { type: Array, default: () => [0, 200, 800, 2000] },
+    range: { type: String, default: "all" },
+  },
+  data() {
+    return {
+      hoverDate: null,
+      hoverCell: null,
+      cellSize: 13,
+      cellGap: 3,
+    };
   },
   computed: {
-    cols() {
-      return Math.max(1, Math.ceil(this.decoratedCells.length / 7));
+    decoratedCells() {
+      const visibleDays = RANGE_DAYS[this.range] || 0;
+      const cutoff = visibleDays ? this.resolveDateOffset(visibleDays - 1) : "";
+      return (this.cells || []).map((cell) => {
+        const words = Number(cell && cell.words ? cell.words : 0);
+        return {
+          date: cell.date,
+          words,
+          dow: cell.dow != null ? cell.dow : new Date(cell.date + "T00:00:00").getDay(),
+          level: this.resolveLevel(words),
+          muted: cutoff ? cell.date < cutoff : false,
+        };
+      });
+    },
+    weeks() {
+      const weeks = [];
+      let current = [];
+      if (this.decoratedCells.length) {
+        const firstDow = this.decoratedCells[0].dow;
+        for (let i = 0; i < firstDow; i++) current.push(null);
+      }
+      this.decoratedCells.forEach((d) => {
+        current.push(d);
+        if (current.length === 7) {
+          weeks.push(current);
+          current = [];
+        }
+      });
+      if (current.length) {
+        while (current.length < 7) current.push(null);
+        weeks.push(current);
+      }
+      return weeks;
+    },
+    svgCells() {
+      const cs = this.cellSize;
+      const gap = this.cellGap;
+      const result = [];
+      this.weeks.forEach((w, wi) => {
+        w.forEach((d, di) => {
+          if (!d) return;
+          result.push({
+            ...d,
+            x: wi * (cs + gap),
+            y: di * (cs + gap),
+          });
+        });
+      });
+      return result;
+    },
+    monthLabels() {
+      const labels = [];
+      let lastMonth = -1;
+      this.weeks.forEach((w, wi) => {
+        const first = w.find((d) => d);
+        if (!first) return;
+        const m = parseInt(first.date.slice(5, 7), 10);
+        if (m !== lastMonth) {
+          labels.push({ wi, label: m + "月" });
+          lastMonth = m;
+        }
+      });
+      return labels;
+    },
+    svgWidth() {
+      return this.weeks.length * (this.cellSize + this.cellGap);
+    },
+    svgHeight() {
+      return 7 * (this.cellSize + this.cellGap) + 18;
     },
     subText() {
-      if (this.range === "30d") {
-        return "最近 30 天保持高亮，其余日期保留全年底稿。";
-      }
-      if (this.range === "7d") {
-        return "最近 7 天保持高亮，其余日期保留全年底稿。";
-      }
-      return "点击任意一天，可直接跳到对应日期的工作日常。";
+      if (this.range === "30d") return "最近 30 天保持高亮，其余日期保留全年底稿。";
+      if (this.range === "7d") return "最近 7 天保持高亮，其余日期保留全年底稿。";
+      return "点击任意一天，跳转到对应日期的工作日常 · hover 查看详情";
     },
     maxDayWords() {
       if (!this.decoratedCells.length) return 0;
@@ -111,70 +184,35 @@ export default {
       const total = this.decoratedCells.reduce((s, c) => s + c.words, 0);
       return Math.round(total / this.decoratedCells.length);
     },
-    decoratedCells() {
-      const visibleDays = RANGE_DAYS[this.range] || 0;
-      const cutoff = visibleDays
-        ? this.resolveDateOffset(visibleDays - 1)
-        : "";
-
-      return (this.cells || []).map((cell) => {
-        const words = Number(cell && cell.words ? cell.words : 0);
-        return {
-          date: cell.date,
-          words,
-          logs: Number(cell && cell.logs ? cell.logs : 0),
-          level: this.resolveLevel(words),
-          muted: cutoff ? cell.date < cutoff : false,
-          title: this.buildTitle(cell),
-        };
-      });
-    },
   },
   methods: {
+    levelFill(l) {
+      return LEVEL_FILLS[l] || LEVEL_FILLS[0];
+    },
     resolveLevel(words) {
       const marks = Array.isArray(this.buckets) ? this.buckets.slice(1) : [];
-      if (!words) {
-        return 0;
-      }
-      if (!marks.length) {
-        return 1;
-      }
+      if (!words) return 0;
+      if (!marks.length) return 1;
       let level = 1;
-      marks.forEach((mark, index) => {
-        if (words > Number(mark || 0)) {
-          level = Math.min(4, index + 2);
-        }
+      marks.forEach((mark, i) => {
+        if (words > Number(mark || 0)) level = Math.min(4, i + 2);
       });
       return level;
     },
-    buildTitle(cell) {
-      const label = this.formatWeekday(cell.date);
-      const words = Number(cell && cell.words ? cell.words : 0);
-      const logs = Number(cell && cell.logs ? cell.logs : 0);
-      if (!words && !logs) {
-        return `${cell.date} ${label} · 没写`;
-      }
-      return `${cell.date} ${label} · 写了 ${this.formatNumber(words)} 字 · ${logs} 条日志`;
-    },
-    formatWeekday(value) {
-      if (!value) {
-        return "";
-      }
-      const date = new Date(`${value}T00:00:00`);
-      const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-      return weekdays[date.getDay()];
-    },
-    formatNumber(value) {
-      return Number(value || 0).toLocaleString();
-    },
     resolveDateOffset(offset) {
-      const date = new Date();
-      date.setHours(0, 0, 0, 0);
-      date.setDate(date.getDate() - offset);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - offset);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    },
+    onCellEnter(cell) {
+      this.hoverDate = cell.date;
+      this.hoverCell = {
+        date: cell.date,
+        words: cell.words,
+        tipX: cell.x + this.cellSize / 2,
+        tipY: cell.y + 16 + this.cellSize + 6,
+      };
     },
   },
 };
@@ -182,36 +220,31 @@ export default {
 
 <style lang="scss" scoped>
 .wp-heat {
-  //min-height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 18px 20px;
   border-radius: var(--wp-radius-card, 16px);
-  border: 1px solid rgba(214, 225, 208, 0.9);
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow:
-    0 24px 40px -30px rgba(84, 106, 74, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px) saturate(150%);
+  height: 100%;
+  box-sizing: border-box;
 
   &__header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
 
-  &__eyebrow {
-    font-size: 12px;
-    line-height: 1.4;
-    color: #6e7a69;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--wp-ink-1, #1f2a1a);
   }
 
   &__sub {
-    margin-top: 6px;
-    color: #7e8a79;
-    font-size: 13px;
+    margin-top: 2px;
+    color: var(--wp-ink-3, #94a189);
+    font-size: 12px;
     line-height: 1.6;
   }
 
@@ -219,10 +252,13 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #92a08b;
-    font-size: 12px;
-    line-height: 1.4;
     white-space: nowrap;
+  }
+
+  &__legend-label {
+    margin: 0 4px;
+    font-size: 11px;
+    color: var(--wp-ink-3, #94a189);
   }
 
   &__legend-cell {
@@ -231,24 +267,14 @@ export default {
     border-radius: 2.5px;
     background: #eef4ee;
 
-    &.lvl-1 {
-      background: #d8ecdb;
-    }
-
-    &.lvl-2 {
-      background: #9dd3a9;
-    }
-
-    &.lvl-3 {
-      background: #5fa979;
-    }
-
-    &.lvl-4 {
-      background: #2e7d4c;
-    }
+    &.lvl-1 { background: #d8ecdb; }
+    &.lvl-2 { background: #9dd3a9; }
+    &.lvl-3 { background: #5fa979; }
+    &.lvl-4 { background: #2e7d4c; }
   }
 
   &__empty {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -260,54 +286,54 @@ export default {
     text-align: center;
   }
 
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(var(--cols), 13px);
-    grid-template-rows: repeat(7, 13px);
-    grid-auto-flow: column;
-    gap: 3px;
-    justify-content: flex-start;
+  &__body {
+    position: relative;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding: 4px 0;
+    flex: 1;
   }
 
-  &__cell {
-    width: 13px;
-    height: 13px;
-    padding: 0;
-    border: none;
-    border-radius: 2.5px;
-    background: #eef4ee;
-    cursor: pointer;
-    transition:
-      transform 0.18s ease,
-      box-shadow 0.18s ease,
-      opacity 0.18s ease;
+  &__svg {
+    display: block;
+  }
 
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 0 1.5px #2e7d4c;
-    }
+  &__month {
+    fill: var(--wp-ink-3, #94a189);
+    font-size: 9.5px;
+  }
 
-    &.lvl-1 {
-      background: #d8ecdb;
-    }
+  &__tip {
+    position: absolute;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(30, 40, 26, 0.88);
+    color: #fff;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateX(-50%);
+    z-index: 10;
 
-    &.lvl-2 {
-      background: #9dd3a9;
-    }
-
-    &.lvl-3 {
-      background: #5fa979;
-    }
-
-    &.lvl-4 {
-      background: #2e7d4c;
+    &::before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 4px solid rgba(30, 40, 26, 0.88);
     }
   }
 
-  &__cell--muted {
-    opacity: 0.3;
+  &__tip-date {
+    opacity: 0.7;
+    font-size: 10px;
+  }
+
+  &__tip-val {
+    font-weight: 600;
+    margin-top: 1px;
   }
 
   &__foot {
