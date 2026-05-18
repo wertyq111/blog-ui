@@ -9,7 +9,7 @@
       </div>
       <a class="wp-logs__link" @click.prevent="$emit('navigate', '/develop/work-daily')">查看全部 →</a>
     </div>
-    <div v-if="!recentLogs.length" class="wp-logs__empty">暂无日志记录。</div>
+    <div v-if="!recentLogs.length" class="wp-logs__empty">暂无日常记录。</div>
     <div v-else class="wp-logs__list">
       <div
         v-for="(log, i) in recentLogs"
@@ -66,7 +66,7 @@ export default {
     getLogPreview: {
       type: Function,
       default() {
-        return () => "暂无日志摘要";
+        return () => "暂无日常摘要";
       },
     },
   },
@@ -86,8 +86,8 @@ export default {
     logTitle(log) {
       if (!log) return "无标题";
       const date = this.resolveDate(log);
-      const content = log.content;
-      if (!content) return `${this.formatMD(date)} 工作日志`;
+      const content = log.platformsName;
+      if (!content) return `${this.formatMD(date)} 工作日常`;
       let platforms = [];
       if (typeof content === "object" && Array.isArray(content.platforms)) {
         platforms = content.platforms;
@@ -102,7 +102,7 @@ export default {
           return `工作日报（${this.formatMD(date)}）`;
         }
       }
-      return `${this.formatMD(date)} 工作日志`;
+      return `${this.formatMD(date)} 工作日常`;
     },
     logWords(log) {
       if (!log || !log.content) return 0;

@@ -417,7 +417,7 @@ export default {
         this.recentLogs = this.extractCollection(res).slice(0, 5);
       } catch (error) {
         this.recentLogs = [];
-        this.setError("logs", this.resolveErrorMessage(error, "工作日志加载失败"));
+        this.setError("logs", this.resolveErrorMessage(error, "工作日常加载失败"));
       } finally {
         this.setLoading("logs", false);
       }
