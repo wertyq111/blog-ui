@@ -3,3 +3,6 @@
 # CodeGraph (local code index, do not commit)
 .cgcignore
 .codegraph/
+
+# Env files (secrets, do not commit)
+.env
