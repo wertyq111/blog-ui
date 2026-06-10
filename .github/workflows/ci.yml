@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# blog-ui 处于维护模式（主力前端为 blog-ui-vue3）；本 CI 仅校验仍可正常构建。
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      # Vue CLI 4 + webpack 4 需 Node 16（Node 17+ 的 OpenSSL3 会触发 ERR_OSSL_EVP_UNSUPPORTED）
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
