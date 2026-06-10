@@ -1,5 +1,6 @@
 {
-  "name": "vwms",
+  "name": "blog-ui",
+  "description": "个人博客 Vue 2 管理后台前端（维护模式，新功能在 blog-ui-vue3 开发）",
   "version": "1.1.0",
   "private": true,
   "scripts": {
