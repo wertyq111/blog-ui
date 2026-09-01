@@ -110,7 +110,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import MemberLevelEdit from './memberlevel-edit.vue';
+import MemberLevelEdit from './member-level-edit.vue';
 
 export default {
   name: 'MemberLevel',
