@@ -236,7 +236,7 @@ export default {
         type: 'warning'
       }).then(() => {
         const loading = this.$loading({lock: true});
-        this.$http.delete('/member-level/batchDelete', {params:{id: this.selection.map(d => d.id)}}).then(res => {
+        this.$http.post('/member-level/delete', {id: this.selection.map(d => d.id)}).then(res => {
           loading.close();
           if (res.data.code === 0) {
             this.$message.success(res.data.msg);
